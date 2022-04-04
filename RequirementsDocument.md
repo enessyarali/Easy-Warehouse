@@ -51,31 +51,27 @@ EZWH (EaSy WareHouse) is a software application to support the management of a w
 | Stakeholder category | Subcategory |Name  | Description | 
 | -----|-----|------- |:-----------:|
 | COMPANY ||| Commercial business employing the EZWH application|
-	||CEO||Chief Executive Officer, buys the software to manage the company warehouse|
-	||IT Department||Department in charge of establishing, monitoring and maintaining IT systems and services|
-		|||IT administrator|Manages the software and its functionalities|
-		|||Security manager|Assesses and possibly enhances policies to protect confidential information|
-		|||DB administrator|Manages the interaction with the company database|
-	||Warehouse (WH)||Building storing manufactured goods prior to their distribution| 
-		|||Warehouse worker|Works *inside* the warehouse, directly interacts with items|
-		|||Warehouse manager| Supervises the availability of items in the warehouse|
-		|||Quality officer| Is responsible for testing items quality|
-	||Organizational Unit (OU)||Part of the company focused on a particular task|
-		|||Unit supervisor|Manages the OU requests for items in the warehouse|
-	||Financial Department||Unit responsible for handling company funds|
-	||Database || Pre-existing database, keeping track of the warehouse content|
-
+||CEO||Chief Executive Officer, buys the software to manage the company warehouse|
+||IT Department||Department in charge of establishing, monitoring and maintaining IT systems and services|
+|||IT administrator|Manages the software and its functionalities|
+|||Security manager|Assesses and possibly enhances policies to protect confidential information|
+|||DB administrator|Manages the interaction with the company database|
+||Warehouse (WH)||Building storing manufactured goods prior to their distribution| 
+|||Warehouse worker|Works *inside* the warehouse, directly interacts with items|
+|||Warehouse manager| Supervises the availability of items in the warehouse|
+|||Quality officer| Is responsible for testing items quality|
+||Organizational Unit (OU)||Part of the company focused on a particular task|
+|||Unit supervisor|Manages the OU requests for items in the warehouse|
+||Financial Department||Unit responsible for handling company funds|
+||Database || Pre-existing database, keeping track of the warehouse content|
 |SOFTWARE HOUSE|||Company in charge of designing and developing the EZWH application|
-	||CEO||Chief Executive Officer, responsible for taking managerial decision|
-	|||Project manager|-----|
-	|||Developer|-----|
-	|||Analyst|-----|
-	|||Tester|-----|
-
+||CEO||Chief Executive Officer, responsible for taking managerial decision|
+|||Project manager|-----|
+|||Developer|-----|
+|||Analyst|-----|
+|||Tester|-----|
 |COMPETITOR|||Software already on the market offering the same or similar services as EZWH|
-
 |SUPPLIER|||Organization providing items to the company|
-
 |COURIER|||Company transporting commercial packages and documents|
 
 
