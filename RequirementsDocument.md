@@ -3,12 +3,12 @@
 
 Date: 22 march 2022
 
-Version: 0.0
+Version: 1.1
 
  
 | Version number | Change |
 | ----------------- |:-----------|
-| | | 
+| 1.1 |  | 
 
 
 # Contents
@@ -48,9 +48,37 @@ EZWH (EaSy WareHouse) is a software application to support the management of a w
 # Stakeholders
 
 
-| Stakeholder name  | Description | 
-| ----------------- |:-----------:|
-|   Stakeholder x..     |             | 
+| Stakeholder category | Subcategory |Name  | Description | 
+| -----|-----|------- |:-----------:|
+| COMPANY ||| Commercial business employing the EZWH application|
+	||CEO||Chief Executive Officer, buys the software to manage the company warehouse|
+	||IT Department||Department in charge of establishing, monitoring and maintaining IT systems and services|
+		|||IT administrator|Manages the software and its functionalities|
+		|||Security manager|Assesses and possibly enhances policies to protect confidential information|
+		|||DB administrator|Manages the interaction with the company database|
+	||Warehouse (WH)||Building storing manufactured goods prior to their distribution| 
+		|||Warehouse worker|Works *inside* the warehouse, directly interacts with items|
+		|||Warehouse manager| Supervises the availability of items in the warehouse|
+		|||Quality officer| Is responsible for testing items quality|
+	||Organizational Unit (OU)||Part of the company focused on a particular task|
+		|||Unit supervisor|Manages the OU requests for items in the warehouse|
+	||Financial Department||Unit responsible for handling company funds|
+	||Database || Pre-existing database, keeping track of the warehouse content|
+
+|SOFTWARE HOUSE|||Company in charge of designing and developing the EZWH application|
+	||CEO||Chief Executive Officer, responsible for taking managerial decision|
+	|||Project manager|-----|
+	|||Developer|-----|
+	|||Analyst|-----|
+	|||Tester|-----|
+
+|COMPETITOR|||Software already on the market offering the same or similar services as EZWH|
+
+|SUPPLIER|||Organization providing items to the company|
+
+|COURIER|||Company transporting commercial packages and documents|
+
+
 
 # Context Diagram and interfaces
 
@@ -60,13 +88,16 @@ EZWH (EaSy WareHouse) is a software application to support the management of a w
 \<actors are a subset of stakeholders>
 
 ## Interfaces
-\<describe here each interface in the context diagram>
-
-\<GUIs will be described graphically in a separate document>
 
 | Actor | Logical Interface | Physical Interface  |
-| ------------- |:-------------:| -----:|
-|   Actor x..     |  |  |
+|-------|-------------------|---------------------|
+|Warehouse manager |Landscape desktop GUI |Screen, keyboard, mouse |
+|Unit supervisor |Landscape desktop GUI |Screen, keyboard, mouse |
+|IT administrator |Landscape desktop GUI, command line interface |Screen, keyboard, mouse |
+|Quality officer |Landscape desktop GUI |Screen, keyboard, mouse |
+|Warehouse worker |Landscape desktop GUI |Tablet |
+|Database |APIs| Internet Connection |
+
 
 # Stories and personas
 \<A Persona is a realistic impersonation of an actor. Define here a few personas and describe in plain text how a persona interacts with the system>
