@@ -49,7 +49,7 @@ EZWH (EaSy WareHouse) is a software application to support the management of a w
 
 
 | Stakeholder category | Subcategory |Name  | Description | 
-| -----|-----|------- |:-----------:|
+| -----|-----|------- |-----------|
 | COMPANY ||| Commercial business employing the EZWH application|
 ||CEO||Chief Executive Officer, buys the software to manage the company warehouse|
 ||IT Department||Department in charge of establishing, monitoring and maintaining IT systems and services|
