@@ -79,7 +79,8 @@ EZWH (EaSy WareHouse) is a software application to support the management of a w
 
 # Context Diagram and interfaces
 
-![Context diagram](Context-diagram-1.png "Context diagram")
+## Context diagram
+![Context diagram](Context-diagram.jpg "Context diagram")
 
 ## Interfaces
 
@@ -148,12 +149,15 @@ EZWH (EaSy WareHouse) is a software application to support the management of a w
 
 \<Describe constraints on functional requirements>
 
-| ID        | Type (efficiency, reliability, ..)           | Description  | Refers to |
-| ------------- |:-------------:| :-----:| -----:|
-|  NFR1     |   |  | |
-|  NFR2     | |  | |
-|  NFR3     | | | |
-| NFRx .. | | | | 
+| ID        | Type     | Description  | Refers to |
+| ------------- |-------------| -----| -----|
+|NF1 |Usability | Basic users shall be able to use all functions after 1 hour training ||
+|NF2 |Usability | Advanced users shall be able to use all functions after 3 hours training ||
+|NF3 |Performance |Database should be queried in less than 1 second |F2.4|
+|NF4 |Performance |All operations (no database-related) should be completed in less than 0.5 seconds ||
+|NF5 |Space |Desktop application should occupy less than 500 MB||
+|NF6 |Portability |Desktop application should be compatible with all main OSs ||
+|NF7 |Privacy |Company data should be protected from external attacks||
 
 
 # Use case diagram and use cases
