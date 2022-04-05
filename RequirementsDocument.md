@@ -1,14 +1,15 @@
 
  #Requirements Document 
 
-Date: 22 march 2022
+Date: 05 April 2022
 
-Version: 1.1
+Version: 1.2
 
  
 | Version number | Change |
 | ----------------- |:-----------|
-| 1.1 |  | 
+| 1.1 | -- |
+| 1.2 | Added functional requirements to manage catalogue and suppliers list |
 
 
 # Contents
@@ -65,7 +66,7 @@ EZWH (EaSy WareHouse) is a software application to support the management of a w
 ||Financial Department||Unit responsible for handling company funds|
 ||Database || Pre-existing database, keeping track of the warehouse content|
 |SOFTWARE HOUSE|||Company in charge of designing and developing the EZWH application|
-||CEO||Chief Executive Officer, responsible for taking managerial decision|
+||CEO||Chief Executive Officer, is responsible for taking managerial decision|
 |||Project manager|Plans and executes the EZWH project|
 |||Developer|Writes, debugs and executes the software source code|
 |||Analyst|Defines requirements for the application|
@@ -78,10 +79,7 @@ EZWH (EaSy WareHouse) is a software application to support the management of a w
 
 # Context Diagram and interfaces
 
-## Context Diagram
-\<Define here Context diagram using UML use case diagram>
-
-\<actors are a subset of stakeholders>
+![Context diagram](Context-diagram-1.png "Context diagram")
 
 ## Interfaces
 
@@ -107,15 +105,44 @@ EZWH (EaSy WareHouse) is a software application to support the management of a w
 
 ## Functional Requirements
 
-\<In the form DO SOMETHING, or VERB NOUN, describe high level capabilities of the system>
-
-\<they match to high level use cases>
-
-| ID        | Description  |
-| ------------- |:-------------:| 
-|  FR1     |  |
-|  FR2     |   |
-| FRx..  | | 
+| Lev.1 ID | Lev.2 ID | Lev.3 ID   | Description  | Profile |
+| ------|---|---- |-------|------| 
+|F1 |||Handle orders||
+||F1.1 ||Pick item(s) and quantity | Warehouse manager / Unit supervisor |
+||F1.2 ||Keep order status (issued-processed-completed-deleted-aborted)||
+||F1.3 ||Keep orders history||
+||F1.4 ||Delete order||
+||F1.5 ||Issue an external order to supplier | Warehouse manager |
+|||F1.5.1 |Keep and inspect supplier list for each item descriptor||
+|||F1.5.2 |Choose and notify supplier(s) -> order status = issued ||
+|||F1.5.3 |Notify Financial Deptartment||
+||F1.6 ||Issue an internal order from OU | Unit supervisor|
+|||F1.6.1 |Notify wh workers -> order status = issued OR deleted |Unit supervisor| 
+|||F1.6.2 |Notify unit supervisor -> order status = processed |Warehouse worker| 
+|F2 |||Monitor and modify warehouse content||
+||F2.1 ||Notify short supply |Warehouse manager|
+||F2.2 ||Add item||
+||F2.3 ||Remove item||
+||F2.4 ||See details about warehouse content |Warehouse worker|
+||F2.5 ||Track item position in warehouse |Warehouse worker|
+||F2.6 ||Track available space||
+||F2.7 ||See details about warehouse catalogue |unit supervisor|
+|F3||| Manage users||
+||F3.1||Log in||
+||F3.2 ||Log out||
+||F3.3 ||Add/Remove users |IT administrator|
+|F4 |||Insert quality check information|Quality officer|
+||F4.1 ||Specify if quality check was done or not||
+||F4.2 ||Keep track of quality check result||
+||F4.3 || Notify if item has to be rejected ||
+|F5 |||Modify catalogue|Warehouse manager|
+||F5.1 ||Add item descriptor||
+||F5.2 ||Remove item descriptor||
+||F5.3 ||Add supplier for item descriptor||
+||F5.4 ||Remove supplier for item descriptor||
+|F6 |||Modify supplier list|Warehouse manager|
+||F6.1 ||Add supplier||
+||F6.2 ||Remove supplier||
 
 ## Non Functional Requirements
 
