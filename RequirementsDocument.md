@@ -176,7 +176,7 @@ EZWH (EaSy WareHouse) is a software application to support the management of a w
 |  Exception     | Wrong Password |
 |  Exception     | User Does Not Exist |
 
-##### Scenario 1.1 - Successful Login
+#### Scenario 1.1 - Successful Login
 
 User succeed in logging in
 
@@ -189,7 +189,7 @@ User succeed in logging in
 |  2     | Application asks for ID and password |
 |  3     | User enters ID and password |
 
-##### Scenario 1.2 - Wrong Password
+#### Scenario 1.2 - Wrong Password
 
 User enter the wrong password
 
@@ -202,7 +202,7 @@ User enter the wrong password
 |  2     | Application asks for ID and password |
 |  3     | User enters wrong password |
 
-##### Scenario 1.3 - User Does Not Exist
+#### Scenario 1.3 - User Does Not Exist
 
 User enter the wrong ID
 
@@ -226,7 +226,7 @@ User enter the wrong ID
 |  Variant     | Successful order from more suppliers |
 |  Exception     | Warehouse is out of physical space |
 
-##### Scenario 2.1 - Successful order from 1 supplier
+#### Scenario 2.1 - Successful order from 1 supplier
 
 An order to one supplier is issued successfully
 
@@ -242,7 +242,7 @@ An order to one supplier is issued successfully
 |  4     | Warehouse has enough space to store new items |
 |  5     | Financial Department and supplier are (externally) notified |
 
-##### Scenario 2.2 - Successful order from more suppliers
+#### Scenario 2.2 - Successful order from more suppliers
 
 An order to more than one supplier is issued successfully
 
@@ -259,7 +259,7 @@ An order to more than one supplier is issued successfully
 |  4     | Warehouse has enough space to store new items |
 |  5     | Financial Department and supplier are (externally) notified |
 
-##### Scenario 2.3 - Warehouse is out of physical space
+#### Scenario 2.3 - Warehouse is out of physical space
 
 Warehouse is full and is not possible to add new items
 
@@ -276,7 +276,7 @@ Warehouse is full and is not possible to add new items
 
 ### Use case 3, UC3 - Issue an internal order from Organisational Unit
 
-| Actors Involved        | Unit Supervisor, Worker, Database, Manager |
+| Actors Involved        | Unit Supervisor, Warehouse Worker, Database, Manager |
 | ------------- |-------------| 
 |  Precondition     | Unit Supervisor is authenticated |
 |  Post condition     | Order is completed / aborted |
@@ -284,7 +284,7 @@ Warehouse is full and is not possible to add new items
 |  Variant     | Number of items goes under threshold after the order |
 |  Exception     | Not enough items |
 
-##### Scenario 3.1 - Successful internal order
+#### Scenario 3.1 - Successful internal order
 
 An order to warehouse from an Organisational Unit is issued successfully
 
@@ -309,7 +309,7 @@ An order to warehouse from an Organisational Unit is issued successfully
 |  12    | Item quantities are updated |
 |  13    | Item quantities are not below the short supply threshold |
 
-##### Scenario 3.2 - Number of items goes under threshold after the order
+#### Scenario 3.2 - Number of items goes under threshold after the order
 
 An order to warehouse from an Organisational Unit is issued successfully, after it the number of items goes below a threshold
 
@@ -336,7 +336,7 @@ An order to warehouse from an Organisational Unit is issued successfully, after 
 | 14 | Warehouse Manager is notified |
 || Repeat 14 for each item whose quantity is below the threshold |
 
-##### Scenario 3.3 - Not enough items
+#### Scenario 3.3 - Not enough items
 
 There is not enough of the requested items inside the warehouse 
 
@@ -352,6 +352,148 @@ There is not enough of the requested items inside the warehouse
 || Repeat 2 and 3 for each item the unit supervisor wants to order |
 |  4     | Warehouse does not contains all ordered items |
 | 5 | Unit Supervisor is notified |
+
+### Use case 4, UC4 - Delete an order
+
+| Actors Involved        | Manager, Unit Supervisor, Warehouse Worker, Database, IT Administrator |
+| ------------- |-------------| 
+|  Precondition     | Unit Supervisor / Warehouse Manager is authenticated |
+|  Post condition     | Order is / is not deleted |
+|  Nominal Scenario     | Successful deletion (external) |
+|  Nominal Scenario     | Successful deletion (internal) |
+|  Exception     | Order already processed |
+|  Exception | System error |
+
+#### Scenario 4.1 - Successful deletion of external order
+
+An order is successfully deleted by the Warehouse Manager	
+
+| Scenario 4.1 - Successful deletion of external order | |
+| ------------- |-------------| 
+|  Precondition     | Warehouse manager is authenticated |
+|  Post condition     | Order is deleted from the Database (order status: Deleted)|
+| Step#        | Description  |
+|  1     | Warehouse manager checks the order list |  
+|  2     | Warehouse manager deletes the order |
+|  3     | Supplier is notified about the deleted order |
+
+#### Scenario 4.2 - Successful deletion of internal order
+
+An order is successfully deleted by the Unit Supervisor	
+
+| Scenario 4.2 - Successful deletion of internal order | |
+| ------------- |-------------| 
+|  Precondition     | Unit Supervisor is authenticated |
+|  Post condition     | Order is deleted from the Database (order status: Deleted)|
+| Step#        | Description  |
+|  1     | Unit Supervisorr checks the order list |  
+|  2     | Unit Supervisor deletes the order |
+|  3     | Warehouse Worker is notified about the deleted order |
+
+#### Scenario 4.3 - Order already processed
+
+An order is already processed and it can not be deleted	
+
+| Scenario 4.3 - Order already processed | |
+| ------------- |-------------| 
+|  Precondition     | Warehouse manager is authenticated |
+|  Post condition     | Order is not deleted from the Database |
+| Step#        | Description  |
+|  1     | Warehouse manager checks the order list |  
+|  2     | Warehouse manager deletes the order |
+|  3     | Supplier is notified about the deleted order |
+| 4 | Supplier sends feedback: Order already processed and shipped |
+
+#### Scenario 4.4 - System Error
+
+System raises an error
+
+| Scenario 4.4 - System Error | |
+| ------------- |-------------| 
+|  Precondition     | Warehouse manager is authenticated |
+|  Post condition     | Order is not deleted from the Database |
+| Step#        | Description  |
+|  1     | Warehouse manager checks the order list |  
+|  2     | Warehouse manager deletes the order |
+|  3     | System raises an error |
+| 4 | IT administrator is notified about the technical error |
+
+### Use case 5, UC5 - Perform Quality Check
+
+| Actors Involved        | Quality Officer, Database |
+| ------------- |-------------| 
+|  Precondition | An item ordered from a supplier has to be checked |
+|  Precondition | Quality officer is authenticated |
+|  Post condition     | The quality check is performed and passed |
+|  Nominal Scenario     | Quality Check passed |
+|  Variant     | Quality Check failed, item kept |
+|  Exception | Quality Check failed, item rejected |
+
+#### Scenario 5.1 - Quality Check passed
+
+The quality check is passed
+
+| Scenario 5.1 - Quality Check passed | |
+| ------------- |-------------| 
+|  Precondition     | An item ordered from a supplier has to be checked |
+| Precondition | Quality officer is authenticated |
+|  Post condition     | The check is performed and passed |
+| Step#        | Description  |
+|  1     | Quality officer take the item |  
+|  2     | Quality officer perform successfully the test |
+|  3     | Quality officer add the information for the item in the application |
+
+#### Scenario 5.2 - Quality Check not passed, item kept
+
+The quality check is not passed but the item is kept
+
+| Scenario 5.2 - Quality Check not passed, item kept| |
+| ------------- |-------------| 
+|  Precondition     | An item ordered from a supplier has to be checked |
+| Precondition | Quality officer is authenticated |
+|  Post condition     | The check is performed and not passed |
+| Step#        | Description  |
+|  1     | Quality officer take the item |  
+|  2     | The item fail the test |
+|  3     | Quality officer add the information for the item in the application |
+
+#### Scenario 5.3 - Quality Check not passed, item rejected
+
+The quality check is not passed and the item is rejected
+
+| Scenario 5.3 - Quality Check not passed, item rejected | |
+| ------------- |-------------| 
+|  Precondition     | An item ordered from a supplier has to be checked |
+| Precondition | Quality officer is authenticated |
+|  Post condition     | The check is performed and not passed |
+| Step#        | Description  |
+|  1     | Quality officer take the item |  
+|  2     | The item fail the test |
+|  3     | Quality officer add the information for the item in the application |
+| 4 | Quality officer notify the manager that the item has to be rejected |
+
+### Use case 6, UC6 - Add a Supplier in the System
+
+| Actors Involved        | Manager, Database |
+| ------------- |-------------| 
+|  Precondition | Manager is authenticated |
+|  Precondition | Supplier has to be added |
+|  Post condition     | Supplier is added successfully |
+|  Nominal Scenario     | Supplier added |
+|  Exception | Supplier already added |
+
+#### Scenario 6.1 - Supplier Added
+
+Successful adding of a Supplier in the System
+
+| Scenario 6.1 - Supplier Added | |
+| ------------- |-------------| 
+|  Precondition     | Warehouse Manager is authenticated|
+| Precondition |  Supplier has to be added  |
+|  Post condition     | Supplier is added successfully |
+| Step#        | Description  |
+|  1     | Warehouse Manager insert information about the Supplier |  
+|  2     | Warehouse manager adds the information in the System |
 
 ### Use case x, UCx
 ..
