@@ -1,8 +1,9 @@
+
 # Requirements Document 
 
 Date: 08 April 2022
 
-Version: 1.2
+Version: 1.3
 
  
 | Version number | Change |
@@ -10,6 +11,7 @@ Version: 1.2
 | 1.0 | Initial version |
 | 1.1 | Added functional requirements to manage catalogue and suppliers list |
 | 1.2 | Added a common generalization for all employees actors |
+| 1.3 | Added stories and use cases |
 
 
 # Contents
@@ -27,7 +29,6 @@ Version: 1.2
 - [Use case diagram and use cases](#use-case-diagram-and-use-cases)
 	+ [Use case diagram](#use-case-diagram)
 	+ [Use cases](#use-cases)
-    	+ [Relevant scenarios](#relevant-scenarios)
 - [Glossary](#glossary)
 - [System design](#system-design)
 - [Deployment diagram](#deployment-diagram)
@@ -97,11 +98,40 @@ Notice that all actors are independently connected to the EzWarehouse system, to
 
 
 # Stories and personas
-\<A Persona is a realistic impersonation of an actor. Define here a few personas and describe in plain text how a persona interacts with the system>
 
-\<Persona is-an-instance-of actor>
 
-\<stories will be formalized later as scenarios in use cases>
+### Andy Cheaper
+#### Bio
+Age 59, warehouse manager, lone wolf without family
+Andy works for a big company passing through difficult times. For each item in short supply, he had to consult catalogues of many suppliers searching for the lowest price, this took him even many hours per day.
+#### Goals
+* Wants to easily find low cost solutions for orders
+* Wants to manage orderings more efficiently 
+#### Story
+It’s friday afternoon, Andy receives a short supply notification and wants to proceed with the order before going home. Through the application he can fastly search among the suppliers for the requested items and filters for the lowest price. In few clicks he sends the order to the chosen supplier(s) and then he is free to manage something else.
+It’s saturday night, he’s staying at home crying and drinking “Tavernello”.
+It’s sunday morning, Andy doesn’t go to church, he is on the rooftop of his house and wants to jump but he decides to not jump and comes back to work on monday. 
+
+
+### Paul Messy
+#### Bio
+Age 42, quality officer, divorcing from his wife
+Paul works as a quality officer in a medium size company’s warehouse. His duty is to perform quality checks on the items the suppliers deliver. For each test he has to fill a long and boring paper form, which subsequently has to be archived manually. Since Paul is not an organised person, his desk is fully covered with old forms that cost Paul many hours per day to search through.
+#### Goals
+* Wants to digitally manage quality check information
+* Wants to rapidly retrieve information about an old quality check
+#### Story
+It's late Wednesday morning. In a few hours Paul will have to go to the lawyer to sign divorce papers. Before going he has to fill out a (paper) report about two tests he performed in the past. In the blink of an eye Paul is able to retrieve information about the items he has checked. Doing so he managed to eat some healthy salad for lunch near the lawyer’s office and to arrive on time at the appointment. Maybe this program won’t allow him to keep his house, but certainly he will have more time to find a new one.
+
+
+### Richard Bronson
+#### Bio 
+Age 63 ,warehouse worker, has knee joint problems and also cataracts.                               Richard works as a warehouse worker in a medium size company’s warehouse. His duty is to find the location of the items ordered  in the warehouse and pack them accordingly to the order. After 43 years of working various blue collar jobs under harsh conditions Richard can’t walk long distances at once and can’t  stand on his feet for long. Just 2 years left until his retirement Richard wants to do as little walking as possible.
+#### Goals
+* Wants to find the location of the item as easily as possible
+* Wants to check if he got the  right item
+#### Story
+It is Friday afternoon at 15:00. Only two hours left for Richards shift to finish.Richard is sitting on his bench in the warehouse while rubbing his knees. Sometimes the pain from the kneecap replacement surgery he had last year is unbearable.When a new order comes in Richard has to get up and find the item and take it to the packing station.In the past finding the item was a nightmare for Richards cataract and knees.Now Richard can find the place of the Item easily and checks if he took the right item by scanning the barcode of the item.The big green tick on tablet is a feast for Richards eyes.He will never have to read the small registration numbers and compare them one by one ever again.
 
 
 # Functional and non functional requirements
@@ -162,9 +192,10 @@ Notice that all actors are independently connected to the EzWarehouse system, to
 
 # Use case diagram and use cases
 
-![Use case diagram](Use-case-diagram.jpg "Use case diagram")
+## Use Case Diagram
+![use case diagram](Use-case-diagram.jpg "Use case diagram")
 
-
+## Use Cases
 ### Use case 1, UC1 - Login
 
 
