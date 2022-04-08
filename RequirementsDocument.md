@@ -8,8 +8,9 @@ Version: 1.2
  
 | Version number | Change |
 | ----------------- |:-----------|
-| 1.1 | -- |
-| 1.2 | Added functional requirements to manage catalogue and suppliers list |
+| 1.0 | Initial version |
+| 1.1 | Added functional requirements to manage catalogue and suppliers list |
+| 1.2 | Added a common generalization for all employees actors |
 
 
 # Contents
@@ -81,6 +82,8 @@ EZWH (EaSy WareHouse) is a software application to support the management of a w
 
 ## Context diagram
 ![Context diagram](Context-diagram.jpg "Context diagram")
+
+Notice that all actors are independently connected to the EzWarehouse system, to emphatize their different interactions with it.
 
 ## Interfaces
 
@@ -160,9 +163,7 @@ EZWH (EaSy WareHouse) is a software application to support the management of a w
 
 # Use case diagram and use cases
 
-
-## Use case diagram
-\<define here UML Use case diagram UCD summarizing all use cases, and their relationships>
+![Use case diagram](Use-case-diagram.jpg "Use case diagram")
 
 
 ### Use case 1, UC1 - Login
@@ -495,16 +496,13 @@ Successful adding of a Supplier in the System
 |  1     | Warehouse Manager insert information about the Supplier |  
 |  2     | Warehouse manager adds the information in the System |
 
-### Use case x, UCx
-..
-
 
 
 # Glossary
 
-\<use UML class diagram to define important terms, or concepts in the domain of the system, and their relationships> 
+![Glossary](Class-diagram.jpg "Glossary")
 
-\<concepts are used consistently all over the document, ex in use cases, requirements etc>
+This glossary is focused on how entities interact with each other, rather than on their definition (to avoid redundancies).
 
 # System Design
 \<describe here system design>
