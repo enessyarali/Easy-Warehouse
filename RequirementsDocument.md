@@ -1,4 +1,3 @@
-
 # Requirements Document 
 
 Date: 08 April 2022
@@ -169,58 +168,58 @@ Notice that all actors are independently connected to the EzWarehouse system, to
 ### Use case 1, UC1 - Login
 
 
-| Actors Involved        | User, Database |
+| Actors Involved        | Employee, Database |
 | ------------- |-------------| 
-|  Precondition     | User is not authenticated |
-|  Post condition     | User is authenticated |
+|  Precondition     | Employee is not authenticated |
+|  Post condition     | Employee is authenticated |
 |  Nominal Scenario     | Successful Login |
 |  Exception     | Wrong Password |
-|  Exception     | User Does Not Exist |
+|  Exception     | Employee Does Not Exist |
 
 #### Scenario 1.1 - Successful Login
 
-User succeed in logging in
+Employee succeed in logging in
 
 | Scenario 1.1 - Successful Login | |
 | ------------- |-------------| 
-|  Precondition     |  User is not authenticated |
-|  Post condition     | User is authenticated |
+|  Precondition     |  Employee is not authenticated |
+|  Post condition     | Employee is authenticated |
 | Step#        | Description  |
-|  1     | User starts application |  
+|  1     | Employee starts application |  
 |  2     | Application asks for ID and password |
-|  3     | User enters ID and password |
+|  3     | Employee enters ID and password |
 
 #### Scenario 1.2 - Wrong Password
 
-User enter the wrong password
+Employee enter the wrong password
 
 |  Scenario 1.2 - Wrong Password | |
 | ------------- |-------------| 
-|  Precondition     |  User is not authenticated |
+|  Precondition     |  Employee is not authenticated |
 |  Post condition     |  Application throws an error |
 | Step#        | Description  |
-|  1     | User starts application |  
+|  1     | Employee starts application |  
 |  2     | Application asks for ID and password |
-|  3     | User enters wrong password |
+|  3     | Employee enters wrong password |
 
-#### Scenario 1.3 - User Does Not Exist
+#### Scenario 1.3 - Employee Does Not Exist
 
-User enter the wrong ID
+Employee enter the wrong ID
 
 |  Scenario 1.2 - Wrong ID | |
 | ------------- |-------------| 
-|  Precondition     |  User is not authenticated |
+|  Precondition     |  Employee is not authenticated |
 |  Post condition     |  Application throws an error |
 | Step#        | Description  |
-|  1     | User starts application |  
+|  1     | Employee starts application |  
 |  2     | Application asks for ID and password |
-|  3     | User enters wrong ID |
+|  3     | Employee enters wrong ID |
 
 ### Use case 2, UC2 - Issue an external order to Supplier
 
-| Actors Involved        | Manager, Database |
+| Actors Involved        | Warehouse Manager, Database |
 | ------------- |-------------| 
-|  Precondition     | Warehouse manager is authenticated |
+|  Precondition     | Warehouse Manager is authenticated |
 | Precondition | It has been notified an item is in short supply |
 |  Post condition     | Order is / is not issued |
 |  Nominal Scenario     | Successful order from 1 supplier |
@@ -233,13 +232,13 @@ An order to one supplier is issued successfully
 
 | Scenario 2.1 - Successful order from 1 supplier | |
 | ------------- |-------------| 
-|  Precondition     | Warehouse manager is authenticated |
+|  Precondition     | Warehouse Manager is authenticated |
 | Precondition | It has been notified an item is in short supply |
 |  Post condition     | Order is correctly issued (order status: issued)|
 | Step#        | Description  |
-|  1     | Warehouse manager checks the list of suppliers for the item |  
-|  2     | Warehouse manager choose one supplier to order the item from |
-|  3     | Warehouse manager selects the item quantity |
+|  1     | Warehouse Manager checks the list of suppliers for the item |  
+|  2     | Warehouse Manager choose one supplier to order the item from |
+|  3     | Warehouse Manager selects the item quantity |
 |  4     | Warehouse has enough space to store new items |
 |  5     | Financial Department and supplier are (externally) notified |
 
@@ -249,14 +248,14 @@ An order to more than one supplier is issued successfully
 
 | Scenario 2.2 - Successful order from more suppliers | |
 | ------------- |-------------| 
-|  Precondition     | Warehouse manager is authenticated |
+|  Precondition     | Warehouse Manager is authenticated |
 | Precondition | It has been notified an item is in short supply |
 |  Post condition     | Order is correctly issued (order status: issued)|
 | Step#        | Description  |
-|  1     | Warehouse manager checks the list of suppliers for the item |  
-|  2     | Warehouse manager choose one supplier to order the item from |
-||Repeat 2 and 3 for each supplier the warehouse manager wants to order from|
-|  3     | Warehouse manager selects the item quantity |
+|  1     | Warehouse Manager checks the list of suppliers for the item |  
+|  2     | Warehouse Manager choose one supplier to order the item from |
+||Repeat 2 and 3 for each supplier the Warehouse Manager wants to order from|
+|  3     | Warehouse Manager selects the item quantity |
 |  4     | Warehouse has enough space to store new items |
 |  5     | Financial Department and supplier are (externally) notified |
 
@@ -266,18 +265,18 @@ Warehouse is full and is not possible to add new items
 
 | Scenario 2.3 - Warehouse is out of physical space | |
 | ------------- |-------------| 
-|  Precondition     | Warehouse manager is authenticated |
+|  Precondition     | Warehouse Manager is authenticated |
 | Precondition | It has been notified an item is in short supply |
 |  Post condition     | Order is NOT issued|
 | Step#        | Description  |
-|  1     | Warehouse manager checks the list of suppliers for the item |  
-|  2     | Warehouse manager chooses one supplier to order the item from |
-|  3     | Warehouse manager selects the item quantity |
+|  1     | Warehouse Manager checks the list of suppliers for the item |  
+|  2     | Warehouse Manager chooses one supplier to order the item from |
+|  3     | Warehouse Manager selects the item quantity |
 |  4     | Warehouse has not enough space to store new items |
 
 ### Use case 3, UC3 - Issue an internal order from Organisational Unit
 
-| Actors Involved        | Unit Supervisor, Warehouse Worker, Database, Manager |
+| Actors Involved        | Unit Supervisor, Warehouse Worker, Database, Warehouse Manager |
 | ------------- |-------------| 
 |  Precondition     | Unit Supervisor is authenticated |
 |  Post condition     | Order is completed / aborted |
@@ -318,7 +317,7 @@ An order to warehouse from an Organisational Unit is issued successfully, after 
 | ------------- |-------------| 
 |  Precondition     | Unit supervisor is authenticated |
 |  Post condition     | Order is completed (order status: completed)|
-| Post condition | Warehouse manager is notified of item(s) in short supply |
+| Post condition | Warehouse Manager is notified of item(s) in short supply |
 | Step#        | Description  |
 |  1     | Unit supervisor checks the catalogue |  
 |  2     | Unit supervisor selects the item to be ordered |
@@ -356,7 +355,7 @@ There is not enough of the requested items inside the warehouse
 
 ### Use case 4, UC4 - Delete an order
 
-| Actors Involved        | Manager, Unit Supervisor, Warehouse Worker, Database, IT Administrator |
+| Actors Involved        | Warehouse Manager, Unit Supervisor, Warehouse Worker, Database, IT Administrator |
 | ------------- |-------------| 
 |  Precondition     | Unit Supervisor / Warehouse Manager is authenticated |
 |  Post condition     | Order is / is not deleted |
@@ -371,11 +370,11 @@ An order is successfully deleted by the Warehouse Manager
 
 | Scenario 4.1 - Successful deletion of external order | |
 | ------------- |-------------| 
-|  Precondition     | Warehouse manager is authenticated |
+|  Precondition     | Warehouse Manager is authenticated |
 |  Post condition     | Order is deleted from the Database (order status: Deleted)|
 | Step#        | Description  |
-|  1     | Warehouse manager checks the order list |  
-|  2     | Warehouse manager deletes the order |
+|  1     | Warehouse Manager checks the order list |  
+|  2     | Warehouse Manager deletes the order |
 |  3     | Supplier is notified about the deleted order |
 
 #### Scenario 4.2 - Successful deletion of internal order
@@ -387,7 +386,7 @@ An order is successfully deleted by the Unit Supervisor
 |  Precondition     | Unit Supervisor is authenticated |
 |  Post condition     | Order is deleted from the Database (order status: Deleted)|
 | Step#        | Description  |
-|  1     | Unit Supervisorr checks the order list |  
+|  1     | Unit Supervisor checks the order list |  
 |  2     | Unit Supervisor deletes the order |
 |  3     | Warehouse Worker is notified about the deleted order |
 
@@ -397,11 +396,11 @@ An order is already processed and it can not be deleted
 
 | Scenario 4.3 - Order already processed | |
 | ------------- |-------------| 
-|  Precondition     | Warehouse manager is authenticated |
+|  Precondition     | Warehouse Manager is authenticated |
 |  Post condition     | Order is not deleted from the Database |
 | Step#        | Description  |
-|  1     | Warehouse manager checks the order list |  
-|  2     | Warehouse manager deletes the order |
+|  1     | Warehouse Manager checks the order list |  
+|  2     | Warehouse Manager deletes the order |
 |  3     | Supplier is notified about the deleted order |
 | 4 | Supplier sends feedback: Order already processed and shipped |
 
@@ -411,13 +410,13 @@ System raises an error
 
 | Scenario 4.4 - System Error | |
 | ------------- |-------------| 
-|  Precondition     | Warehouse manager is authenticated |
+|  Precondition     | Warehouse Manager is authenticated |
 |  Post condition     | Order is not deleted from the Database |
 | Step#        | Description  |
-|  1     | Warehouse manager checks the order list |  
-|  2     | Warehouse manager deletes the order |
+|  1     | Warehouse Manager checks the order list |  
+|  2     | Warehouse Manager deletes the order |
 |  3     | System raises an error |
-| 4 | IT administrator is notified about the technical error |
+| 4 | IT Administrator is notified about the technical error |
 
 ### Use case 5, UC5 - Perform Quality Check
 
@@ -425,59 +424,59 @@ System raises an error
 | ------------- |-------------| 
 |  Precondition | An item ordered from a supplier has to be checked |
 |  Precondition | Quality officer is authenticated |
-|  Post condition     | The quality check is performed and passed |
+|  Post condition     | The Quality Check is performed and passed |
 |  Nominal Scenario     | Quality Check passed |
 |  Variant     | Quality Check failed, item kept |
 |  Exception | Quality Check failed, item rejected |
 
 #### Scenario 5.1 - Quality Check passed
 
-The quality check is passed
+The Quality Check is passed
 
 | Scenario 5.1 - Quality Check passed | |
 | ------------- |-------------| 
 |  Precondition     | An item ordered from a supplier has to be checked |
-| Precondition | Quality officer is authenticated |
+| Precondition | Quality Officer is authenticated |
 |  Post condition     | The check is performed and passed |
 | Step#        | Description  |
-|  1     | Quality officer take the item |  
-|  2     | Quality officer perform successfully the test |
-|  3     | Quality officer add the information for the item in the application |
+|  1     | Quality Officer take the item |  
+|  2     | Quality Officer perform successfully the test |
+|  3     | Quality Officer add the information for the item in the application |
 
 #### Scenario 5.2 - Quality Check not passed, item kept
 
-The quality check is not passed but the item is kept
+The Quality Check is not passed but the item is kept
 
 | Scenario 5.2 - Quality Check not passed, item kept| |
 | ------------- |-------------| 
 |  Precondition     | An item ordered from a supplier has to be checked |
-| Precondition | Quality officer is authenticated |
+| Precondition | Quality Officer is authenticated |
 |  Post condition     | The check is performed and not passed |
 | Step#        | Description  |
-|  1     | Quality officer take the item |  
+|  1     | Quality Officer take the item |  
 |  2     | The item fail the test |
-|  3     | Quality officer add the information for the item in the application |
+|  3     | Quality Officer add the information for the item in the application |
 
 #### Scenario 5.3 - Quality Check not passed, item rejected
 
-The quality check is not passed and the item is rejected
+The Quality Check is not passed and the item is rejected
 
 | Scenario 5.3 - Quality Check not passed, item rejected | |
 | ------------- |-------------| 
 |  Precondition     | An item ordered from a supplier has to be checked |
-| Precondition | Quality officer is authenticated |
+| Precondition | Quality Officer is authenticated |
 |  Post condition     | The check is performed and not passed |
 | Step#        | Description  |
-|  1     | Quality officer take the item |  
+|  1     | Quality Officer take the item |  
 |  2     | The item fail the test |
-|  3     | Quality officer add the information for the item in the application |
-| 4 | Quality officer notify the manager that the item has to be rejected |
+|  3     | Quality Officer add the information for the item in the application |
+| 4 | Quality Officer notify the Warehouse Manager that the item has to be rejected |
 
 ### Use case 6, UC6 - Add a Supplier in the System
 
 | Actors Involved        | Manager, Database |
 | ------------- |-------------| 
-|  Precondition | Manager is authenticated |
+|  Precondition | Warehouse Manager is authenticated |
 |  Precondition | Supplier has to be added |
 |  Post condition     | Supplier is added successfully |
 |  Nominal Scenario     | Supplier added |
@@ -512,9 +511,9 @@ The supplier is already present in the system
 
 ### Use case 7, UC7 - Add an Item in the Catalogue
 
-| Actors Involved        | Manager, Database |
+| Actors Involved        | Warehouse Manager, Database |
 | ------------- |-------------| 
-|  Precondition | Manager is authenticated |
+|  Precondition | Warehouse Manager is authenticated |
 |  Precondition | Item has to be added |
 |  Post condition     | Item is added successfully |
 |  Nominal Scenario     | Item added |
@@ -532,7 +531,7 @@ Successful adding Item in the Catalogue
 |  Post condition     | Item descriptor is added successfully |
 | Step#        | Description  |
 |  1     | Warehouse Manager insert information about the Item |  
-|  2     | Warehouse manager adds the information in the Catalogue |
+|  2     | Warehouse Manager adds the information in the Catalogue |
 
 #### Scenario 7.2 - Item from New Supplier
 
@@ -546,8 +545,8 @@ Successful adding Item in the Catalogue and updating Supplier list
 | Post condition | Supplier list is updated |
 | Step#        | Description  |
 |  1     | Warehouse Manager insert information about the Item |  
-|  2     | Warehouse manager adds the information in the Catalogue |
-| 3 | Warehouse manager adds Supplier in the System |
+|  2     | Warehouse Manager adds the information in the Catalogue |
+| 3 | Warehouse Manager adds Supplier in the System |
 
 #### Scenario 7.3 - Item already Added
 
@@ -560,17 +559,17 @@ Item is already present in the Catalogue
 |  Post condition     | System raise an error |
 | Step#        | Description  |
 |  1     | Warehouse Manager insert information about the Item |  
-|  2     | Warehouse manager adds the information in the Catalogue |
+|  2     | Warehouse Manager adds the information in the Catalogue |
 | 3 | System detect Item is already present |
 
 ### Use case 8, UC8 - Visualize Wareouse content
 
-| Actors Involved        | User, Database |
+| Actors Involved        | Employee, Database |
 | ------------- |-------------| 
-|  Precondition | User is authenticated |
-|  Post condition     | User sees information |
+|  Precondition | Employee is authenticated |
+|  Post condition     | Employee sees information |
 |  Nominal Scenario     | Informations displayed |
-|  Exception |  User has no permission to see requested information |
+|  Exception |  Employee has no permission to see requested information |
 
 #### Scenario 8.1 - Informations Displayed
 
@@ -578,22 +577,22 @@ Requested information are successfully displayed
 
 | Scenario 8.1 - Informations Displayed | |
 | ------------- |-------------| 
-|  Precondition     | User is authenticated|
-|  Post condition     | User sees informations |
+|  Precondition     | Employee is authenticated|
+|  Post condition     | Employee sees informations |
 | Step#        | Description  |
-|  1     | User selects the information he wants to visualise |  
+|  1     | Employee selects the information he wants to visualise |  
 |  2     | System visualises informations |
 
 #### Scenario 8.2 - No authorization for requested information
 
-User has not the correct authorization to access requested informations
+Employee has not the correct authorization to access requested informations
 
 | Scenario 8.2 - No authorization for requested information | |
 | ------------- |-------------| 
-|  Precondition     | User is authenticated|
-|  Post condition     | User sis notified that required permissions are missing |
+|  Precondition     | Employee is authenticated|
+|  Post condition     | Employee is notified that required permissions are missing |
 | Step#        | Description  |
-|  1     | User selects the information he wants to visualise |  
+|  1     | Employee selects the information he wants to visualise |  
 |  2     | System denies visualisation of requested information |
 
 # Glossary
