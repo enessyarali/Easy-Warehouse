@@ -496,7 +496,105 @@ Successful adding of a Supplier in the System
 |  1     | Warehouse Manager insert information about the Supplier |  
 |  2     | Warehouse manager adds the information in the System |
 
+#### Scenario 6.2 - Supplier already Added
 
+The supplier is already present in the system
+
+| Scenario 6.2 - Supplier already Added | |
+| ------------- |-------------| 
+|  Precondition     | Warehouse Manager is authenticated|
+| Precondition |  Supplier has to be added  |
+|  Post condition     | System raise an error |
+| Step#        | Description  |
+|  1     | Warehouse Manager insert information about the Supplier |  
+|  2     | Warehouse manager adds the information in the System |
+|  3    | System reject the modification |
+
+### Use case 7, UC7 - Add an Item in the Catalogue
+
+| Actors Involved        | Manager, Database |
+| ------------- |-------------| 
+|  Precondition | Manager is authenticated |
+|  Precondition | Item has to be added |
+|  Post condition     | Item is added successfully |
+|  Nominal Scenario     | Item added |
+| Variant | Item from new supplier |
+|  Exception | Item already added |
+
+#### Scenario 7.1 - Item Added
+
+Successful adding Item in the Catalogue
+
+| Scenario 7.1 - Item Added | |
+| ------------- |-------------| 
+|  Precondition     | Warehouse Manager is authenticated|
+| Precondition |  Item descriptor has to be added  |
+|  Post condition     | Item descriptor is added successfully |
+| Step#        | Description  |
+|  1     | Warehouse Manager insert information about the Item |  
+|  2     | Warehouse manager adds the information in the Catalogue |
+
+#### Scenario 7.2 - Item from New Supplier
+
+Successful adding Item in the Catalogue and updating Supplier list
+
+| Scenario 7.2 - Item from New Supplier| |
+| ------------- |-------------| 
+|  Precondition     | Warehouse Manager is authenticated|
+| Precondition |  Item descriptor has to be added  |
+|  Post condition     | Item descriptor is added successfully |
+| Post condition | Supplier list is updated |
+| Step#        | Description  |
+|  1     | Warehouse Manager insert information about the Item |  
+|  2     | Warehouse manager adds the information in the Catalogue |
+| 3 | Warehouse manager adds Supplier in the System |
+
+#### Scenario 7.3 - Item already Added
+
+Item is already present in the Catalogue
+
+| Scenario 7.3 - Item already Added| |
+| ------------- |-------------| 
+|  Precondition     | Warehouse Manager is authenticated|
+| Precondition |  Item descriptor has to be added  |
+|  Post condition     | System raise an error |
+| Step#        | Description  |
+|  1     | Warehouse Manager insert information about the Item |  
+|  2     | Warehouse manager adds the information in the Catalogue |
+| 3 | System detect Item is already present |
+
+### Use case 8, UC8 - Visualize Wareouse content
+
+| Actors Involved        | User, Database |
+| ------------- |-------------| 
+|  Precondition | User is authenticated |
+|  Post condition     | User sees information |
+|  Nominal Scenario     | Informations displayed |
+|  Exception |  User has no permission to see requested information |
+
+#### Scenario 8.1 - Informations Displayed
+
+Requested information are successfully displayed
+
+| Scenario 8.1 - Informations Displayed | |
+| ------------- |-------------| 
+|  Precondition     | User is authenticated|
+|  Post condition     | User sees informations |
+| Step#        | Description  |
+|  1     | User selects the information he wants to visualise |  
+|  2     | System visualises informations |
+
+#### Scenario 8.2 - No authorization for requested information
+
+User has not the correct authorization to access requested informations
+
+| Scenario 8.2 - No authorization for requested information | |
+| ------------- |-------------| 
+|  Precondition     | User is authenticated|
+|  Post condition     | User sis notified that required permissions are missing |
+| Step#        | Description  |
+|  1     | User selects the information he wants to visualise |  
+|  2     | System denies visualisation of requested information |
 
 # Glossary
 
