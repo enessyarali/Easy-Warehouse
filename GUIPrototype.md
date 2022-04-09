@@ -32,8 +32,6 @@ A handy sidebar provides different types of filters, to ensure each employee can
 
 All pages are characterized by the same navigation bar. A user button on the right side shows a quick-access profile menu.
 
-# Maybe add here all variants of chair page? idk
-
 ## Orders history
 
 ![Orders history page](./GUI/My-orders.png "Orders history page")
