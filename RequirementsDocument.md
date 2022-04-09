@@ -1,9 +1,9 @@
 
 # Requirements Document 
 
-Date: 08 April 2022
+Date: 09 April 2022
 
-Version: 1.3
+Version: 1.4
 
  
 | Version number | Change |
@@ -12,6 +12,7 @@ Version: 1.3
 | 1.1 | Added functional requirements to manage catalogue and suppliers list |
 | 1.2 | Added a common generalization for all employees actors |
 | 1.3 | Modified stories to make them compliant with the application functionalities |
+| 1.4 | Removed a "design" class from Glossary |
 
 
 # Contents
