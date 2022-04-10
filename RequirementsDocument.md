@@ -1,9 +1,9 @@
 
 # Requirements Document 
 
-Date: 09 April 2022
+Date: 10 April 2022
 
-Version: 1.4
+Version: 1.5
 
  
 | Version number | Change |
@@ -13,6 +13,7 @@ Version: 1.4
 | 1.2 | Added a common generalization for all employees actors |
 | 1.3 | Modified stories to make them compliant with the application functionalities |
 | 1.4 | Removed a "design" class from Glossary |
+| 1.5 | Explicited a generalization in Context diagram |
 
 
 # Contents
@@ -84,17 +85,17 @@ EZWH (EaSy WareHouse) is a software application to support the management of a w
 ## Context diagram
 ![Context diagram](Context-diagram.jpg "Context diagram")
 
-Notice that all actors are independently connected to the EzWarehouse system, to emphatize their different interactions with it.
+Notice that *Employee* does not correspond to any profile/role, it is simply a conceptual generalization of all company profiles (for this reason, it is not listed neither among stakeholders nor among actors).
 
 ## Interfaces
 
 | Actor | Logical Interface | Physical Interface  |
 |-------|-------------------|---------------------|
-|Warehouse manager |Landscape desktop GUI |Screen, keyboard, mouse |
 |Unit supervisor |Landscape desktop GUI |Screen, keyboard, mouse |
-|IT administrator |Landscape desktop GUI, command line interface |Screen, keyboard, mouse |
-|Quality officer |Landscape desktop GUI |Screen, keyboard, mouse |
 |Warehouse worker |Landscape desktop GUI |Tablet |
+|Warehouse manager |Landscape desktop GUI |Screen, keyboard, mouse |
+|Quality officer |Landscape desktop GUI |Screen, keyboard, mouse |
+|IT administrator |Landscape desktop GUI, command line interface |Screen, keyboard, mouse |
 |Database |APIs| Internet Connection |
 
 
@@ -633,14 +634,8 @@ Employee has not the correct authorization to access requested informations
 This glossary is focused on how entities interact with each other, rather than on their definition (to avoid redundancies).
 
 # System Design
-\<describe here system design>
-
-\<must be consistent with Context diagram>
+![System design](System-diagram.jpg "System design")
 
 # Deployment Diagram 
 
-\<describe here deployment diagram >
-
-
-
-
+![Deployment diagram](Deployment-diagram.png "Deployment diagram")
