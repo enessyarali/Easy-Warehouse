@@ -83,7 +83,7 @@ EZWH (EaSy WareHouse) is a software application to support the management of a w
 # Context Diagram and interfaces
 
 ## Context diagram
-![Context diagram](Context-diagram.jpg "Context diagram")
+![Context diagram](./Requirement-diagrams/Context-diagram.jpg "Context diagram")
 
 Notice that *Employee* does not correspond to any profile/role, it is simply a conceptual generalization of all company profiles (for this reason, it is not listed neither among stakeholders nor among actors).
 
@@ -194,7 +194,7 @@ It is Tuesday afternoon, only two hours left for Richards shift to finish. Richa
 # Use case diagram and use cases
 
 ## Use Case Diagram
-![use case diagram](Use-case-diagram.jpg "Use case diagram")
+![use case diagram](./Requirement-diagrams/Use-case-diagram.jpg "Use case diagram")
 
 ## Use Cases
 ### Use case 1, UC1 - Login
@@ -629,13 +629,13 @@ Employee has not the correct authorization to access requested informations
 
 # Glossary
 
-![Glossary](Class-diagram.jpg "Glossary")
+![Glossary](./Requirement-diagrams/Class-diagram.jpg "Glossary")
 
 This glossary is focused on how entities interact with each other, rather than on their definition (to avoid redundancies).
 
 # System Design
-![System design](System-diagram.jpg "System design")
+![System design](./Requirement-diagrams/System-diagram.jpg "System design")
 
 # Deployment Diagram 
 
-![Deployment diagram](Deployment-diagram.png "Deployment diagram")
+![Deployment diagram](./Requirement-diagrams/Deployment-diagram.png "Deployment diagram")
