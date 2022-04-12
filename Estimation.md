@@ -5,6 +5,7 @@ Version: 1.1
 
 
 # Estimation approach
+All estimations are based on our judgment and slightly supported by previous projects.
 
 ## Estimate by size
 ### 
