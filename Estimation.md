@@ -36,8 +36,7 @@ All estimations are based on our judgment and slightly supported by previous pro
 
 ## Estimate by activity decomposition
 
-LEGEND  
-
+*LEGEND*  
 **bold** : main activity  
 \- : sub-activity  
 ◆ : milestone
@@ -64,7 +63,7 @@ LEGEND
 | - Perform analysis | 160 |
 | - Formalize design | 96 |
 | - Perform consistency verification | 32 |
-| ◆ Document is consisten | - |
+| ◆ Document is consistent | - |
 | **Coding** ||
 | - Code back-end modules | 256 |
 | - Code front-end modules | 256 |
