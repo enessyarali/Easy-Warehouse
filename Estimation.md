@@ -85,13 +85,16 @@ All estimations are based on our judgment and slightly supported by previous pro
 
 ## Summary
 
-Report here the results of the three estimation approaches. The  estimates may differ. Discuss here the possible reasons for the difference
-
 |             | Estimated effort                        |   Estimated duration |          
 | ----------- | ------------------------------- | ---------------|
 | Estimate by size |1,000 ph| 6.25 calendar weeks |
 | Estimate by product decomposition | 1,070 ph | 6.8 calendar weeks |
 | Estimate by activity decomposition |1,952 ph| 12.2 calendar weeks |
+
+
+As we can see from the table, estimation by size and by product decomposition lead us to very similiar results. On the other hand, estimation by activity decomposition gives us a totally different outcome (that is almost double the previous ones).  
+This can be due to the impossibility to internally parallelize some of the activities among different workers, which is more easily noticed while drawing the Gantt diagram.  
+Overall, the result obtained by activity decomposition can be (possibly) considered as more reliable than those obtained with estimation by size and by product decomposition.
 
 
 
