@@ -1,7 +1,9 @@
-# Project Estimation  
+# Project Estimation
+Authors: Ilaria Pilo, Marco Sacchet, Luca Scibetta, Enes Yarali
+
 Date: 12 April 2022
 
-Version: 1.1
+Version: 1.2
 
 
 # Estimation approach
@@ -38,7 +40,7 @@ All estimations are based on our judgment and slightly supported by previous pro
 | ----------- | ------------------------------- | 
 | | |
 ###
-Insert here Gantt chart with above activities
+![Gantt activity diagram](gantt_diagram.jpg "Gantt activity diagram")
 
 ## Summary
 
