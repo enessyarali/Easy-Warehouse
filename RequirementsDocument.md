@@ -1,9 +1,9 @@
 
 # Requirements Document 
 
-Date: 10 April 2022
+Date: 12 April 2022
 
-Version: 1.5
+Version: 1.6
 
  
 | Version number | Change |
@@ -14,6 +14,7 @@ Version: 1.5
 | 1.3 | Modified stories to make them compliant with the application functionalities |
 | 1.4 | Removed a "design" class from Glossary |
 | 1.5 | Explicited a generalization in Context diagram |
+| 1.6 | Fixed Use case diagram |
 
 
 # Contents
