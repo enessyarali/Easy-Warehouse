@@ -3,7 +3,7 @@
 
 Date: 12 April 2022
 
-Version: 1.6
+Version: 1.7
 
  
 | Version number | Change |
@@ -15,6 +15,7 @@ Version: 1.6
 | 1.4 | Removed a "design" class from Glossary |
 | 1.5 | Explicited a generalization in Context diagram |
 | 1.6 | Fixed Use case diagram |
+| 1.7 | Removed a redundant scenario |
 
 
 # Contents
@@ -97,7 +98,7 @@ Notice that *Employee* does not correspond to any profile/role, it is simply a c
 |Warehouse manager |Landscape desktop GUI |Screen, keyboard, mouse |
 |Quality officer |Landscape desktop GUI |Screen, keyboard, mouse |
 |IT administrator |Landscape desktop GUI, command line interface |Screen, keyboard, mouse |
-|Database |APIs| Internet Connection |
+|Database |APIs| Intranet connection |
 
 
 # Stories and personas
@@ -122,7 +123,7 @@ Paul works as a quality officer in a medium size company’s warehouse. His duty
 * Wants to digitally manage quality check information
 * Wants to rapidly retrieve information about an old quality check
 #### Story
-It's late Wednesday morning. In a few hours Paul will have to go to the lawyer to sign divorce papers. Before going he has to fill out a report about two tests he performed in the past. In the blink of an eye, Paul is able to retrieve information about the items he has checked. Doing so he manages to eat some healthy salad for lunch near the lawyer’s office and to arrive on time at the appointment. Maybe this program won’t allow him to keep his house, but certainly he will have more time to find a new one.
+It's late Wednesday morning. In a few hours Paul will have to go to the lawyer to sign divorce papers. Before going, he has to fill out a report about two tests he performed in the past. In the blink of an eye, Paul is able to retrieve information about the items he has checked. Doing so, he manages to eat some healthy salad for lunch near the lawyer’s office and to arrive on time at the appointment. Maybe this program won’t allow him to keep his house, but certainly he will have more time to find a new one.
 
 
 ### Richard Bronson
@@ -133,7 +134,7 @@ Richard is a worker in a medium size company’s warehouse. His duty is to find 
 * Wants to find the location of items as easily as possible
 * Wants to check if he got the right item
 #### Story
-It is Tuesday afternoon, only two hours left for Richards shift to finish. Richard is sitting on his bench in the warehouse while rubbing his knees. Sometimes the pain from the kneecap replacement surgery he had last year is unbearable. When a new order comes in, Richard has to get up, find the item and take it to the packing station. In the past, finding the item was a nightmare for Richard's cataract and knees. Now, he can easily find the item place thanks to the tracking functionality. Moreover, he can check if he took the right item by scanning its barcode. The big green tick on tablet is a feast for Richard's eyes. He will never have to read the small code numbers and compare them one by one ever again.
+It's Tuesday afternoon, only two hours left for Richards shift to finish. Richard is sitting on his bench in the warehouse while rubbing his knees. Sometimes the pain from the kneecap replacement surgery he had last year is unbearable. When a new order comes in, Richard has to get up, find the item and take it to the packing station. In the past, finding the item was a nightmare for Richard's cataract and knees. Now, he can easily find the item place thanks to the tracking functionality. Moreover, he can check if he took the right item by scanning its barcode. The big green tick on tablet is a feast for Richard's eyes. He will never have to read the small code numbers and compare them one by one ever again.
 
 
 # Functional and non functional requirements
@@ -142,11 +143,11 @@ It is Tuesday afternoon, only two hours left for Richards shift to finish. Richa
 
 | Lev.1 ID | Lev.2 ID | Lev.3 ID   | Description  | Profile |
 | ------|---|---- |-------|------| 
-|F1 |||Handle orders||
+|F1 |||**Handle orders**||
 ||F1.1 ||Pick item(s) and quantity | Warehouse manager / Unit supervisor |
 ||F1.2 ||Keep order status (issued-processed-completed-deleted-aborted)||
 ||F1.3 ||Keep orders history||
-||F1.4 ||Delete order||
+||F1.4 ||Delete issued order||
 ||F1.5 ||Issue an external order to supplier | Warehouse manager |
 |||F1.5.1 |Keep and inspect supplier list for each item descriptor||
 |||F1.5.2 |Choose and notify supplier(s) -> order status = issued ||
@@ -154,28 +155,28 @@ It is Tuesday afternoon, only two hours left for Richards shift to finish. Richa
 ||F1.6 ||Issue an internal order from OU | Unit supervisor|
 |||F1.6.1 |Notify wh workers -> order status = issued OR deleted |Unit supervisor| 
 |||F1.6.2 |Notify unit supervisor -> order status = processed |Warehouse worker| 
-|F2 |||Monitor and modify warehouse content||
+|F2 |||**Monitor and modify warehouse content**||
 ||F2.1 ||Notify short supply |Warehouse manager|
 ||F2.2 ||Add item||
 ||F2.3 ||Remove item||
 ||F2.4 ||See details about warehouse content |Warehouse worker|
 ||F2.5 ||Track item position in warehouse |Warehouse worker|
 ||F2.6 ||Track available space||
-||F2.7 ||See details about warehouse catalogue |unit supervisor|
-|F3||| Manage users||
+||F2.7 ||See details about warehouse catalogue |Unit supervisor|
+|F3||| **Manage users**||
 ||F3.1||Log in||
 ||F3.2 ||Log out||
 ||F3.3 ||Add/Remove users |IT administrator|
-|F4 |||Insert quality check information|Quality officer|
+|F4 |||**Insert quality check information**|Quality officer|
 ||F4.1 ||Specify if quality check was done or not||
 ||F4.2 ||Keep track of quality check result||
 ||F4.3 || Notify if item has to be rejected ||
-|F5 |||Modify catalogue|Warehouse manager|
+|F5 |||**Modify catalogue**|Warehouse manager|
 ||F5.1 ||Add item descriptor||
 ||F5.2 ||Remove item descriptor||
 ||F5.3 ||Add supplier for item descriptor||
 ||F5.4 ||Remove supplier for item descriptor||
-|F6 |||Modify supplier list|Warehouse manager|
+|F6 |||**Modify supplier list**|Warehouse manager|
 ||F6.1 ||Add supplier||
 ||F6.2 ||Remove supplier||
 
@@ -183,14 +184,16 @@ It is Tuesday afternoon, only two hours left for Richards shift to finish. Richa
 
 | ID        | Type     | Description  | Refers to |
 | ------------- |-------------| -----| -----|
-|NF1 |Usability | Basic users shall be able to use all functions after 1 hour training ||
-|NF2 |Usability | Advanced users shall be able to use all functions after 3 hours training ||
+|NF1 |Usability | Basic users [^1] shall be able to use all functions after 1 hour training ||
+|NF2 |Usability | Advanced users [^2] shall be able to use all functions after 3 hours training ||
 |NF3 |Performance |Database should be queried in less than 1 second |F2.4|
 |NF4 |Performance |All operations (no database-related) should be completed in less than 0.5 seconds ||
 |NF5 |Space |Desktop application should occupy less than 500 MB||
 |NF6 |Portability |Desktop application should be compatible with all main OSs ||
 |NF7 |Privacy |Company data should be protected from external attacks||
 
+[^1]: Warehouse worker, Unit supervisor
+[^2]: Quality officer, Warehouse manager, IT administrator 
 
 # Use case diagram and use cases
 
@@ -204,14 +207,14 @@ It is Tuesday afternoon, only two hours left for Richards shift to finish. Richa
 | Actors Involved        | Employee, Database |
 | ------------- |-------------| 
 |  Precondition     | Employee is not authenticated |
-|  Post condition     | Employee is authenticated |
+|  Post condition     | Employee is / is not authenticated |
 |  Nominal Scenario     | Successful Login |
 |  Exception     | Wrong Password |
 |  Exception     | Employee Does Not Exist |
 
 #### Scenario 1.1 - Successful Login
 
-Employee succeed in logging in
+Employee succeeds in logging in.
 
 | Scenario 1.1 - Successful Login | |
 | ------------- |-------------| 
@@ -224,12 +227,12 @@ Employee succeed in logging in
 
 #### Scenario 1.2 - Wrong Password
 
-Employee enter the wrong password
+Employee enters the wrong password.
 
 |  Scenario 1.2 - Wrong Password | |
 | ------------- |-------------| 
 |  Precondition     |  Employee is not authenticated |
-|  Post condition     |  Application throws an error |
+|  Post condition     |  Employee is not authenticated. Application throws an error |
 | Step#        | Description  |
 |  1     | Employee starts application |  
 |  2     | Application asks for ID and password |
@@ -237,12 +240,12 @@ Employee enter the wrong password
 
 #### Scenario 1.3 - Employee Does Not Exist
 
-Employee enter the wrong ID
+Employee enters the wrong ID.
 
 |  Scenario 1.2 - Wrong ID | |
 | ------------- |-------------| 
 |  Precondition     |  Employee is not authenticated |
-|  Post condition     |  Application throws an error |
+|  Post condition     |  Employee is not authenticated. Application throws an error |
 | Step#        | Description  |
 |  1     | Employee starts application |  
 |  2     | Application asks for ID and password |
@@ -252,8 +255,7 @@ Employee enter the wrong ID
 
 | Actors Involved        | Warehouse Manager, Database |
 | ------------- |-------------| 
-|  Precondition     | Warehouse Manager is authenticated |
-| Precondition | It has been notified an item is in short supply |
+|  Precondition     | Warehouse Manager is authenticated and has been notified an item is in short supply |
 |  Post condition     | Order is / is not issued |
 |  Nominal Scenario     | Successful order from 1 supplier |
 |  Variant     | Successful order from more suppliers |
@@ -261,53 +263,50 @@ Employee enter the wrong ID
 
 #### Scenario 2.1 - Successful order from 1 supplier
 
-An order to one supplier is issued successfully
+An order to one supplier is successfully issued.
 
 | Scenario 2.1 - Successful order from 1 supplier | |
 | ------------- |-------------| 
-|  Precondition     | Warehouse Manager is authenticated |
-| Precondition | It has been notified an item is in short supply |
+|  Precondition     | Warehouse Manager is authenticated and has been notified an item is in short supply |
 |  Post condition     | Order is correctly issued (order status: issued)|
 | Step#        | Description  |
 |  1     | Warehouse Manager checks the list of suppliers for the item |  
-|  2     | Warehouse Manager choose one supplier to order the item from |
+|  2     | Warehouse Manager chooses one supplier to order the item from |
 |  3     | Warehouse Manager selects the item quantity |
 |  4     | Warehouse has enough space to store new items |
 |  5     | Financial Department and supplier are (externally) notified |
 
 #### Scenario 2.2 - Successful order from more suppliers
 
-An order to more than one supplier is issued successfully
+An order to more than one supplier is successfully issued.
 
 | Scenario 2.2 - Successful order from more suppliers | |
 | ------------- |-------------| 
-|  Precondition     | Warehouse Manager is authenticated |
-| Precondition | It has been notified an item is in short supply |
+|  Precondition     | Warehouse Manager is authenticated and has been notified an item is in short supply |
 |  Post condition     | Order is correctly issued (order status: issued)|
 | Step#        | Description  |
 |  1     | Warehouse Manager checks the list of suppliers for the item |  
-|  2     | Warehouse Manager choose one supplier to order the item from |
-||Repeat 2 and 3 for each supplier the Warehouse Manager wants to order from|
+|  2     | Warehouse Manager chooses one supplier to order the item from |
 |  3     | Warehouse Manager selects the item quantity |
+||Repeat 2 and 3 for each supplier the Warehouse Manager wants to order from|
 |  4     | Warehouse has enough space to store new items |
-|  5     | Financial Department and supplier are (externally) notified |
+|  5     | Financial Department and suppliers are (externally) notified |
 
 #### Scenario 2.3 - Warehouse is out of physical space
 
-Warehouse is full and is not possible to add new items
+Warehouse is full and it is not possible to add new items.
 
 | Scenario 2.3 - Warehouse is out of physical space | |
 | ------------- |-------------| 
-|  Precondition     | Warehouse Manager is authenticated |
-| Precondition | It has been notified an item is in short supply |
-|  Post condition     | Order is NOT issued|
+|  Precondition     | Warehouse Manager is authenticated and has been notified an item is in short supply |
+|  Post condition     | Order is not issued|
 | Step#        | Description  |
 |  1     | Warehouse Manager checks the list of suppliers for the item |  
 |  2     | Warehouse Manager chooses one supplier to order the item from |
 |  3     | Warehouse Manager selects the item quantity |
 |  4     | Warehouse has not enough space to store new items |
 
-### Use case 3, UC3 - Issue an internal order from Organisational Unit
+### Use case 3, UC3 - Issue an internal order from Organizational Unit
 
 | Actors Involved        | Unit Supervisor, Warehouse Worker, Database, Warehouse Manager |
 | ------------- |-------------| 
@@ -319,13 +318,12 @@ Warehouse is full and is not possible to add new items
 
 #### Scenario 3.1 - Successful internal order
 
-An order to warehouse from an Organisational Unit is issued successfully
+An order to warehouse from an Organizational Unit is completed.
 
 | Scenario 3.1 - Successful internal order | |
 | ------------- |-------------| 
 |  Precondition     | Unit supervisor is authenticated |
-| Precondition | It has been notified an item is in short supply |
-|  Post condition     | Order is correctly issued (order status: completed)|
+|  Post condition     | Order is completed (order status: completed)|
 | Step#        | Description  |
 |  1     | Unit supervisor checks the catalogue |  
 |  2     | Unit supervisor selects the item to be ordered |
@@ -344,7 +342,7 @@ An order to warehouse from an Organisational Unit is issued successfully
 
 #### Scenario 3.2 - Number of items goes under threshold after the order
 
-An order to warehouse from an Organisational Unit is issued successfully, after it the number of items goes below a threshold
+An order to warehouse from an Organizational Unit is completed. After it, the number of items goes below the short supply threshold.
 
 | Scenario 3.2 - Number of items goes under threshold after the order | |
 | ------------- |-------------| 
@@ -371,12 +369,11 @@ An order to warehouse from an Organisational Unit is issued successfully, after 
 
 #### Scenario 3.3 - Not enough items
 
-There is not enough of the requested items inside the warehouse 
+There is not enough of the requested items inside the warehouse.
 
 | Scenario 3.3 - Not enough items | |
 | ------------- |-------------| 
 |  Precondition     | Unit Supervisor is authenticated |
-| Precondition | It has been notified an item is in short supply |
 |  Post condition     | Order is aborted (order status: aborted) |
 | Step#        | Description  |
 |  1     | Unit Supervisor checks the catalogue |  
@@ -392,19 +389,19 @@ There is not enough of the requested items inside the warehouse
 | ------------- |-------------| 
 |  Precondition     | Unit Supervisor / Warehouse Manager is authenticated |
 |  Post condition     | Order is / is not deleted |
-|  Nominal Scenario     | Successful deletion (external) |
-|  Nominal Scenario     | Successful deletion (internal) |
+|  Nominal Scenario (1)     | Successful deletion (external) |
+|  Nominal Scenario (2)     | Successful deletion (internal) |
 |  Exception     | Order already processed |
 |  Exception | System error |
 
 #### Scenario 4.1 - Successful deletion of external order
 
-An order is successfully deleted by the Warehouse Manager	
+An order is successfully deleted by the Warehouse Manager.
 
 | Scenario 4.1 - Successful deletion of external order | |
 | ------------- |-------------| 
 |  Precondition     | Warehouse Manager is authenticated |
-|  Post condition     | Order is deleted from the Database (order status: Deleted)|
+|  Post condition     | Order is deleted (order status: deleted)|
 | Step#        | Description  |
 |  1     | Warehouse Manager checks the order list |  
 |  2     | Warehouse Manager deletes the order |
@@ -412,12 +409,12 @@ An order is successfully deleted by the Warehouse Manager
 
 #### Scenario 4.2 - Successful deletion of internal order
 
-An order is successfully deleted by the Unit Supervisor	
+An order is successfully deleted by the Unit Supervisor.	
 
 | Scenario 4.2 - Successful deletion of internal order | |
 | ------------- |-------------| 
 |  Precondition     | Unit Supervisor is authenticated |
-|  Post condition     | Order is deleted from the Database (order status: Deleted)|
+|  Post condition     | Order is deleted (order status: deleted)|
 | Step#        | Description  |
 |  1     | Unit Supervisor checks the order list |  
 |  2     | Unit Supervisor deletes the order |
@@ -425,12 +422,12 @@ An order is successfully deleted by the Unit Supervisor
 
 #### Scenario 4.3 - Order already processed
 
-An order is already processed and it can not be deleted	
+An order is already processed and it cannot be deleted.	
 
 | Scenario 4.3 - Order already processed | |
 | ------------- |-------------| 
 |  Precondition     | Warehouse Manager is authenticated |
-|  Post condition     | Order is not deleted from the Database |
+|  Post condition     | Order is not deleted|
 | Step#        | Description  |
 |  1     | Warehouse Manager checks the order list |  
 |  2     | Warehouse Manager deletes the order |
@@ -439,12 +436,12 @@ An order is already processed and it can not be deleted
 
 #### Scenario 4.4 - System Error
 
-System raises an error
+System raises an error.
 
 | Scenario 4.4 - System Error | |
 | ------------- |-------------| 
 |  Precondition     | Warehouse Manager is authenticated |
-|  Post condition     | Order is not deleted from the Database |
+|  Post condition     | Order is not deleted|
 | Step#        | Description  |
 |  1     | Warehouse Manager checks the order list |  
 |  2     | Warehouse Manager deletes the order |
@@ -455,55 +452,51 @@ System raises an error
 
 | Actors Involved        | Quality Officer, Database |
 | ------------- |-------------| 
-|  Precondition | An item ordered from a supplier has to be checked |
 |  Precondition | Quality officer is authenticated |
-|  Post condition     | The Quality Check is performed and passed |
+|  Post condition     | Quality Check is performed|
 |  Nominal Scenario     | Quality Check passed |
 |  Variant     | Quality Check failed, item kept |
 |  Exception | Quality Check failed, item rejected |
 
 #### Scenario 5.1 - Quality Check passed
 
-The Quality Check is passed
+The Quality Check is passed.
 
 | Scenario 5.1 - Quality Check passed | |
 | ------------- |-------------| 
-|  Precondition     | An item ordered from a supplier has to be checked |
 | Precondition | Quality Officer is authenticated |
 |  Post condition     | The check is performed and passed |
 | Step#        | Description  |
-|  1     | Quality Officer take the item |  
-|  2     | Quality Officer perform successfully the test |
-|  3     | Quality Officer add the information for the item in the application |
+|  1     | Quality Officer takes the item |  
+|  2     | The item passes the test |
+|  3     | Quality Officer adds the information for the item in the application |
 
 #### Scenario 5.2 - Quality Check not passed, item kept
 
-The Quality Check is not passed but the item is kept
+The Quality Check is not passed but the item is kept.
 
 | Scenario 5.2 - Quality Check not passed, item kept| |
 | ------------- |-------------| 
-|  Precondition     | An item ordered from a supplier has to be checked |
 | Precondition | Quality Officer is authenticated |
 |  Post condition     | The check is performed and not passed |
 | Step#        | Description  |
-|  1     | Quality Officer take the item |  
-|  2     | The item fail the test |
-|  3     | Quality Officer add the information for the item in the application |
+|  1     | Quality Officer takes the item |  
+|  2     | The item fails the test |
+|  3     | Quality Officer adds the information for the item in the application |
 
 #### Scenario 5.3 - Quality Check not passed, item rejected
 
-The Quality Check is not passed and the item is rejected
+The Quality Check is not passed and the item is rejected.
 
 | Scenario 5.3 - Quality Check not passed, item rejected | |
 | ------------- |-------------| 
-|  Precondition     | An item ordered from a supplier has to be checked |
 | Precondition | Quality Officer is authenticated |
 |  Post condition     | The check is performed and not passed |
 | Step#        | Description  |
-|  1     | Quality Officer take the item |  
-|  2     | The item fail the test |
-|  3     | Quality Officer add the information for the item in the application |
-| 4 | Quality Officer notify the Warehouse Manager that the item has to be rejected |
+|  1     | Quality Officer takes the item |  
+|  2     | The item fails the test |
+|  3     | Quality Officer adds the information for the item in the application |
+| 4 | Quality Officer notify the Warehouse Manager that the item has to be rejected (through the application)|
 
 ### Use case 6, UC6 - Add a Supplier in the System
 
@@ -511,119 +504,98 @@ The Quality Check is not passed and the item is rejected
 | ------------- |-------------| 
 |  Precondition | Warehouse Manager is authenticated |
 |  Precondition | Supplier has to be added |
-|  Post condition     | Supplier is added successfully |
+|  Post condition     | Supplier is / is not added |
 |  Nominal Scenario     | Supplier added |
-|  Exception | Supplier already added |
+|  Exception | Supplier already present|
 
 #### Scenario 6.1 - Supplier Added
 
-Successful adding of a Supplier in the System
+Successful adding of a Supplier in the system.
 
 | Scenario 6.1 - Supplier Added | |
 | ------------- |-------------| 
 |  Precondition     | Warehouse Manager is authenticated|
-| Precondition |  Supplier has to be added  |
 |  Post condition     | Supplier is added successfully |
 | Step#        | Description  |
-|  1     | Warehouse Manager insert information about the Supplier |  
-|  2     | Warehouse manager adds the information in the System |
+|  1     | Warehouse Manager inserts information about the Supplier |  
+|  2     | Warehouse Manager adds the information in the System |
 
-#### Scenario 6.2 - Supplier already Added
+#### Scenario 6.2 - Supplier already present
 
-The supplier is already present in the system
+The supplier is already present in the system.
 
-| Scenario 6.2 - Supplier already Added | |
+| Scenario 6.2 - Supplier already present | |
 | ------------- |-------------| 
 |  Precondition     | Warehouse Manager is authenticated|
-| Precondition |  Supplier has to be added  |
-|  Post condition     | System raise an error |
+|  Post condition     |  Supplier is not added |
 | Step#        | Description  |
-|  1     | Warehouse Manager insert information about the Supplier |  
-|  2     | Warehouse manager adds the information in the System |
+|  1     | Warehouse Manager inserts information about the Supplier |  
+|  2     | Warehouse Manager adds the information in the System |
 |  3    | System reject the modification |
 
-### Use case 7, UC7 - Add an Item in the Catalogue
+### Use case 7, UC7 - Add an item descriptor in the Catalogue
 
 | Actors Involved        | Warehouse Manager, Database |
 | ------------- |-------------| 
 |  Precondition | Warehouse Manager is authenticated |
-|  Precondition | Item has to be added |
-|  Post condition     | Item is added successfully |
-|  Nominal Scenario     | Item added |
-| Variant | Item from new supplier |
-|  Exception | Item already added |
+|  Post condition     | Item descriptor is / is not added|
+|  Nominal Scenario     | Item descriptor added |
+|  Exception | Item descriptor already present |
 
-#### Scenario 7.1 - Item Added
+#### Scenario 7.1 - Item descriptor added
 
-Successful adding Item in the Catalogue
+Successful adding Item descriptor in the Catalogue.
 
-| Scenario 7.1 - Item Added | |
+| Scenario 7.1 - Item descriptor added | |
 | ------------- |-------------| 
 |  Precondition     | Warehouse Manager is authenticated|
-| Precondition |  Item descriptor has to be added  |
 |  Post condition     | Item descriptor is added successfully |
 | Step#        | Description  |
-|  1     | Warehouse Manager insert information about the Item |  
+|  1     | Warehouse Manager inserts information about the Item descriptor|  
 |  2     | Warehouse Manager adds the information in the Catalogue |
 
-#### Scenario 7.2 - Item from New Supplier
+#### Scenario 7.2 - Item descriptor already present
 
-Successful adding Item in the Catalogue and updating Supplier list
+Item descriptor is already present in the Catalogue.
 
-| Scenario 7.2 - Item from New Supplier| |
+| Scenario 7.2 - Item descriptor already present| |
 | ------------- |-------------| 
 |  Precondition     | Warehouse Manager is authenticated|
-| Precondition |  Item descriptor has to be added  |
-|  Post condition     | Item descriptor is added successfully |
-| Post condition | Supplier list is updated |
+|  Post condition     | Item descriptor is not added  |
 | Step#        | Description  |
-|  1     | Warehouse Manager insert information about the Item |  
+|  1     | Warehouse Manager insert information about the Item descriptor|  
 |  2     | Warehouse Manager adds the information in the Catalogue |
-| 3 | Warehouse Manager adds Supplier in the System |
-
-#### Scenario 7.3 - Item already Added
-
-Item is already present in the Catalogue
-
-| Scenario 7.3 - Item already Added| |
-| ------------- |-------------| 
-|  Precondition     | Warehouse Manager is authenticated|
-| Precondition |  Item descriptor has to be added  |
-|  Post condition     | System raise an error |
-| Step#        | Description  |
-|  1     | Warehouse Manager insert information about the Item |  
-|  2     | Warehouse Manager adds the information in the Catalogue |
-| 3 | System detect Item is already present |
+| 3 | System detect Item descriptor is already present |
 
 ### Use case 8, UC8 - Visualize Wareouse content
 
 | Actors Involved        | Employee, Database |
 | ------------- |-------------| 
 |  Precondition | Employee is authenticated |
-|  Post condition     | Employee sees information |
+|  Post condition     | Employee does / does not access to information |
 |  Nominal Scenario     | Informations displayed |
 |  Exception |  Employee has no permission to see requested information |
 
 #### Scenario 8.1 - Informations Displayed
 
-Requested information are successfully displayed
+Requested information is successfully displayed.
 
 | Scenario 8.1 - Informations Displayed | |
 | ------------- |-------------| 
 |  Precondition     | Employee is authenticated|
-|  Post condition     | Employee sees informations |
+|  Post condition     | Employee accesses information |
 | Step#        | Description  |
 |  1     | Employee selects the information he wants to visualise |  
-|  2     | System visualises informations |
+|  2     | System visualises information |
 
 #### Scenario 8.2 - No authorization for requested information
 
-Employee has not the correct authorization to access requested informations
+Employee has not the correct authorization to access requested information.
 
 | Scenario 8.2 - No authorization for requested information | |
 | ------------- |-------------| 
 |  Precondition     | Employee is authenticated|
-|  Post condition     | Employee is notified that required permissions are missing |
+|  Post condition     | Employee does not access information |
 | Step#        | Description  |
 |  1     | Employee selects the information he wants to visualise |  
 |  2     | System denies visualisation of requested information |

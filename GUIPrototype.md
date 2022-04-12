@@ -50,14 +50,14 @@ A dual approach is used to handle the insertion of a new supplier.
 
 ![Pop-up for positions tracking](./GUI/Track-position.png "Pop-up for positions tracking")
 
-After selecting a given item descriptor, all users having Warehouse Worker's privileges can click on the <u>See position</u> label to retrieve the physical position of all items inside the warehouse.  
-They can also add new position by clicking on the proper button.
+After selecting a given item descriptor, all users having Warehouse Worker's privileges can click on the *See position* label to retrieve the physical position of all items inside the warehouse.  
+They can also add new positions by clicking on the proper button.
 
 ## Short supply and external orders
 
 ![Pop-up for external orders management](./GUI/Short-supply.png "Pop-up for external orders management")
 
-Whenever the Warehouse Manager receives a notification for a short supply, he/she can click on it to be conveniently redirected to the external order page. The same page can be manually reached by querying the catalogue in the proper search bar with the item name, and then clicking on the <u>Short supply!</u> danger button.  
+Whenever the Warehouse Manager receives a notification for a short supply, he/she can click on it to be conveniently redirected to the external order page. The same page can be manually reached by querying the catalogue in the proper search bar with the item name, and then clicking on the *Short supply!* danger button.  
 The page shows a list of supplier for the item, sorted by increasing price. It is also possible to order from many different suppliers in one shot.
 
 ## Quality tests management
@@ -71,10 +71,10 @@ Whenever the result of the test is marked as *Rejected*, a pop-up is shown, lead
 
 ![Pop-up for tests management](./GUI/Tests-history.png "Pop-up for tests management")
 
-Moreover, after selecting a given item descriptor, they can click on the <u>Tests history</u> label to quickly access all tests on that item descriptor.
+Moreover, after selecting a given item descriptor, they can click on the *Tests history* label to quickly access all tests on that item descriptor.
 
 ## Internal orders
 
 ![Unit Supervisor internal order page](./GUI/Internal-order.png "Unit Supervisor internal order page")
 
-Unit Supervisors have limited access to warehouse information, hence they can simply query the catalogue and place internal orders. All internal and *physical* information are hidden to them.
+Unit Supervisors have limited access to warehouse information, hence they can simply query the catalogue and place internal orders. Internal and *physical* information is hidden to them.
