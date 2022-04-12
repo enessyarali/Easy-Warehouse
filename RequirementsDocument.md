@@ -403,7 +403,7 @@ An order is successfully deleted by the Warehouse Manager.
 |  Precondition     | Warehouse Manager is authenticated |
 |  Post condition     | Order is deleted (order status: deleted)|
 | Step#        | Description  |
-|  1     | Warehouse Manager checks the order list |  
+|  1     | Warehouse Manager checks the orders history |  
 |  2     | Warehouse Manager deletes the order |
 |  3     | Supplier is notified about the deleted order |
 
@@ -416,7 +416,7 @@ An order is successfully deleted by the Unit Supervisor.
 |  Precondition     | Unit Supervisor is authenticated |
 |  Post condition     | Order is deleted (order status: deleted)|
 | Step#        | Description  |
-|  1     | Unit Supervisor checks the order list |  
+|  1     | Unit Supervisor checks the orders history |  
 |  2     | Unit Supervisor deletes the order |
 |  3     | Warehouse Worker is notified about the deleted order |
 
@@ -429,7 +429,7 @@ An order is already processed and it cannot be deleted.
 |  Precondition     | Warehouse Manager is authenticated |
 |  Post condition     | Order is not deleted|
 | Step#        | Description  |
-|  1     | Warehouse Manager checks the order list |  
+|  1     | Warehouse Manager checks the orders history |  
 |  2     | Warehouse Manager deletes the order |
 |  3     | Supplier is notified about the deleted order |
 | 4 | Supplier sends feedback: Order already processed and shipped |
@@ -443,7 +443,7 @@ System raises an error.
 |  Precondition     | Warehouse Manager is authenticated |
 |  Post condition     | Order is not deleted|
 | Step#        | Description  |
-|  1     | Warehouse Manager checks the order list |  
+|  1     | Warehouse Manager checks the orders history |  
 |  2     | Warehouse Manager deletes the order |
 |  3     | System raises an error |
 | 4 | IT Administrator is notified about the technical error |
