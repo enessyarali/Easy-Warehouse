@@ -22,11 +22,20 @@ The design must satisfy the Official Requirements document, notably functional a
 # High level design 
 
 <discuss architectural styles used, if any>
-<report package diagram, if needed>
+- client/server
+- 3 tier (DATABASE)??? / model-view  
 
+![Package diagram](./package-diagram.png "Package diagram")
 
+## Front End
+The front end, which contains the GUI, is externally provided.  
+Hence, we will not focus on it.
 
-
+## Back End
+The back end is further divided into 3 different packages:
+- Warehouse, which is used as a façade by the front end
+- Model, containing all classes needed to manage and process data
+- Exceptions, to handle any incorrect action triggered either by a user or the system itself
 
 
 # Low level design
@@ -58,3 +67,6 @@ The design must satisfy the Official Requirements document, notably functional a
 # Verification sequence diagrams 
 \<select key scenarios from the requirement document. For each of them define a sequence diagram showing that the scenario can be implemented by the classes and methods in the design>
 
+
+
+```
