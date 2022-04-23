@@ -71,10 +71,18 @@ get-----
 Fetches the SKU from the database by calling db.loadSKU(), then calls sku.modify(). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKU(sku).
 
     setSKUPostion()
-Fetches the SKU from the database by calling db.loadSKU(), then calls sku.setPosition(). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKU(sku).
+Fetches the SKU and the position from the database by calling db.loadSKU() and db.loadPosition(), then calls sku.setPosition(). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKU(sku) and db.updatePosition(p).
 
     deleteSKU()
-Fetches the SKU from the database by calling db.loadSKU(), then calls sku.setPosition(null). Finally, if no exceptions have been raised, the SKU is deleted by calling db.deleteSKU(sku.id).
+Fetches the SKU and its assigned position - if any - from the database by calling db.loadSKU() and db.loadPosition(). Then, it possibly calls p.setSKU(null). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updatePosition(p) and the SKU is deleted by calling db.deleteSKU(sku.id).
+
+---------
+
+
+
+    deletePosition()
+Fetches the position and its assigned SKU - if any - from the database by calling db.loadPosition() and db.loadSKU(). Then, it possibly calls sku.setPosition(null). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKU(sku) and the position is deleted by calling db.deletePosition(p.id).
+
 
 ```
 
@@ -89,16 +97,19 @@ Fetches the SKU from the database by calling db.loadSKU(), then calls sku.setPos
 Changes the value of attributes. If either weight, volume or availableQuantity are modified and the SKU is assigned to a position, that position is fetched from the database by calling db.loadPosition() and p.updateOccupiedWeightAndVolume() is called. Finally, if no exceptions have been raised, the changes are made persistent by calling db.updatePosition(p). 
 
     setPosition()
-> if pId!=null
-Fetches the position from the database by calling db.loadPosition(), then calls p.setSKU(). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updatePosition(p).
-> if pId==null
-Fetches sku.position from the database by calling db.loadPosition(), then calls p.setSKU(null). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updatePosition(p).
+> if p!=null
+Calls p.setSKU() and, if no exceptions have been raised, sets sku.positoinId = p.getId().
+> if p==null
+Simply sets sku.positionId = p.getId()
     
   
 
 ```
 ### Position
 ```
+    modify()
+Changes the value of attributes. ---------------
+
     updateOccupiedWeightAndVolume()
 Computes new, temporary values for p.occupiedWeight and p.occupiedVolume.If they are still lower than the respective maximum values, they are modified. Otherwise, -------------------------- is raised.
 
