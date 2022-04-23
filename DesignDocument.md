@@ -17,13 +17,15 @@ Version:
 
 # Instructions
 
-The design must satisfy the Official Requirements document, notably functional and non functional requirements, and be consistent with the APIs
+The design must satisfy the Official Requirements document, notably functional and non functional requirements, and be consistent with the APIs.
 
 # High level design 
 
-<discuss architectural styles used, if any>
-- client/server
-- 3 tier (DATABASE)??? / model-view  
+For our design, we have adopted a layered, model-view architectural style.  
+In particular, we have a front end, taking care of the presentational aspect, which interacts with a back end, managing the application logic and data.  
+The back end is then further logically split into two parts, one taking care of the model and its logic, and another one which is used as an interface with the database. 
+
+## Package diagram
 
 ![Package diagram](./package-diagram.png "Package diagram")
 
@@ -33,22 +35,80 @@ Hence, we will not focus on it.
 
 ## Back End
 The back end is further divided into 3 different packages:
-- Warehouse, which is used as a façade by the front end
-- Model, containing all classes needed to manage and process data
-- Exceptions, to handle any incorrect action triggered either by a user or the system itself
-
+- `warehouse`, which is used as a façade by the front end
+- `model`, containing all classes needed to manage and process data
+- `exceptions`, to handle any incorrect action triggered either by a user or the system itself
 
 # Low level design
 
-<for each package in high level design, report class diagram. Each class should detail attributes and operations>
+Apart from the listed methods, all classes have:
+- a personalized constructor to initialize (part of) its attributes
+- getters for all attributes  
+...............
+
+which have been omitted for the sake of brevity.
+
+
+
+### DatabaseUtilities
+This class will be used as an interface towards the database storing information needed by the application. All functions are extremely simple and low-level.
 
 
 
 
 
+### EzWhInterface & EzWh
+The `EzWhInterface` interface, which in our case is implemented by the `EzWh` class, is the façade used by the front end to interact with the back end.  
+Its role is mainly _translational_, since every function
+1. Possibly converts from JSON to custom Java classes
+2. Interacts with the database by calling the proper low-level functions
+3. Possibly converts the result from custom Java classes to JSON  
+
+```
+get-----
+------
+    modifySKU()
+Fetches the SKU from the database by calling db.loadSKU(), then calls sku.modify(). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKU(sku).
+
+    setSKUPostion()
+Fetches the SKU from the database by calling db.loadSKU(), then calls sku.setPosition(). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKU(sku).
+
+    deleteSKU()
+Fetches the SKU from the database by calling db.loadSKU(), then calls sku.setPosition(null). Finally, if no exceptions have been raised, the SKU is deleted by calling db.deleteSKU(sku.id).
+
+```
 
 
 
+
+
+### SKU
+
+```
+    modify()
+Changes the value of attributes. If either weight, volume or availableQuantity are modified and the SKU is assigned to a position, that position is fetched from the database by calling db.loadPosition() and p.updateOccupiedWeightAndVolume() is called. Finally, if no exceptions have been raised, the changes are made persistent by calling db.updatePosition(p). 
+
+    setPosition()
+> if pId!=null
+Fetches the position from the database by calling db.loadPosition(), then calls p.setSKU(). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updatePosition(p).
+> if pId==null
+Fetches sku.position from the database by calling db.loadPosition(), then calls p.setSKU(null). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updatePosition(p).
+    
+  
+
+```
+### Position
+```
+    updateOccupiedWeightAndVolume()
+Computes new, temporary values for p.occupiedWeight and p.occupiedVolume.If they are still lower than the respective maximum values, they are modified. Otherwise, -------------------------- is raised.
+
+    setSKU()
+> if sku!=null
+First, checks if it is already assigned to another SKU. If yes, --------------- is raised. If no, checks if it is able to store the available SKU in terms of weight and volume. If yes, the SKU is set. If no, ----------------- is raised.
+> if sku==null
+Resets the position to its initial state, that is p.sku = null, occupiedWeight = 0 and occupiedVolume = 0.
+
+```
 
 # Verification traceability matrix
 
