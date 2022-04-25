@@ -315,12 +315,6 @@ Changes the value of attributes. If either weight, volume or availableQuantity a
 
     void setPosition(p :Position)
 Calls p.setSKU() and, if no exceptions have been raised, sets sku.positoinId = p.getId().
-
-    Integer getMinOccupiedWeight()
-Returns weight*availableQuantity.
-
-    Integer getMinOccupiedVolume()
-Returns volume*availableQuantity.
     
 ```
 ### SKUitem
@@ -345,9 +339,7 @@ Changes the value of attributes.
 ### Position
 ```
     void modify(newAisleId :String, newRow :String, newCol :String, newMaxWeight :Integer, newMaxVolume :Integer, newOccupiedWeight :Integer, newOccupiedVolume :Integer, db :DatabaseUtilities)
-Changes the value of attributes. If the position is assigned to a SKU, that SKU is fetched from the database by calling sku = db.loadSKU(skuId). If either newOccupiedWeight or newOccupiedVolume are modified and the position is assigned to a SKU, minW = sku.getMinOccupiedWeight() and minV = sku.getMinOccupiedVolume() are computed. 
-Then, if minW > newOccupiedWeight or minV > newOccupiedVolume, -------------------- is raised.
-Moreover, if newOccupiedWieght > newMaxWeight or newOccupiedVolume > newMaxVolume, ----------------------- is raised.
+Changes the value of attributes. If the position is assigned to a SKU, that SKU is fetched from the database by calling sku = db.loadSKU(skuId). If newOccupiedWieght > newMaxWeight or newOccupiedVolume > newMaxVolume, ----------------------- is raised.
 Finally, the new value for the id is computed by calling computePositionId(), and then set, and sku.setPosition(this) is possibly called.    
     
     void modify(newPositionId :String)
