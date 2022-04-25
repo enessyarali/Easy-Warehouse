@@ -135,6 +135,32 @@ Fetches from the database the test descriptor and SKU whose ids match the ones i
     void deleteTestDescriptor(testId :Integer)
 Fetches from the database the test descriptor whose id matches the one in input by calling test = db.loadTestDescriptor(testId). Then, it calls test.clean(). Finally, if no exceptions have been raised, the descriptor is deleted by calling db.deleteTestDescriptor(testId).
 
+    Array<String> getTestResultsByRfid(rfid :String):
+Returns a list of all the test results in the database correspondent to a SKUitem whose rfid matches the one in input, by calling db.loadTestResult(rfid).
+
+    String getTestResultbyId(rfid :String, resultId :Integer):
+Searches in the database the test result whose pair (rfid, id) matches the one in input, by calling db.loadTestResult(rfid, resultId).
+Returns the requested TestResult.
+
+    void addTestResult (rfid :String, testId :Integer, testDescription :String, date :Date, result :Boolean):
+Fetches from the database the SKUitem whose rfid matches the one in input by calling skuItem = db.loadSKUitem(rfid) and the descriptor whose id matches the one in input by calling test = db.loadTestDescriptor(testId). Then, creates a new test result by calling its constructor [the constructor will take care of checking the test.getSkuId() == skuItem.getSkuId()]. Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKU(sku), and the descriptor is added in the database by calling db.intertTestDescriptor().
+
+    void modifyTestResult (rfid :String, resultId :Integer, newTestDescription :String, newDate :Date, newResult :Boolean)
+Creates a new test result object by calling the unsafe constructor (which performs no checks), then calls db.updateTestResult().
+
+    void deleteTesResult(rfid :String, resultId :Integer)
+Simply calls db.deleteTestResult(rfid, resultId).
+
+
+
+
+
+
+
+
+
+
+
 
 ---------
 
@@ -173,6 +199,15 @@ Returns volume*availableQuantity.
   
 
 ```
+### SKU
+
+```
+    void modify(newRfid :String, newAvailable :Boolean, newDateOfStock :Date)
+Changes the value of attributes.
+
+```
+
+
 ### Position
 ```
     
