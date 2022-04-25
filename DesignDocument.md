@@ -102,7 +102,7 @@ Creates a new SKUitem by calling its constructor, then adds it in the database b
 Fetches the SKUitem from the database by calling skuItem = db.loadSKUitem(rfid), then calls skuItem.modify(...). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKUitem(skuItem).
 
     void deleteSKUItem(rfid :String)
-Removes the SKUitem from the database by calling db.deleteSKUitem(rfid).
+Removes the SKUitem from the database by calling db.deleteSKUitem(rfid). To ensure consistency, all test results --------------------------------- referring to that SKUitem are also deleted by calling db.deleteTestResult(rfid).
 
     Array<String> getAllPositions()
 Returns a list of all the positions in the database, by calling db.loadPosition(null).
@@ -127,13 +127,13 @@ Searches in the database the test descriptor whose id matches the one in input, 
 Returns the requested TestDescriptor.
    
     void addTestDescriptor (name :String, procedureDescription :String, skuId :Integer)
-Fetches from the database the SKU whose id matches the one in input by calling sku = db.loadSKU(skuId), and creates a new test descriptor by calling its constructor [the constructor will take care of adding the test descriptor to the SKU by calling sku.addTestDescriptor()]. Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKU(sku), and the descriptor is added in the database by calling db.intertTestDescriptor().
+Fetches from the database the SKU whose id matches the one in input by calling sku = db.loadSKU(skuId), and creates a new test descriptor by calling its constructor. Finally, if no exceptions have been raised, the descriptor is added in the database by calling db.intertTestDescriptor().
 
     void modifyTestDescriptor (testId :Integer, newName :String, newProcedureDescription :String, newSKUId :Integer)
-Fetches from the database the test descriptor and SKU whose ids match the ones in input by calling test = db.loadTestDescriptor(testId) and sku = db.loadSKU(newSkuId). Then, it calls test.modify(...). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKU(sku) and db.updateTestDescriptor(test).
+Fetches from the database the test descriptor and SKU whose ids match the ones in input by calling test = db.loadTestDescriptor(testId) and sku = db.loadSKU(newSkuId). Then, it calls test.modify(...). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateTestDescriptor(test).
 
     void deleteTestDescriptor(testId :Integer)
-Fetches from the database the test descriptor whose id matches the one in input by calling test = db.loadTestDescriptor(testId). Then, it calls test.clean(). Finally, if no exceptions have been raised, the descriptor is deleted by calling db.deleteTestDescriptor(testId).
+Simply calls db.deleteTestDescriptor(testId). To ensure consistency, all test results --------------------------------- referring to that test descriptor are also deleted by calling db.deleteTestResult(testId).
 
     Array<String> getTestResultsByRfid(rfid :String):
 Returns a list of all the test results in the database correspondent to a SKUitem whose rfid matches the one in input, by calling db.loadTestResult(rfid).
@@ -239,11 +239,8 @@ Reads the current values of this.aisleId, this.row and this.column, and concaten
 ### Test Descriptor
 ```
        void modify (newName :String, newProcedureDescription :String, newSKU :SKU)
-If newSKU is different from the old one, fetches from the database the old SKU by calling oldSku = db.loadSKU(this.skuId), removes the test descriptor by calling oldSku.addTestDescriptor(this.id, false) and makes everything persistent by calling db.updateSKU(oldSku).
-Changes the value of attributes, and calls newSKU.addTestDescriptor(this.id).
+Changes the value of attributes.
 
-    void clean()
-Simply call modify() with newSKU = null.
   
 
 ```
