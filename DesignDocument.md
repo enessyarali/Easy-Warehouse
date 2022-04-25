@@ -48,12 +48,10 @@ Apart from the listed methods, all classes have:
 
 which have been omitted for the sake of brevity.
 
+## Exceptions
 
 
-### DatabaseUtilities
-This class will be used as an interface towards the database storing information needed by the application. All functions are extremely simple and low-level.
-
-
+## Warehouse & Model
 
 
 
@@ -65,6 +63,8 @@ Its role is mainly _translational_, since every function
 3. Possibly converts the result from custom Java classes to JSON  
 
 ```
+************************* SKU *************************
+
     Array<String> getAllSKUs()
 Returns a list of all the SKUs in the database, by calling db.loadSKU(null).
 
@@ -83,6 +83,8 @@ Fetches the SKU and the position from the database by calling sku = db.loadSKU(s
 
     void deleteSKU(skuId :Integer)
 Fetches the SKU and its assigned position - if any - from the database by calling first sku = db.loadSKU(skuId) and then p = db.loadPosition(sku.getPosition()). Then, it possibly calls p.setSKU(null). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updatePosition(p) and the SKU is deleted by calling db.deleteSKU(sku.getId()). To ensure consistency, all SKUitems, test descriptors --------------------------------- referring to that SKU are also deleted by calling db.deleteSKUitem(skuId), db.deleteTestDescriptor(skuId).
+
+************************* SKUitem *************************
 
     Array<String> getAllSKUitems()
 Returns a list of all the SKUitems in the database, by calling db.loadSKUitem(null).
@@ -104,6 +106,8 @@ Fetches the SKUitem from the database by calling skuItem = db.loadSKUitem(rfid),
     void deleteSKUItem(rfid :String)
 Removes the SKUitem from the database by calling db.deleteSKUitem(rfid). To ensure consistency, all test results --------------------------------- referring to that SKUitem are also deleted by calling db.deleteTestResult(rfid).
 
+************************* Position *************************
+
     Array<String> getAllPositions()
 Returns a list of all the positions in the database, by calling db.loadPosition(null).
 
@@ -118,6 +122,8 @@ Fetches the position from the database by calling p = db.loadPosition(oldPositio
 
     void deletePosition(positionId :String)
 Fetches the position and its assigned SKU - if any - from the database by calling p = db.loadPosition(positionId) and sku = db.loadSKU(p.getSkuId()). Then, it possibly calls sku.setPosition(null). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKU(sku) and the position is deleted by calling db.deletePosition(positionId).
+
+************************* TestDescriptor *************************
 
     Array<String> getAllTestDescriptors()
 Returns a list of all the test descriptors in the database, by calling db.loadTestDescriptor(null).
@@ -135,6 +141,8 @@ Fetches from the database the test descriptor and SKU whose ids match the ones i
     void deleteTestDescriptor(testId :Integer)
 Simply calls db.deleteTestDescriptor(testId). To ensure consistency, all test results --------------------------------- referring to that test descriptor are also deleted by calling db.deleteTestResult(testId).
 
+************************* TestResult *************************
+
     Array<String> getTestResultsByRfid(rfid :String):
 Returns a list of all the test results in the database correspondent to a SKUitem whose rfid matches the one in input, by calling db.loadTestResult(rfid).
 
@@ -143,7 +151,7 @@ Searches in the database the test result whose pair (rfid, id) matches the one i
 Returns the requested TestResult.
 
     void addTestResult (rfid :String, testId :Integer, testDescription :String, date :Date, result :Boolean):
-Fetches from the database the SKUitem whose rfid matches the one in input by calling skuItem = db.loadSKUitem(rfid) and the descriptor whose id matches the one in input by calling test = db.loadTestDescriptor(testId). Then, creates a new test result by calling its constructor [the constructor will take care of checking the test.getSkuId() == skuItem.getSkuId()]. Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKU(sku), and the descriptor is added in the database by calling db.intertTestDescriptor().
+Fetches from the database the SKUitem whose rfid matches the one in input by calling skuItem = db.loadSKUitem(rfid) and the descriptor whose id matches the one in input by calling test = db.loadTestDescriptor(testId). Then, creates a new TestResult object by calling its constructor [the constructor will take care of checking the test.getSkuId() == skuItem.getSkuId()]. Finally, if no exceptions have been raised, the descriptor is added in the database by calling db.intertTestDescriptor().
 
     void modifyTestResult (rfid :String, resultId :Integer, newTestDescription :String, newDate :Date, newResult :Boolean)
 Creates a new test result object by calling the unsafe constructor (which performs no checks), then calls db.updateTestResult().
@@ -151,28 +159,77 @@ Creates a new test result object by calling the unsafe constructor (which perfor
     void deleteTesResult(rfid :String, resultId :Integer)
 Simply calls db.deleteTestResult(rfid, resultId).
 
+************************* User *************************
 
+    String getUserInfo()
+Returns the content of currentlyLoggedUser. If no user is logged in, it throws ------------------------.
 
+    Array<String> getAllSuppliers()
+Returns a list of all the suppliers in the database by calling db.loadUser(type = SUPPLIER).
 
+    Array<String> getAllUsers()
+Returns a list of all the users in the database by calling db.loadUser().
 
+    void addUser(username :String, name :String, surname :String, password :String, type :String)
+Creates a new user object by calling its constructor, then calls db.insertUser(). If type = MANAGER, ------------------ is raised.
 
+    void login(username :String, password :String, type :String)
+Fetches from the the database usr = db.loadUser(username, type), then compares the password. If they are different, ------------------- is raised. Otherwise, currentlyLoggedUser is set to usr.
 
+    void logout()
+Sets currentlyLoggedUser to null. If it is already null, ---------------- is thrown.
 
+    void modifyUserRole(username :String, oldType :String, newType :String)
+Fetches from the the database usr = db.loadUser(username, oldType), then calls usr.setType(newType). If type = MANAGER, ------------------ is raised. Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateUser(usr). 
 
+    void deleteUser(username :String, type :String)
+Calls db.deleteUser(username, type). If type = MANAGER, ------------------ is raised. If type = SUPPLIER, to ensure consistency, all items --------------------------------- referring to that supplier are also deleted by calling db.deleteItem(usr.getId()).
 
+************************* RestockOrder *************************
+
+    Array<String> getAllRestockOrders()
+Returns a list of all the restock orders in the database by calling db.loadRestockOrder().
+
+    Array<String> getRestockOrdersIssued()
+Returns a list of all the restock orders in the database in the ISSUED state by calling db.loadRestockOrder(state = ISSUED).
+
+    String getRestockOrderById(orderId :Integer)
+Searches in the database the restock order whose id matches the one in input, by calling db.loadRestockOrder(orderId).
+Returns the requested RestockOrder.
+
+    void addRestockOrder()
 
 
 ---------
 
 
+************************* Item *************************
 
+    Array<String> getAllItems()
+Returns a list of all the items in the database by calling db.loadItem(null).
 
+    String getItemById(itemId :Integer)
+Searches in the database the item whose id matches the one in input, by calling db.loadItem(itemId).
+Returns the requested Item.
 
+    void addItem (description :String, price :Float, skuId :Integr, supplierId :Integer):
+Fetches from the database the SKU and the supplier whose ids match the ones in input by calling sku = db.loadSKU(skuId) and usr = db.loadUser(supplierId). Then, creates a new Item object by calling its constructor. Finally, if no exceptions have been raised, the item is added in the database by calling db.insertItem().
+
+    void modifyItem (itemId :Integr, newDescription :String, newPrice :Float):
+Fetches from the database the item whose id matches the one in input by calling item = db.loadItem(itemId). Then, calls item.modify(...). Finally, if no exceptions have been raised, the item is updated by calling db.updateItem(item).
+
+    void deleteItem(itemId :Integer)
+Simply calls db.deleteItem(itemId).
 
 ```
 
 
+### DatabaseUtilities
+This class will be used as an interface towards the database storing information needed by the application. All functions are extremely simple and low-level. For each function, we will specify the query on the database.
 
+
+
+If there is not an SKU with an id matching the input, the system throws the UnexistingSKUException.
 
 
 ### SKU
@@ -187,22 +244,25 @@ Calls p.setSKU() and, if no exceptions have been raised, sets sku.positoinId = p
 > if p==null
 Simply sets sku.positionId = p.getId().
 
-    void addtestDescriptor(testId: Integer, toBeAdded :Boolean)
-If toBeAdded == true, testId is added to the list of test descriptors. Otherwise, it is removed.
-
     Integer getMinOccupiedWeight()
 Returns weight*availableQuantity.
 
     Integer getMinOccupiedVolume()
 Returns volume*availableQuantity.
     
-  
-
 ```
-### SKU
+### SKUitem
 
 ```
     void modify(newRfid :String, newAvailable :Boolean, newDateOfStock :Date)
+Changes the value of attributes. If newRfid is different than rfid, to ensure consistency, fetches from the database all test results,------------------- referring to that rfid and, for each of them, calls setSkuItemRfid(newRfid) and propagates the changes to the database.
+
+```
+
+### Item
+
+```
+    void modify(newDescription :String, newPrice :Float)
 Changes the value of attributes.
 
 ```
@@ -210,7 +270,6 @@ Changes the value of attributes.
 
 ### Position
 ```
-    
     void modify(newAisleId :String, newRow :String, newCol :String, newMaxWeight :Integer, newMaxVolume :Integer, newOccupiedWeight :Integer, newOccupiedVolume :Integer, db :DatabaseUtilities)
 Changes the value of attributes. If the position is assigned to a SKU, that SKU is fetched from the database by calling sku = db.loadSKU(skuId). If either newOccupiedWeight or newOccupiedVolume are modified and the position is assigned to a SKU, minW = sku.getMinOccupiedWeight() and minV = sku.getMinOccupiedVolume() are computed. 
 Then, if minW > newOccupiedWeight or minV > newOccupiedVolume, -------------------- is raised.
@@ -238,16 +297,21 @@ Reads the current values of this.aisleId, this.row and this.column, and concaten
 ```
 ### Test Descriptor
 ```
-       void modify (newName :String, newProcedureDescription :String, newSKU :SKU)
+       void modify (newName :String, newProcedureDescription :String, newSKUid :Integer)
 Changes the value of attributes.
-
-  
 
 ```
 
-### database 
+### Test Result
+```
+       void setSkuItemRfid(rfid :String)
+Changes the value of the skuItemRfid attribute.
 
-If there is not an SKU with an id matching the input, the system throws the UnexistingSKUException.
+```
+
+
+
+
 
 # Verification traceability matrix
 
