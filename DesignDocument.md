@@ -53,8 +53,6 @@ which have been omitted for the sake of brevity.
 
 ## Warehouse & Model
 
-
-
 ### EzWhInterface & EzWh
 The `EzWhInterface` interface, which in our case is implemented by the `EzWh` class, is the façade used by the front end to interact with the back end.  
 Its role is mainly _translational_, since every function
@@ -90,7 +88,7 @@ Fetches the SKU and its assigned position - if any - from the database by callin
 Returns a list of all the SKUitems in the database, by calling db.loadSKUitem(null).
 
     Array<String> getSKUbySKUItemId(skuId :Integer)
-Searches in the database all SKUitems whose skuId matches the one in input, by calling db.loadSKUitemBySKU(skuId).
+Searches in the database all SKUitems whose skuId matches the one in input, by calling db.loadSKUitem(skuId).
 Returns the requested SKUitems.
 
     String getSKUitemByRfid(rfid :String)
@@ -103,8 +101,9 @@ Creates a new SKUitem by calling its constructor, then adds it in the database b
     void modifySKUitem(rfid :String, newRfid :String, newAvailable :Boolean, newDateOfStock :Date)
 Fetches the SKUitem from the database by calling skuItem = db.loadSKUitem(rfid), then calls skuItem.modify(...). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKUitem(skuItem).
 
-    void deleteSKUItem(rfid :String)
-Removes the SKUitem from the database by calling db.deleteSKUitem(rfid). To ensure consistency, all test results --------------------------------- referring to that SKUitem are also deleted by calling db.deleteTestResult(rfid).
+    void deleteSKUitem(rfid :String)
+To keep the order history clear, SKUitems are never deleted: their isAvailable flag is simply put to false. Hence, this function fetches the SKUitem from the database by calling skuItem = db.loadSKUitem(rfid), then calls skuItem.setIsAvailable(false). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKUitem(skuItem).
+However, to ensure consistency, all test results --------------------------------- referring to that SKUitem are also deleted by calling db.deleteTestResult(rfid).
 
 ************************* Position *************************
 
@@ -120,8 +119,8 @@ Fetches the position from the database by calling p = db.loadPosition(oldPositio
     void modifyPosition(oldPositionId :String, newPositionId :String)
 Fetches the position from the database by calling p = db.loadPosition(oldPositionId), then calls p.modify(newPositionId). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updatePosition(p).
 
-    void deletePosition(positionId :String)
-Fetches the position and its assigned SKU - if any - from the database by calling p = db.loadPosition(positionId) and sku = db.loadSKU(p.getSkuId()). Then, it possibly calls sku.setPosition(null). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKU(sku) and the position is deleted by calling db.deletePosition(positionId).
+    void deleteSKUitemFromPosition(positionId :String)
+Removes a SKUitem from the position identified by positionId. In particular, the SKUitem with the lowest date of stock must be selected, to apply a FIFO-like criteria. To do so, db.fifoPopSKUitemFromPosition(positionId) is called.
 
 ************************* TestDescriptor *************************
 
@@ -156,7 +155,7 @@ Fetches from the database the SKUitem whose rfid matches the one in input by cal
     void modifyTestResult (rfid :String, resultId :Integer, newTestDescription :String, newDate :Date, newResult :Boolean)
 Creates a new test result object by calling the unsafe constructor (which performs no checks), then calls db.updateTestResult().
 
-    void deleteTesResult(rfid :String, resultId :Integer)
+    void deleteTestResult(rfid :String, resultId :Integer)
 Simply calls db.deleteTestResult(rfid, resultId).
 
 ************************* User *************************
@@ -197,11 +196,60 @@ Returns a list of all the restock orders in the database in the ISSUED state by 
 Searches in the database the restock order whose id matches the one in input, by calling db.loadRestockOrder(orderId).
 Returns the requested RestockOrder.
 
+    Array<String> getRestockOrderReturnItem()
+
+
+
     void addRestockOrder()
+NOT ORDER MORE THAN WHAT THE WH IS CAPABLE OF STORING!!!
 
 
----------
 
+    void modifyRestockOrderState(orderId :Integer, newState :String)
+Fetches from the the database the requested restock order restock = db.loadRestockOrder(orderId). Then, calls restock.setState(newState). Finally, if no exceptions have been raised, the order is updated by calling db.updateRestockOrder(restock).
+
+    void modifyRestockOrderSKUitems(orderId :Integer, skuItems :Array<String>)
+Fetches from the the database the requested restock order restock = db.loadRestockOrder(orderId). 
+-------------------------
+Then, calls restock............... Finally, if no exceptions have been raised, the order is updated by calling db.updateRestockOrder(restock).
+
+    void modifyRestockOrderTransportNote(orderId :Integer, transportNote :String)
+Fetches from the the database the requested restock order restock = db.loadRestockOrder(orderId). Then, calls restock.setTransportNote(transportNote). Finally, if no exceptions have been raised, the order is updated by calling db.updateRestockOrder(restock).
+
+    void deleteRestockOrder(orderId :Integer)
+Calls db.deleteRestockOrder(orderId).
+To keep the order history explicit, we do not automatically delete return orders referencing to deleted restock orders.
+More in general, when treating orders, we never perform automatic deletion (e.g., if an item is deleted, all orders referencing that item are still kept in the database).
+
+************************* ReturnOrder *************************
+
+
+
+
+************************* InternalOrder *************************
+
+    Array<String> getAllInternalOrders()
+Returns a list of all the internal orders in the database by calling db.loadInternalOrder().
+
+    Array<String> getInternalOrdersIssued()
+Returns a list of all the internal orders in the database in the ISSUED state by calling db.loadInternalOrder(state = ISSUED).
+
+    Array<String> getInternalOrdersAccepted()
+Returns a list of all the internal orders in the database in the ACCEPTED state by calling db.loadInternalOrder(state = ACCEPTED).
+
+    String getInternalOrderById(orderId :Integer)
+Searches in the database the internal order whose id matches the one in input, by calling db.loadInternalOrder(orderId).
+Returns the requested InternalOrder.
+
+    void addInternalOrder (issueDate :Date, products: Map<String, Integer>, customerId :Integer):
+Fetches from the database the customer whose id matches the one in input by calling usr = db.loadUser(customerId, type = CUSTOMER).
+Then, creates a new InternalOrder object by calling its constructor. Finally, if no exceptions have been raised, the order is added in the database by calling db.insertInternalOrder().
+
+    void modifyInternalOrderState(orderId :Integer, newState :String, products :Array<String>)
+Fetches from the the database the requested internal order internal = db.loadInternalOrder(orderId). Then, calls restock.setState(newState, products). Finally, if no exceptions have been raised, the order is updated by calling db.updateRestockOrder(restock).
+
+    void deleteInternalOrder(orderId :Integer)
+Calls db.deleteInternalOrder(orderId).
 
 ************************* Item *************************
 
@@ -213,7 +261,7 @@ Searches in the database the item whose id matches the one in input, by calling 
 Returns the requested Item.
 
     void addItem (description :String, price :Float, skuId :Integr, supplierId :Integer):
-Fetches from the database the SKU and the supplier whose ids match the ones in input by calling sku = db.loadSKU(skuId) and usr = db.loadUser(supplierId). Then, creates a new Item object by calling its constructor. Finally, if no exceptions have been raised, the item is added in the database by calling db.insertItem().
+Fetches from the database the SKU and the supplier whose ids match the ones in input by calling sku = db.loadSKU(skuId) and usr = db.loadUser(supplierId, type = SUPPLIER). Then, creates a new Item object by calling its constructor. Finally, if no exceptions have been raised, the item is added in the database by calling db.insertItem().
 
     void modifyItem (itemId :Integr, newDescription :String, newPrice :Float):
 Fetches from the database the item whose id matches the one in input by calling item = db.loadItem(itemId). Then, calls item.modify(...). Finally, if no exceptions have been raised, the item is updated by calling db.updateItem(item).
@@ -225,7 +273,34 @@ Simply calls db.deleteItem(itemId).
 
 
 ### DatabaseUtilities
-This class will be used as an interface towards the database storing information needed by the application. All functions are extremely simple and low-level. For each function, we will specify the query on the database.
+This class will be used as an interface towards the database storing information needed by the application. All functions are generally simple and low-level, except for few cases. For each function, we will specify the query on the database.
+
+```
+
+
+
+
+
+
+
+    SKUitem fifoPopSKUitemFromPosition(positionId :String)
+SELECT skuId INTO skuIdVar
+FROM POSITIONS P
+WHERE P.positionId = positionId
+If skuIdVar is empty, raise ------------------------------------.
+SELECT (rfid, skuId, isAvailable, dateOfStock) INTO skuVar
+FROM SKU-ITEMS SI
+WHERE SI.isAvailable = true AND SI.dateOfStock = (
+    SELECT MIN(dateOfStock)
+    FROM SKU-ITEMS SI
+    WHERE SI.isAvailable = true
+)
+If skuVar contains more than 1 element, choose a random one.
+UPDATE SKU-ITEMS
+SET isAvailable = false
+WHERE rfid = skuVar.rfid
+
+```
 
 
 
@@ -239,10 +314,7 @@ If there is not an SKU with an id matching the input, the system throws the Unex
 Changes the value of attributes. If either weight, volume or availableQuantity are modified and the SKU is assigned to a position, that position is fetched from the database by calling p = db.loadPosition(positionId) and p.updateOccupiedWeightAndVolume() is called. Finally, if no exceptions have been raised, the changes are made persistent by calling db.updatePosition(p). 
 
     void setPosition(p :Position)
-> if p!=null
 Calls p.setSKU() and, if no exceptions have been raised, sets sku.positoinId = p.getId().
-> if p==null
-Simply sets sku.positionId = p.getId().
 
     Integer getMinOccupiedWeight()
 Returns weight*availableQuantity.
@@ -257,6 +329,9 @@ Returns volume*availableQuantity.
     void modify(newRfid :String, newAvailable :Boolean, newDateOfStock :Date)
 Changes the value of attributes. If newRfid is different than rfid, to ensure consistency, fetches from the database all test results,------------------- referring to that rfid and, for each of them, calls setSkuItemRfid(newRfid) and propagates the changes to the database.
 
+    void setIsAvailable(isAvailable :Boolean)
+Changes the value of isAvailable.
+
 ```
 
 ### Item
@@ -266,7 +341,6 @@ Changes the value of attributes. If newRfid is different than rfid, to ensure co
 Changes the value of attributes.
 
 ```
-
 
 ### Position
 ```
@@ -286,7 +360,7 @@ Computes new, temporary values for p.occupiedWeight and p.occupiedVolume.If they
 > if sku!=null
 First, checks if it is already assigned to a different SKU. If yes, --------------- is raised. If no, checks if it is able to store the available SKU in terms of weight and volume. If yes, the SKU is set. If no, ----------------- is raised.
 > if sku==null
-Resets the position to its initial state, that is p.sku = null, occupiedWeight = 0 and occupiedVolume = 0.
+Resets the position to its initial state.
 
     void computeAndSetPositionCoordinates()
 Reads the current value of this.id and splits it to compute and set aisleId, row and column attributes.
@@ -295,6 +369,7 @@ Reads the current value of this.id and splits it to compute and set aisleId, row
 Reads the current values of this.aisleId, this.row and this.column, and concatenates them to compute and return the id attribute.
 
 ```
+
 ### Test Descriptor
 ```
        void modify (newName :String, newProcedureDescription :String, newSKUid :Integer)
