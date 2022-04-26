@@ -50,12 +50,62 @@ The back end is further divided into 3 different packages:
 ## Warehouse & Model
 
 Apart from the listed methods, all classes have:
-- a personalized constructor to initialize (part of) its attributes
+- a personalized constructor to initialize (part of) its attributes. 
 - getters for all attributes  
 ...............
 
 which have been omitted for the sake of brevity.
 
+<<<<<<< HEAD
+=======
+## Exceptions
+In the event of all system failures where the system raises an Error we have an Exception causing the Error.Depending on the Error there can be multiple exceptions that triggers specific error raising. 
+
+```
+class NotAuthorizedException
+class AlreadyAddedSupplierException
+class AlreadyAddedItemException
+class OutOfSpaceException
+class ItemQuantityUnderThresholdException
+class NotEnoughItemsException
+class WrongUsernameException
+class WrongIdException
+class WrongPasswordException
+class NonPassedQualityCheckException
+class ItemRejectedException
+class ExternalOrderAlreadyException
+class SystemErrorException
+class UnexistingSKUException 
+class UnexistingItemException
+class NotLoggedInException
+class IDValidationFailedException
+class RFIDValidationFailedException
+class RequestBodyFailedException
+class RequestIDFailedException
+class AvailableVolumeWeightException
+class PositionAlreadyAssignedException
+class PositionValidationFailedException
+class UnassociatedRFIDException
+class UnassociatedIDException
+class UnassociatedPositionIDExeption
+class RequestbodyValidationException
+class PositionIdValidationException
+class UnassociatedTestDescriptorException
+class EmailAlreadyUsedException
+class SameTypeUserExistsException
+class UserDontExistException
+class UsernameValidationFailedException
+class ModifyRightsFailedException
+class DeleteAttemptFaieldException
+class UnassociatedRestockOrderException
+class ResctockAlreadyCompletedException
+class WrongOrderStateException
+class DeliveryDateBeforeIssueDateException
+
+```
+## Warehouse & Model
+
+>>>>>>> 6e8db32eb05cebfc2e67b5fb0ba85090edf5723e
 ### EzWhInterface & EzWh
 The `EzWhInterface` interface, which in our case is implemented by the `EzWh` class, is the façade used by the front end to interact with the back end.  
 Its role is mainly _translational_, since every function
@@ -273,15 +323,76 @@ Simply calls db.deleteItem(itemId).
 
 
 ### DatabaseUtilities
-This class will be used as an interface towards the database storing information needed by the application. All functions are generally simple and low-level, except for few cases. For each function, we will specify the query on the database.
-
+This class will be used as an interface towards the database storing information needed by the application. All functions are generally simple and low-level, except for a few cases. Given that, pseudo-code is explicitly written just for most complex queries. 
+Given the possibility to modify SKUItem's Id, a fixed Id is provided to maintain database's internal consistency.
 ```
+    void createConnection ()
+Establish a connection between database and the program.
 
+    void closeConnection ()
+Close the connection between database and the program.
 
+    Array<SKU> loadSKU (skuId :Integer=null)
+Select all SKU with the given skuId. If no skuId is provided, it returns all skus in the database.
+For every SKU selected, all testDescriptors'id with matching skuId are returned.
+For every SKU selected, positionId with matching skuId are returned.
 
+    Array<SKUitem> loadSKUitem (rfid :String=null, skuId :Integer=null)
+Select alla SKUitem with the given skuId and rfId. If no id is provided, it returns all SKUitems in the database.
 
+    Array<Position> loadPosition(positionId :String=null)
+Select all Position with the given positionId. If no positionId is provided, it returns all Positions in the database.
 
+    Array<TestDescriptor> loadTestDescriptor (testId :Integer=null)
+Select all TestDescriptor with the given testId. If no testId is provided, it returns all TestDescriptor in the database.
 
+    Array<TestResult> loadTestResult (rfid :String, resultId :Integer=null)
+Select all TestResult with the given rfid and resultId. If no resultId is provided, it returns all TestResult with the given rfid.
+
+    Array<User> loadUser (username :String=null, type :Role=null, userId :Integer=null)
+Select all User with the given username, type and userId. If one or more parameters are missing, it returns all Users in the database matching parameters provided. If all parameters are missing, it returns all the Users in the database.
+
+    Array<RestockOrder> loadRestockOrder (orderId :Interger=null, state :RestockOrderdState=null)
+Select all RestockOrder with the given orderId and state.. If no orderId is provided, it returns all RestockOrders in the database with a matching state. If no state is provided, it returns all RestockOrders in the database with a matching orderId.  If all parameters are missing, it returns all the RestockOrders in the database.
+
+    Array<ReturnOrder> loadReturnOrder (orderId :Integer=null)
+Select all ReturnOrder with the given orderId. If no orderdId is provided, it returns all ReturnOrders in the database.
+
+    Array<InternalOrder> loadInternalOrder (orderId :Integer=null, state :InternalOrderState=null)
+Select all InternalOrder with the given orderId. If no orderdId is provided, it returns all internalOrders in the database with a matching state. If no state is provided, it returns all InternalOrder in the database with a matching orderId. If all paramters are missing, it returns all the InternalOrders in the database.
+
+    Array<Item> loadItem (itemId :Itenger=null)
+Select all Item with the given itemId. If no itemId is provided, it returns all Items in the database.
+
+    Void insertSKU (sku :SKU)
+Insert a new SKU in the database.
+
+    Void insertSKUitem (skuitem :SKUitem)
+Insert a new SKUitem in the database.
+
+    Void insertPosition (position :Position)
+Insert a new Position in the database.
+
+    Void insertTestDescriptor (testdescriptor :TestDescriptor)
+Insert a new TestDescriptor in the database.
+
+    Void insertTestResult (testresult :TestResult)
+Insert a new TestResult in the database.
+
+    Void insertUser (user :User)
+Insert a new User in the database.
+
+    Void insertRestockOrder (restockorder :RestockOrder)
+Insert a new RestockOrder in the database.
+
+    Void insertReturnOrder (returnorder :ReturnOrder)
+Insert a new ReturnOrder in the database.
+
+    Void insertInternalOrder (internalorder :InternalOrder)
+Insert a new InternalOrder in the database.
+
+    Void insertItem (item :Item)
+Insert a new Item in the database.
 
     SKUitem fifoPopSKUitemFromPosition(positionId :String)
 SELECT skuId INTO skuIdVar
