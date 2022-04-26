@@ -45,6 +45,10 @@ The back end is further divided into 3 different packages:
 
 ## Exceptions
 
+In the event of all system failures where the system raises an Error we have an Exception causing the Error.
+Depending on the Error there can be multiple exceptions that triggers specific error raising.Also same exception can be used to 
+raise different type of errors depending on the case.
+
 
 
 ## Warehouse & Model
@@ -59,7 +63,6 @@ which have been omitted for the sake of brevity.
 <<<<<<< HEAD
 =======
 ## Exceptions
-In the event of all system failures where the system raises an Error we have an Exception causing the Error.Depending on the Error there can be multiple exceptions that triggers specific error raising. 
 
 ```
 class NotAuthorizedException
@@ -82,7 +85,7 @@ class IDValidationFailedException
 class RFIDValidationFailedException
 class RequestBodyFailedException
 class RequestIDFailedException
-class AvailableVolumeWeightException
+class VolumeWeightException
 class PositionAlreadyAssignedException
 class PositionValidationFailedException
 class UnassociatedRFIDException
@@ -214,7 +217,7 @@ Simply calls db.deleteTestResult(rfid, resultId).
 ************************* User *************************
 
     String getUserInfo()
-Returns the content of currentlyLoggedUser. If no user is logged in, it throws ------------------------.
+Returns the content of currentlyLoggedUser. If no user is logged in, it throws NotLoggedInException.
 
     Array<String> getAllSuppliers()
 Returns a list of all the suppliers in the database by calling db.loadUser(type = SUPPLIER).
@@ -223,19 +226,19 @@ Returns a list of all the suppliers in the database by calling db.loadUser(type 
 Returns a list of all the users in the database by calling db.loadUser().
 
     void addUser(username :String, name :String, surname :String, password :String, type :String)
-Creates a new user object by calling its constructor, then calls db.insertUser(). If type = MANAGER, ------------------ is raised.
+Creates a new user object by calling its constructor, then calls db.insertUser(). If type = MANAGER, ManagerException is raised.
 
     void login(username :String, password :String, type :String)
-Fetches from the the database usr = db.loadUser(username, type), then compares the password. If they are different, ------------------- is raised. Otherwise, currentlyLoggedUser is set to usr.
+Fetches from the the database usr = db.loadUser(username, type), then compares the password. If they are different, WrongPasswordException is raised. Otherwise, currentlyLoggedUser is set to usr.
 
     void logout()
-Sets currentlyLoggedUser to null. If it is already null, ---------------- is thrown.
+Sets currentlyLoggedUser to null. If it is already null, AlreadyLoggedoutException is thrown.
 
     void modifyUserRole(username :String, oldType :String, newType :String)
-Fetches from the the database usr = db.loadUser(username, oldType), then calls usr.setType(newType). If type = MANAGER, ------------------ is raised. Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateUser(usr). 
+Fetches from the the database usr = db.loadUser(username, oldType), then calls usr.setType(newType). If type = MANAGER, ManagerException is raised. Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateUser(usr). 
 
     void deleteUser(username :String, type :String)
-Calls db.deleteUser(username, type). If type = MANAGER, ------------------ is raised. 
+Calls db.deleteUser(username, type). If type = MANAGER, ManagerException is raised. 
 
 ************************* RestockOrder *************************
 
@@ -261,7 +264,7 @@ Fetches from the the database the requested restock order restock = db.loadResto
 
     void modifyRestockOrderSKUitems(orderId :Integer, skuItems :Array<String>)
 Fetches from the the database the requested restock order restock = db.loadRestockOrder(orderId). If restock.getState() != DELIVERED, throw 
--------------------------. Then, calls restock.addSKUitems(skuItems). Finally, if no exceptions have been raised, the order is updated by calling db.updateRestockOrder(restock).
+AlreadyDeliveredException Then, calls restock.addSKUitems(skuItems). Finally, if no exceptions have been raised, the order is updated by calling db.updateRestockOrder(restock).
 
     void modifyRestockOrderTransportNote(orderId :Integer, transportNote :String)
 Fetches from the the database the requested restock order restock = db.loadRestockOrder(orderId). Then, calls restock.setTransportNote(transportNote). Finally, if no exceptions have been raised, the order is updated by calling db.updateRestockOrder(restock).
@@ -398,7 +401,7 @@ Insert a new Item in the database.
 SELECT skuId INTO skuIdVar
 FROM POSITIONS P
 WHERE P.positionId = positionId
-If skuIdVar is empty, raise ------------------------------------.
+If skuIdVar is empty, raise IDValidationFailedException.
 SELECT (rfid, skuId, isAvailable, dateOfStock) INTO skuVar
 FROM SKU-ITEMS SI
 WHERE SI.isAvailable = true AND SI.dateOfStock = (
@@ -415,8 +418,8 @@ WHERE rfid = skuVar.rfid
 SELECT order INTO orderVar
 FROM RESTOCK-ORDERS RO
 WHERE RO.id = orderId
-If orderVar is empty, raise ------------------------------------.
-If orderVar.state != COMPLETEDRETURN, raise ------------------------------------.
+If orderVar is empty, raise. UnassociatedIDException.
+If orderVar.state != COMPLETEDRETURN, raise  WrongOrderStateException.
 SELECT skuItem INTO skuItemsArray
 FROM SKU-ITEMS SI
 WHERE SI.rfid 
@@ -460,18 +463,18 @@ Changes the value of attributes.
 ### Position
 ```
     void modify(newAisleId :String, newRow :String, newCol :String, newMaxWeight :Integer, newMaxVolume :Integer, newOccupiedWeight :Integer, newOccupiedVolume :Integer, db :DatabaseUtilities)
-Changes the value of attributes. If the position is assigned to a SKU, that SKU is fetched from the database by calling sku = db.loadSKU(skuId). If newOccupiedWieght > newMaxWeight or newOccupiedVolume > newMaxVolume, ----------------------- is raised.
+Changes the value of attributes. If the position is assigned to a SKU, that SKU is fetched from the database by calling sku = db.loadSKU(skuId). If newOccupiedWieght > newMaxWeight or newOccupiedVolume > newMaxVolume, VolumeWeightException is raised.
 Finally, the new value for the id is computed by calling computePositionId(), and then set, and sku.setPosition(this) is possibly called.    
     
     void modify(newPositionId :String)
 Changes the value of attributes. The new values for aisleId, row and column are computed and set by calling computeAndSetPositionCoordinates(). If the position is assigned to a SKU, that SKU is fetched from the database by calling sku = db.loadSKU(skuId), and sku.setPosition(this) is called.
 
     void updateOccupiedWeightAndVolume(weightOffset :Integer, volumeOffset :Integer)
-Computes new, temporary values for p.occupiedWeight and p.occupiedVolume.If they are still lower than the respective maximum values, they are modified. Otherwise, -------------------------- is raised.
+Computes new, temporary values for p.occupiedWeight and p.occupiedVolume.If they are still lower than the respective maximum values, they are modified. Otherwise, VolumeWeightException is raised.
 
     setSKU(sku :SKU)
 > if sku!=null
-First, checks if it is already assigned to a different SKU. If yes, --------------- is raised. If no, checks if it is able to store the available SKU in terms of weight and volume. If yes, the SKU is set. If no, ----------------- is raised.
+First, checks if it is already assigned to a different SKU. If yes, IDValidationFailedException is raised. If no, checks if it is able to store the available SKU in terms of weight and volume. If yes, the SKU is set. If no, OutOfSpaceException is raised.
 > if sku==null
 Resets the position to its initial state.
 
