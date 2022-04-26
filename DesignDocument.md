@@ -42,15 +42,57 @@ The back end is further divided into 3 different packages:
 # Low level design
 
 Apart from the listed methods, all classes have:
-- a personalized constructor to initialize (part of) its attributes
+- a personalized constructor to initialize (part of) its attributes. 
 - getters for all attributes  
 ...............
 
 which have been omitted for the sake of brevity.
 
 ## Exceptions
+In the event of all system failures where the system raises an Error we have an Exception causing the Error.Depending on the Error there can be multiple exceptions that triggers specific error raising. 
 
+```
+class NotAuthorizedException
+class AlreadyAddedSupplierException
+class AlreadyAddedItemException
+class OutOfSpaceException
+class ItemQuantityUnderThresholdException
+class NotEnoughItemsException
+class WrongUsernameException
+class WrongIdException
+class WrongPasswordException
+class NonPassedQualityCheckException
+class ItemRejectedException
+class ExternalOrderAlreadyException
+class SystemErrorException
+class UnexistingSKUException 
+class UnexistingItemException
+class NotLoggedInException
+class IDValidationFailedException
+class RFIDValidationFailedException
+class RequestBodyFailedException
+class RequestIDFailedException
+class AvailableVolumeWeightException
+class PositionAlreadyAssignedException
+class PositionValidationFailedException
+class UnassociatedRFIDException
+class UnassociatedIDException
+class UnassociatedPositionIDExeption
+class RequestbodyValidationException
+class PositionIdValidationException
+class UnassociatedTestDescriptorException
+class EmailAlreadyUsedException
+class SameTypeUserExistsException
+class UserDontExistException
+class UsernameValidationFailedException
+class ModifyRightsFailedException
+class DeleteAttemptFaieldException
+class UnassociatedRestockOrderException
+class ResctockAlreadyCompletedException
+class WrongOrderStateException
+class DeliveryDateBeforeIssueDateException
 
+```
 ## Warehouse & Model
 
 ### EzWhInterface & EzWh
