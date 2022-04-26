@@ -105,7 +105,6 @@ class DeliveryDateBeforeIssueDateException
 ```
 ## Warehouse & Model
 
->>>>>>> 6e8db32eb05cebfc2e67b5fb0ba85090edf5723e
 ### EzWhInterface & EzWh
 The `EzWhInterface` interface, which in our case is implemented by the `EzWh` class, is the façade used by the front end to interact with the back end.  
 Its role is mainly _translational_, since every function
@@ -425,8 +424,37 @@ Update informations of an existing Item in the database.
 Delete from the database the SKU with matching skuId.
 
     Void deleteSKUitem (rfId :String=null, skuId :Integer=null)
-Delete from the database the SKU with matching skuId.
+Delete from the database the SKUitem with matching skuId.
+Delete from the database the SKUitem with matching rfId. 
 
+    Void deletePosition (PositionId :String)
+Delete from the database the Position with matching PositionId.
+
+    Void deleteTestDescriptor (testId :Integer=null, skuid :Integer=null)
+Delete from the database the TestDescriptor with matching skuId.
+Delete from the database the TestDescriptor with matching testId.
+
+    Void deleteTestResult (rfId :String=null, resultId :Integer=null,testId :Integer=null)
+Delete from the database the TestResult with matching rfId.
+Delete from the database the TestResult with matching resultId.
+Delete from the database the TestResult with matching testId.
+
+    Void deleteUser (username :String, type :Role)
+Delete from the database the User with matching username and type.
+
+    Void deleteRestockOrder (orderId :Integer)
+Delete from the database the RestockOrder with matching orderId.
+
+    Void deleteReturnOrder (orderId :Integer)
+Delete from the database the ReturnOrder with matching orderId.
+
+    Void deleteInternalOrder (orderId :Integer)
+Delete from the database the InternalOrder with matching orderId.
+
+    Void deleteItem (itemId :Integer=null, supplierId :Integer=null, skuId :Integer=null)
+Delete from the database the Item with matching itemId.
+Delete from the database the Item with matching supplierId.
+Delete from the database the Item with matching skuId.
 
 
     SKUitem fifoPopSKUitemFromPosition(positionId :String)
