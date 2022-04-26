@@ -338,7 +338,7 @@ For every SKU selected, all testDescriptors'id with matching skuId are returned.
 For every SKU selected, positionId with matching skuId are returned.
 
     Array<SKUitem> loadSKUitem (rfid :String=null, skuId :Integer=null)
-Select alla SKUitem with the given skuId and rfId. If no id is provided, it returns all SKUitems in the database.
+Select alla SKUitem with the given skuId and rfId. If no id is provided, it returns all SKUitems in the database with Available equals to true.
 
     Array<Position> loadPosition(positionId :String=null)
 Select all Position with the given positionId. If no positionId is provided, it returns all Positions in the database.
@@ -350,7 +350,7 @@ Select all TestDescriptor with the given testId. If no testId is provided, it re
 Select all TestResult with the given rfid and resultId. If no resultId is provided, it returns all TestResult with the given rfid.
 
     Array<User> loadUser (username :String=null, type :Role=null, userId :Integer=null)
-Select all User with the given username, type and userId. If one or more parameters are missing, it returns all Users in the database matching parameters provided. If all parameters are missing, it returns all the Users in the database.
+Select all User with the given username, type and userId. If one or more parameters are missing, it returns all Users in the database matching parameters provided. If all parameters are missing, it returns all the Users in the database excluding Managers.
 
     Array<RestockOrder> loadRestockOrder (orderId :Interger=null, state :RestockOrderdState=null)
 Select all RestockOrder with the given orderId and state.. If no orderId is provided, it returns all RestockOrders in the database with a matching state. If no state is provided, it returns all RestockOrders in the database with a matching orderId.  If all parameters are missing, it returns all the RestockOrders in the database.
@@ -368,7 +368,7 @@ Select all Item with the given itemId. If no itemId is provided, it returns all 
 Insert a new SKU in the database.
 
     Void insertSKUitem (skuitem :SKUitem)
-Insert a new SKUitem in the database.
+Insert a new SKUitem in the database with Available equals to false.
 
     Void insertPosition (position :Position)
 Insert a new Position in the database.
@@ -393,6 +393,41 @@ Insert a new InternalOrder in the database.
 
     Void insertItem (item :Item)
 Insert a new Item in the database.
+
+    Void updateSKU (sku :SKU)
+Update informations of an existing SKU in the database.
+
+    Void updateSKUitem (oldRfId :String, skuItem :SKUitem)
+Update informations of an existing SKUitem in the database.
+
+    Void updatePosition (oldPositionId :String, position :Position)
+Update informations of an existing Position in the database.
+
+    Void updateTestDescriptor (testdescriptor :TestDescriptor)
+Update informations of an existing TestDescriptor in the database.
+
+    Void updateTestResult (testresult :TestResult)
+Update informations of an existing TestResult in the database.
+
+    Void updateUser (oldType :Role, user :User)
+Update informations of an existing User in the database.
+
+    Void updateRestockOrder (restockOrder :RestockOrder)
+Update informations of an existing RestockOrder in the database.
+    
+    Void updateInternalOrder (internalOrder :InternalOrder)
+Update informations of an existing InternalOrder in the database.
+
+    Void updateItem (item :Item)
+Update informations of an existing Item in the database.
+
+    Void deleteSKU (skuId :Integer)
+Delete from the database the SKU with matching skuId.
+
+    Void deleteSKUitem (rfId :String=null, skuId :Integer=null)
+Delete from the database the SKU with matching skuId.
+
+
 
     SKUitem fifoPopSKUitemFromPosition(positionId :String)
 SELECT skuId INTO skuIdVar
