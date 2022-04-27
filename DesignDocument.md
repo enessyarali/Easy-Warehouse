@@ -135,13 +135,14 @@ Searches in the database the SKUitem whose rfid matches the one in input, by cal
 Returns the requested SKUitem.
 
 `void addSKUitem(rfid :String, skuId :Integer, dateOfStock :Date)`  
-Creates a new SKUitem by calling its constructor, then adds it in the database by calling db.intertSKUitem().
+Creates a new SKUitem by calling its constructor, then calls skuItem.updateAvailableQuantity(+1). Finally, it adds it in the database by calling db.intertSKUitem().
 
 `void modifySKUitem(rfid :String, newRfid :String, newAvailable :Boolean, newDateOfStock :Date)`  
-Fetches the SKUitem from the database by calling skuItem = db.loadSKUitem(rfid), then calls skuItem.modify(...). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKUitem(skuItem).
+Fetches the SKUitem from the database by calling skuItem = db.loadSKUitem(rfid), then calls skuItem.modify(...). Then, if isAvailable has changed, it calls skuItem.updateAvailableQuantity(+1/-1).Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKUitem(skuItem).
 
 `void deleteSKUitem(rfid :String)`  
-Calls db.deleteSKUitem(rfid).
+Fetches the SKUitem from the database by calling skuItem = db.loadSKUitem(rfid), then calls skuItem.updateAvailableQuantity(-1).
+Finally, it calls db.deleteSKUitem(rfid).
 
 ------------------------------------------------------------
 **Position**
@@ -244,14 +245,13 @@ Calls db.selectReturnItems(orderId). This function is done at a lower level to a
 
 `  void addRestockOrder(issueDate :Date, products :Array<String>, supplierId :Integer)`  
 Fetches from the database the supplier whose id matches the one in input by calling usr = db.loadUser(supplierId, type = SUPPLIER).
-Then, creates a new RestockOrder object by calling its constructor [the constructor will take care of checking that we are not ordering more items than what the warehouse is capable of storing, and that all selected items are provided by the same supplier]. Finally, if no exceptions have been raised, the order is added in the database by calling db.insertRestockOrder().
+Then, creates a new RestockOrder object by calling its constructor [the constructor will take care of checking that we are not ordering more items than what the warehouse is capable of storing, by calling modify(+qty) for each SKU, and that all selected items are provided by the same supplier]. Finally, if no exceptions have been raised, the order is added in the database by calling db.insertRestockOrder().
 
 `  void modifyRestockOrderState(orderId :Integer, newState :String)`  
 Fetches from the the database the requested restock order restock = db.loadRestockOrder(orderId). Then, calls restock.setState(newState). Finally, if no exceptions have been raised, the order is updated by calling db.updateRestockOrder(restock).
 
 `  void modifyRestockOrderSKUitems(orderId :Integer, skuItems :Array<String>)`  
-Fetches from the the database the requested restock order restock = db.loadRestockOrder(orderId). If restock.getState() != DELIVERED, throw 
-AlreadyDeliveredException Then, calls restock.addSKUitems(skuItems). Finally, if no exceptions have been raised, the order is updated by calling db.updateRestockOrder(restock).
+Fetches from the the database the requested restock order restock = db.loadRestockOrder(orderId). If restock.getState() != DELIVERED, throw WrongOrderStateException. Then, calls restock.addSKUitems(skuItems). Finally, if no exceptions have been raised, the order is updated by calling db.updateRestockOrder(restock).
 
 `  void modifyRestockOrderTransportNote(orderId :Integer, transportNote :String)`  
 Fetches from the the database the requested restock order restock = db.loadRestockOrder(orderId). Then, calls restock.setTransportNote(transportNote). Finally, if no exceptions have been raised, the order is updated by calling db.updateRestockOrder(restock).
@@ -273,7 +273,7 @@ Returns the requested ReturnOrder.
 
 `  void addReturnOrder(returnDate :Date, products :Array<String>, restockOrderId :Integer)`  
 Fetches from the database the restock order whose id matches the one in input by calling db.loadRestockOrder(restockOrderId).
-Then, creates a new ReturnOrder object by calling its constructor [the constructor will take care of checking the consistency between the products to be returned and the one which have been received]. Finally, if no exceptions have been raised, the order is added in the database by calling db.insertReturnOrder().
+Then, creates a new ReturnOrder object by calling its constructor [the constructor will take care of checking the consistency between the products to be returned and the one which have been received, as well as calling updateAvailableQuantity(-1) for each SKUitem]. Finally, if no exceptions have been raised, the order is added in the database by calling db.insertReturnOrder().
 
 `  void deleteReturnOrder(orderId :Integer)`  
 Calls db.deleteReturnOrder(orderId).
@@ -296,10 +296,10 @@ Returns the requested InternalOrder.
 
 `  void addInternalOrder (issueDate :Date, products: Array<String>, customerId :Integer)`  
 Fetches from the database the customer whose id matches the one in input by calling usr = db.loadUser(customerId, type = CUSTOMER).
-Then, creates a new InternalOrder object by calling its constructor. Finally, if no exceptions have been raised, the order is added in the database by calling db.insertInternalOrder().
+Then, creates a new InternalOrder object by calling its constructor [the constructor will take care of checking there are enough SKUs by calling modify(-qty) for each SKU]. Finally, if no exceptions have been raised, the order is added in the database by calling db.insertInternalOrder().
 
 `  void modifyInternalOrderState(orderId :Integer, newState :String, products :Array<String>)`  
-Fetches from the the database the requested internal order internal = db.loadInternalOrder(orderId). Then, calls internal.setState(newState, products). Finally, if no exceptions have been raised, the order is updated by calling db.updateRestockOrder(internal).
+Fetches from the the database the requested internal order internal = db.loadInternalOrder(orderId). Then, calls internal.setState(newState, products). If newState == CANCELED || REFUSED, call modify(+qty) for each SKU].Finally, if no exceptions have been raised, the order is updated by calling db.updateRestockOrder(internal).
 
 `  void deleteInternalOrder(orderId :Integer)`  
 Calls db.deleteInternalOrder(orderId).
@@ -347,7 +347,6 @@ Select all SKUitem with the given skuId and rfId. If no id is provided, it retur
 Select the Position with the given positionId.
 Select the Position storing the SKU with the given skuId.
 If no positionId / skuId is provided, it returns all Positions in the database.
-
 
 `  Array<TestDescriptor> loadTestDescriptor (testId :Integer=null)`  
 Select all TestDescriptor with the given testId. If no testId is provided, it returns all TestDescriptor in the database.
@@ -498,7 +497,10 @@ WHERE orderVar.skuItems.contains(SI.rfid) AND NOT EXISTS (
 ### SKU
 
 `  void modify(newDescription :String, newWeight :Integer, newVolume :Integer, newNotes :String, newPrice :Float, newAvailableQuantity :Integer, db :DatabaseUtility)`  
-Changes the value of attributes. If either weight, volume or availableQuantity are modified and the SKU is assigned to a position, that position is fetched from the database by calling p = db.loadPosition(positionId) and p.updateOccupiedWeightAndVolume() is called. Finally, if no exceptions have been raised, the changes are made persistent by calling db.updatePosition(p). 
+Changes the value of attributes. If newAvailableQuantity < 0, throws NotEnoughItemsException. If either weight, volume or availableQuantity are modified and the SKU is assigned to a position, that position is fetched from the database by calling p = db.loadPosition(positionId) and p.updateOccupiedWeightAndVolume() is called. Finally, if no exceptions have been raised, the changes are made persistent by calling db.updatePosition(p). 
+
+`  void modify(qtyOffset :Integer, db :DatabaseUtility)`  
+Calls standard modify with current values but newAvailableQuantity = availableQuantity + qtyOffset.
 
 `  void setPosition(p :Position)`  
 Calls p.setSKU() and, if no exceptions have been raised, sets sku.positoinId = p.getId().  
@@ -510,6 +512,9 @@ Changes the value of attributes.
 
 `  void setIsAvailable(isAvailable :Boolean)`  
 Changes the value of isAvailable.
+
+`  void updateAvailableQuantity(qtyOffset :Integer, db :DatabaseUtility)`  
+Fetches the correspondent SKU from the database by calling sku = db.loadSKU(skuId) and sku.modify(qtyOffset) is called. Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSku(sku). 
 
 ### Item
 
