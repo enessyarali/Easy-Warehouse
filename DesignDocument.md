@@ -45,6 +45,10 @@ The back end is further divided into 3 different packages:
 
 ## Exceptions
 
+In the event of all system failures where the system raises an Error we have an Exception causing the Error.
+Depending on the Error there can be multiple exceptions that triggers specific error raising.Also same exception can be used to 
+raise different type of errors depending on the case.
+
 
 
 ## Warehouse & Model
@@ -59,7 +63,6 @@ which have been omitted for the sake of brevity.
 <<<<<<< HEAD
 =======
 ## Exceptions
-In the event of all system failures where the system raises an Error we have an Exception causing the Error.Depending on the Error there can be multiple exceptions that triggers specific error raising. 
 
 ```
 class NotAuthorizedException
@@ -82,7 +85,7 @@ class IDValidationFailedException
 class RFIDValidationFailedException
 class RequestBodyFailedException
 class RequestIDFailedException
-class AvailableVolumeWeightException
+class VolumeWeightException
 class PositionAlreadyAssignedException
 class PositionValidationFailedException
 class UnassociatedRFIDException
@@ -105,7 +108,6 @@ class DeliveryDateBeforeIssueDateException
 ```
 ## Warehouse & Model
 
->>>>>>> 6e8db32eb05cebfc2e67b5fb0ba85090edf5723e
 ### EzWhInterface & EzWh
 The `EzWhInterface` interface, which in our case is implemented by the `EzWh` class, is the façade used by the front end to interact with the back end.  
 Its role is mainly _translational_, since every function
@@ -214,7 +216,7 @@ Simply calls db.deleteTestResult(rfid, resultId).
 ************************* User *************************
 
     String getUserInfo()
-Returns the content of currentlyLoggedUser. If no user is logged in, it throws ------------------------.
+Returns the content of currentlyLoggedUser. If no user is logged in, it throws NotLoggedInException.
 
     Array<String> getAllSuppliers()
 Returns a list of all the suppliers in the database by calling db.loadUser(type = SUPPLIER).
@@ -223,19 +225,19 @@ Returns a list of all the suppliers in the database by calling db.loadUser(type 
 Returns a list of all the users in the database by calling db.loadUser().
 
     void addUser(username :String, name :String, surname :String, password :String, type :String)
-Creates a new user object by calling its constructor, then calls db.insertUser(). If type = MANAGER, ------------------ is raised.
+Creates a new user object by calling its constructor, then calls db.insertUser(). If type = MANAGER, ManagerException is raised.
 
     void login(username :String, password :String, type :String)
-Fetches from the the database usr = db.loadUser(username, type), then compares the password. If they are different, ------------------- is raised. Otherwise, currentlyLoggedUser is set to usr.
+Fetches from the the database usr = db.loadUser(username, type), then compares the password. If they are different, WrongPasswordException is raised. Otherwise, currentlyLoggedUser is set to usr.
 
     void logout()
-Sets currentlyLoggedUser to null. If it is already null, ---------------- is thrown.
+Sets currentlyLoggedUser to null. If it is already null, AlreadyLoggedoutException is thrown.
 
     void modifyUserRole(username :String, oldType :String, newType :String)
-Fetches from the the database usr = db.loadUser(username, oldType), then calls usr.setType(newType). If type = MANAGER, ------------------ is raised. Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateUser(usr). 
+Fetches from the the database usr = db.loadUser(username, oldType), then calls usr.setType(newType). If type = MANAGER, ManagerException is raised. Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateUser(usr). 
 
     void deleteUser(username :String, type :String)
-Calls db.deleteUser(username, type). If type = MANAGER, ------------------ is raised. 
+Calls db.deleteUser(username, type). If type = MANAGER, ManagerException is raised. 
 
 ************************* RestockOrder *************************
 
@@ -261,7 +263,7 @@ Fetches from the the database the requested restock order restock = db.loadResto
 
     void modifyRestockOrderSKUitems(orderId :Integer, skuItems :Array<String>)
 Fetches from the the database the requested restock order restock = db.loadRestockOrder(orderId). If restock.getState() != DELIVERED, throw 
--------------------------. Then, calls restock.addSKUitems(skuItems). Finally, if no exceptions have been raised, the order is updated by calling db.updateRestockOrder(restock).
+AlreadyDeliveredException Then, calls restock.addSKUitems(skuItems). Finally, if no exceptions have been raised, the order is updated by calling db.updateRestockOrder(restock).
 
     void modifyRestockOrderTransportNote(orderId :Integer, transportNote :String)
 Fetches from the the database the requested restock order restock = db.loadRestockOrder(orderId). Then, calls restock.setTransportNote(transportNote). Finally, if no exceptions have been raised, the order is updated by calling db.updateRestockOrder(restock).
@@ -349,7 +351,7 @@ For every SKU selected, all testDescriptors'id with matching skuId are returned.
 For every SKU selected, positionId with matching skuId are returned.
 
     Array<SKUitem> loadSKUitem (rfid :String=null, skuId :Integer=null)
-Select alla SKUitem with the given skuId and rfId. If no id is provided, it returns all SKUitems in the database.
+Select alla SKUitem with the given skuId and rfId. If no id is provided, it returns all SKUitems in the database with Available equals to true.
 
     Array<Position> loadPosition(positionId :String=null)
 Select all Position with the given positionId. If no positionId is provided, it returns all Positions in the database.
@@ -361,7 +363,7 @@ Select all TestDescriptor with the given testId. If no testId is provided, it re
 Select all TestResult with the given rfid and resultId. If no resultId is provided, it returns all TestResult with the given rfid.
 
     Array<User> loadUser (username :String=null, type :Role=null, userId :Integer=null)
-Select all User with the given username, type and userId. If one or more parameters are missing, it returns all Users in the database matching parameters provided. If all parameters are missing, it returns all the Users in the database.
+Select all User with the given username, type and userId. If one or more parameters are missing, it returns all Users in the database matching parameters provided. If all parameters are missing, it returns all the Users in the database excluding Managers.
 
     Array<RestockOrder> loadRestockOrder (orderId :Interger=null, state :RestockOrderdState=null)
 Select all RestockOrder with the given orderId and state.. If no orderId is provided, it returns all RestockOrders in the database with a matching state. If no state is provided, it returns all RestockOrders in the database with a matching orderId.  If all parameters are missing, it returns all the RestockOrders in the database.
@@ -379,7 +381,7 @@ Select all Item with the given itemId. If no itemId is provided, it returns all 
 Insert a new SKU in the database.
 
     Void insertSKUitem (skuitem :SKUitem)
-Insert a new SKUitem in the database.
+Insert a new SKUitem in the database with Available equals to false.
 
     Void insertPosition (position :Position)
 Insert a new Position in the database.
@@ -405,11 +407,75 @@ Insert a new InternalOrder in the database.
     Void insertItem (item :Item)
 Insert a new Item in the database.
 
+    Void updateSKU (sku :SKU)
+Update informations of an existing SKU in the database.
+
+    Void updateSKUitem (oldRfId :String, skuItem :SKUitem)
+Update informations of an existing SKUitem in the database.
+
+    Void updatePosition (oldPositionId :String, position :Position)
+Update informations of an existing Position in the database.
+
+    Void updateTestDescriptor (testdescriptor :TestDescriptor)
+Update informations of an existing TestDescriptor in the database.
+
+    Void updateTestResult (testresult :TestResult)
+Update informations of an existing TestResult in the database.
+
+    Void updateUser (oldType :Role, user :User)
+Update informations of an existing User in the database.
+
+    Void updateRestockOrder (restockOrder :RestockOrder)
+Update informations of an existing RestockOrder in the database.
+    
+    Void updateInternalOrder (internalOrder :InternalOrder)
+Update informations of an existing InternalOrder in the database.
+
+    Void updateItem (item :Item)
+Update informations of an existing Item in the database.
+
+    Void deleteSKU (skuId :Integer)
+Delete from the database the SKU with matching skuId.
+
+    Void deleteSKUitem (rfId :String=null, skuId :Integer=null)
+Delete from the database the SKUitem with matching skuId.
+Delete from the database the SKUitem with matching rfId. 
+
+    Void deletePosition (PositionId :String)
+Delete from the database the Position with matching PositionId.
+
+    Void deleteTestDescriptor (testId :Integer=null, skuid :Integer=null)
+Delete from the database the TestDescriptor with matching skuId.
+Delete from the database the TestDescriptor with matching testId.
+
+    Void deleteTestResult (rfId :String=null, resultId :Integer=null,testId :Integer=null)
+Delete from the database the TestResult with matching rfId.
+Delete from the database the TestResult with matching resultId.
+Delete from the database the TestResult with matching testId.
+
+    Void deleteUser (username :String, type :Role)
+Delete from the database the User with matching username and type.
+
+    Void deleteRestockOrder (orderId :Integer)
+Delete from the database the RestockOrder with matching orderId.
+
+    Void deleteReturnOrder (orderId :Integer)
+Delete from the database the ReturnOrder with matching orderId.
+
+    Void deleteInternalOrder (orderId :Integer)
+Delete from the database the InternalOrder with matching orderId.
+
+    Void deleteItem (itemId :Integer=null, supplierId :Integer=null, skuId :Integer=null)
+Delete from the database the Item with matching itemId.
+Delete from the database the Item with matching supplierId.
+Delete from the database the Item with matching skuId.
+
+
     SKUitem fifoPopSKUitemFromPosition(positionId :String)
 SELECT skuId INTO skuIdVar
 FROM POSITIONS P
 WHERE P.positionId = positionId
-If skuIdVar is empty, raise ------------------------------------.
+If skuIdVar is empty, raise IDValidationFailedException.
 SELECT (rfid, skuId, isAvailable, dateOfStock) INTO skuVar
 FROM SKU-ITEMS SI
 WHERE SI.isAvailable = true AND SI.dateOfStock = (
@@ -426,8 +492,8 @@ WHERE rfid = skuVar.rfid
 SELECT order INTO orderVar
 FROM RESTOCK-ORDERS RO
 WHERE RO.id = orderId
-If orderVar is empty, raise ------------------------------------.
-If orderVar.state != COMPLETEDRETURN, raise ------------------------------------.
+If orderVar is empty, raise. UnassociatedIDException.
+If orderVar.state != COMPLETEDRETURN, raise  WrongOrderStateException.
 SELECT skuItem INTO skuItemsArray
 FROM SKU-ITEMS SI
 WHERE orderVar.skuItems.contains(SI.rfid) AND NOT EXISTS (
@@ -470,18 +536,18 @@ Changes the value of attributes.
 ### Position
 ```
     void modify(newAisleId :String, newRow :String, newCol :String, newMaxWeight :Integer, newMaxVolume :Integer, newOccupiedWeight :Integer, newOccupiedVolume :Integer, db :DatabaseUtilities)
-Changes the value of attributes. If the position is assigned to a SKU, that SKU is fetched from the database by calling sku = db.loadSKU(skuId). If newOccupiedWieght > newMaxWeight or newOccupiedVolume > newMaxVolume, ----------------------- is raised.
+Changes the value of attributes. If the position is assigned to a SKU, that SKU is fetched from the database by calling sku = db.loadSKU(skuId). If newOccupiedWieght > newMaxWeight or newOccupiedVolume > newMaxVolume, VolumeWeightException is raised.
 Finally, the new value for the id is computed by calling computePositionId(), and then set, and sku.setPosition(this) is possibly called.    
     
     void modify(newPositionId :String)
 Changes the value of attributes. The new values for aisleId, row and column are computed and set by calling computeAndSetPositionCoordinates(). If the position is assigned to a SKU, that SKU is fetched from the database by calling sku = db.loadSKU(skuId), and sku.setPosition(this) is called.
 
     void updateOccupiedWeightAndVolume(weightOffset :Integer, volumeOffset :Integer)
-Computes new, temporary values for p.occupiedWeight and p.occupiedVolume.If they are still lower than the respective maximum values, they are modified. Otherwise, -------------------------- is raised.
+Computes new, temporary values for p.occupiedWeight and p.occupiedVolume.If they are still lower than the respective maximum values, they are modified. Otherwise, VolumeWeightException is raised.
 
     setSKU(sku :SKU)
 > if sku!=null
-First, checks if it is already assigned to a different SKU. If yes, --------------- is raised. If no, checks if it is able to store the available SKU in terms of weight and volume. If yes, the SKU is set. If no, ----------------- is raised.
+First, checks if it is already assigned to a different SKU. If yes, IDValidationFailedException is raised. If no, checks if it is able to store the available SKU in terms of weight and volume. If yes, the SKU is set. If no, OutOfSpaceException is raised.
 > if sku==null
 Resets the position to its initial state.
 
