@@ -1,11 +1,11 @@
 # Design Document 
 
 
-Authors: 
+Authors: Ilaria Pilo, Marco Sacchet, Luca Scibetta, Enes Yarali
 
-Date:
+Date: 27 April 2022
 
-Version:
+Version: 1.5
 
 
 # Contents
@@ -27,7 +27,7 @@ The back end is then further logically split into two parts, one taking care of 
 
 ## Package diagram
 
-![Package diagram](./package-diagram.png "Package diagram")
+![Package diagram](./Design-diagrams/package-diagram.png "Package diagram")
 
 ## Front End
 The front end, which contains the GUI, is externally provided.  
@@ -41,28 +41,9 @@ The back end is further divided into 3 different packages:
 
 # Low level design
 
-
-
 ## Exceptions
 
-In the event of all system failures where the system raises an Error we have an Exception causing the Error.
-Depending on the Error there can be multiple exceptions that triggers specific error raising.Also same exception can be used to 
-raise different type of errors depending on the case.
-
-
-
-## Warehouse & Model
-
-Apart from the listed methods, all classes have:
-- a personalized constructor to initialize (part of) its attributes. 
-- getters for all attributes  
-...............
-
-which have been omitted for the sake of brevity.
-
-<<<<<<< HEAD
-=======
-## Exceptions
+Whenever the system reaches an incorrect state, a proper exception is raised, in order to notify and possibly fix such state. Notice that the same exception can be used to raise different type of errors, depending on the case.
 
 ```
 class NotAuthorizedException
@@ -104,9 +85,15 @@ class UnassociatedRestockOrderException
 class ResctockAlreadyCompletedException
 class WrongOrderStateException
 class DeliveryDateBeforeIssueDateException
-
 ```
 ## Warehouse & Model
+![Design class diagram](./Design-diagrams/Class-diagram-design.svg "Design class diagram")
+
+Apart from the listed methods, all classes have:
+- one / many personalized constructors to initialize (part of) its attributes and possibly performing some consistency checks. 
+- getters for all attributes  
+
+which have been omitted for the sake of brevity.
 
 ### EzWhInterface & EzWh
 The `EzWhInterface` interface, which in our case is implemented by the `EzWh` class, is the façade used by the front end to interact with the back end.  
@@ -331,12 +318,11 @@ Fetches from the database the item whose id matches the one in input by calling 
 
     void deleteItem(itemId :Integer)
 Simply calls db.deleteItem(itemId).
-
 ```
 
 
 ### DatabaseUtilities
-This class will be used as an interface towards the database storing information needed by the application. All functions are generally simple and low-level, except for a few cases. Given that, pseudo-code is explicitly written just for most complex queries. 
+This class will be used as an interface towards the database storing information needed by the application. All functions are generally simple and low-level, except for few cases. Given that, pseudo-code is explicitly written just for most complex queries.  
 Given the possibility to modify SKUItem's Id, a fixed Id is provided to maintain database's internal consistency.
 ```
     void createConnection ()
@@ -377,95 +363,95 @@ Select all InternalOrder with the given orderId. If no orderdId is provided, it 
     Array<Item> loadItem (itemId :Itenger=null)
 Select all Item with the given itemId. If no itemId is provided, it returns all Items in the database.
 
-    Void insertSKU (sku :SKU)
+    void insertSKU (sku :SKU)
 Insert a new SKU in the database.
 
-    Void insertSKUitem (skuitem :SKUitem)
+    void insertSKUitem (skuitem :SKUitem)
 Insert a new SKUitem in the database with Available equals to false.
 
-    Void insertPosition (position :Position)
+    void insertPosition (position :Position)
 Insert a new Position in the database.
 
-    Void insertTestDescriptor (testdescriptor :TestDescriptor)
+    void insertTestDescriptor (testDescriptor :TestDescriptor)
 Insert a new TestDescriptor in the database.
 
-    Void insertTestResult (testresult :TestResult)
+    void insertTestResult (testresult :TestResult)
 Insert a new TestResult in the database.
 
-    Void insertUser (user :User)
+    void insertUser (user :User)
 Insert a new User in the database.
 
-    Void insertRestockOrder (restockorder :RestockOrder)
+    void insertRestockOrder (restockorder :RestockOrder)
 Insert a new RestockOrder in the database.
 
-    Void insertReturnOrder (returnorder :ReturnOrder)
+    void insertReturnOrder (returnorder :ReturnOrder)
 Insert a new ReturnOrder in the database.
 
-    Void insertInternalOrder (internalorder :InternalOrder)
+    void insertInternalOrder (internalOrder :InternalOrder)
 Insert a new InternalOrder in the database.
 
-    Void insertItem (item :Item)
+    void insertItem (item :Item)
 Insert a new Item in the database.
 
-    Void updateSKU (sku :SKU)
+    void updateSKU (sku :SKU)
 Update informations of an existing SKU in the database.
 
-    Void updateSKUitem (oldRfId :String, skuItem :SKUitem)
+    void updateSKUitem (oldRfId :String, skuItem :SKUitem)
 Update informations of an existing SKUitem in the database.
 
-    Void updatePosition (oldPositionId :String, position :Position)
+    void updatePosition (oldPositionId :String, position :Position)
 Update informations of an existing Position in the database.
 
-    Void updateTestDescriptor (testdescriptor :TestDescriptor)
+    void updateTestDescriptor (testDescriptor :TestDescriptor)
 Update informations of an existing TestDescriptor in the database.
 
-    Void updateTestResult (testresult :TestResult)
+    void updateTestResult (testresult :TestResult)
 Update informations of an existing TestResult in the database.
 
-    Void updateUser (oldType :Role, user :User)
+    void updateUser (oldType :Role, user :User)
 Update informations of an existing User in the database.
 
-    Void updateRestockOrder (restockOrder :RestockOrder)
+    void updateRestockOrder (restockOrder :RestockOrder)
 Update informations of an existing RestockOrder in the database.
     
-    Void updateInternalOrder (internalOrder :InternalOrder)
+    void updateInternalOrder (internalOrder :InternalOrder)
 Update informations of an existing InternalOrder in the database.
 
-    Void updateItem (item :Item)
+    void updateItem (item :Item)
 Update informations of an existing Item in the database.
 
-    Void deleteSKU (skuId :Integer)
+    void deleteSKU (skuId :Integer)
 Delete from the database the SKU with matching skuId.
 
-    Void deleteSKUitem (rfId :String=null, skuId :Integer=null)
+    void deleteSKUitem (rfId :String=null, skuId :Integer=null)
 Delete from the database the SKUitem with matching skuId.
 Delete from the database the SKUitem with matching rfId. 
 
-    Void deletePosition (PositionId :String)
+    void deletePosition (positionId :String)
 Delete from the database the Position with matching PositionId.
 
-    Void deleteTestDescriptor (testId :Integer=null, skuid :Integer=null)
+    void deleteTestDescriptor (testId :Integer=null, skuid :Integer=null)
 Delete from the database the TestDescriptor with matching skuId.
 Delete from the database the TestDescriptor with matching testId.
 
-    Void deleteTestResult (rfId :String=null, resultId :Integer=null,testId :Integer=null)
+    void deleteTestResult (rfId :String=null, resultId :Integer=null,testId :Integer=null)
 Delete from the database the TestResult with matching rfId.
 Delete from the database the TestResult with matching resultId.
 Delete from the database the TestResult with matching testId.
 
-    Void deleteUser (username :String, type :Role)
+    void deleteUser (username :String, type :Role)
 Delete from the database the User with matching username and type.
 
-    Void deleteRestockOrder (orderId :Integer)
+    void deleteRestockOrder (orderId :Integer)
 Delete from the database the RestockOrder with matching orderId.
 
-    Void deleteReturnOrder (orderId :Integer)
+    void deleteReturnOrder (orderId :Integer)
 Delete from the database the ReturnOrder with matching orderId.
 
-    Void deleteInternalOrder (orderId :Integer)
+    void deleteInternalOrder (orderId :Integer)
 Delete from the database the InternalOrder with matching orderId.
 
-    Void deleteItem (itemId :Integer=null, supplierId :Integer=null, skuId :Integer=null)
+    void deleteItem (itemId :Integer=null, supplierId :Integer=null, skuId :Integer=null)
 Delete from the database the Item with matching itemId.
 Delete from the database the Item with matching supplierId.
 Delete from the database the Item with matching skuId.
@@ -501,7 +487,6 @@ WHERE orderVar.skuItems.contains(SI.rfid) AND NOT EXISTS (
     FROM TEST-RESULTS TR
     WHERE SI.rfid = TR.rfid AND TR.result = true
 )
-
 ```
 
 ### SKU
@@ -511,8 +496,7 @@ WHERE orderVar.skuItems.contains(SI.rfid) AND NOT EXISTS (
 Changes the value of attributes. If either weight, volume or availableQuantity are modified and the SKU is assigned to a position, that position is fetched from the database by calling p = db.loadPosition(positionId) and p.updateOccupiedWeightAndVolume() is called. Finally, if no exceptions have been raised, the changes are made persistent by calling db.updatePosition(p). 
 
     void setPosition(p :Position)
-Calls p.setSKU() and, if no exceptions have been raised, sets sku.positoinId = p.getId().
-    
+Calls p.setSKU() and, if no exceptions have been raised, sets sku.positoinId = p.getId().  
 ```
 ### SKUitem
 
@@ -522,7 +506,6 @@ Changes the value of attributes.
 
     void setIsAvailable(isAvailable :Boolean)
 Changes the value of isAvailable.
-
 ```
 
 ### Item
@@ -530,7 +513,6 @@ Changes the value of isAvailable.
 ```
     void modify(newDescription :String, newPrice :Float)
 Changes the value of attributes.
-
 ```
 
 ### Position
@@ -556,21 +538,18 @@ Reads the current value of this.id and splits it to compute and set aisleId, row
 
     String computePositionId()
 Reads the current values of this.aisleId, this.row and this.column, and concatenates them to compute and return the id attribute.
-
 ```
 
 ### Test Descriptor
 ```
        void modify (newName :String, newProcedureDescription :String, newSKUid :Integer)
 Changes the value of attributes.
-
 ```
 
 ### Test Result
 ```
        void setSkuItemRfid(rfid :String)
 Changes the value of the skuItemRfid attribute.
-
 ```
 
 ### Restock Order
@@ -583,7 +562,6 @@ Merges the content of skuItems with the one of this.skuItems. This function shou
 
     void setTransportNote(transportNote :String)
 Changes the value of the transportNote attribute.
-
 ```
 
 ### Internal Order
@@ -591,32 +569,25 @@ Changes the value of the transportNote attribute.
        void setState(state :InternalOrderState, products :Array<String>)
 Changes the value of the attributes.
 If state == COMPLETED, products are updated by adding the rfid information, otherwise they are ignored.
-
 ```
 
 ### User
 ```
        void setType(type :Role)
 Changes the value of the type attributes.
-
 ```
-
-
-
 
 # Verification traceability matrix
 
-\<for each functional requirement from the requirement document, list which classes concur to implement it>
-
-
-
-
-
-
-
-
-
-
+|  | EzWh | DatabaseUtilities | User | SKU | SKUitem | Item | Position | TestDescriptor | TestResult | RestockOrder | ReturnOrder | InternalOrder |
+| ------------- |:-------------:| :-----:| :-----:| :-----:| :-----:| :-----:| :-----:| :-----:| :-----:| :-----: | :-----: | :-----: |
+| FR1  | X | X | X | | | | | | | | |  |
+| FR2  | X | X | | X | | | | | | | |  |
+| FR3  | X | X | | X |  |  | X | | X | | | |
+| FR4  | X | X | X | | | | | | | | ||
+| FR5  | X | X | X | | X | X | | | X | X | X | |
+| FR6  | X | X | X | | | X | | | | |  | X |
+| FR7  | X | X | X | X | | X | | |  | | |  |
 
 # Verification sequence diagrams 
 \<select key scenarios from the requirement document. For each of them define a sequence diagram showing that the scenario can be implemented by the classes and methods in the design>
