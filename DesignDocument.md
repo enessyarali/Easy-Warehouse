@@ -73,6 +73,7 @@ class WrongPasswordFormatException
 class ManagerException
 class WrongUsernameException
 class WrongPasswordException
+class AlreadyLoggedoutException
 
 class WrongOrderStateException
 class DeliveryDateBeforeIssueDateException
@@ -244,8 +245,7 @@ Returns the requested RestockOrder.
 Calls db.selectReturnItems(orderId). This function is done at a lower level to avoid many unnecessary loads from the database.
 
 `  void addRestockOrder(issueDate :Date, products :Array<String>, supplierId :Integer)`  
-Fetches from the database the supplier whose id matches the one in input by calling usr = db.loadUser(supplierId, type = SUPPLIER).
-Then, creates a new RestockOrder object by calling its constructor [the constructor will take care of checking that we are not ordering more items than what the warehouse is capable of storing, by calling modify(+qty) for each SKU, and that all selected items are provided by the same supplier]. Finally, if no exceptions have been raised, the order is added in the database by calling db.insertRestockOrder().
+Fetches from the database the supplier whose id matches the one in input by calling usr = db.loadUser(supplierId, type = SUPPLIER). It checks we are not ordering more items than what the warehouse is capable of storing, by calling modify(+qty) for each item.SKU, and that all selected items are provided by the same supplier. Then, it creates a new RestockOrder object by calling its constructor. Finally, if no exceptions have been raised, the order is added in the database by calling db.insertRestockOrder().
 
 `  void modifyRestockOrderState(orderId :Integer, newState :String)`  
 Fetches from the the database the requested restock order restock = db.loadRestockOrder(orderId). Then, calls restock.setState(newState). Finally, if no exceptions have been raised, the order is updated by calling db.updateRestockOrder(restock).
@@ -258,8 +258,6 @@ Fetches from the the database the requested restock order restock = db.loadResto
 
 `  void deleteRestockOrder(orderId :Integer)`  
 Calls db.deleteRestockOrder(orderId).
-To keep the order history explicit, we do not automatically delete return orders referencing to deleted restock orders.
-More in general, when treating orders, we never perform automatic deletion (e.g., if an item is deleted, all orders referencing that item are still kept in the database).
 
 ------------------------------------------------------------
 **ReturnOrder**
@@ -273,7 +271,7 @@ Returns the requested ReturnOrder.
 
 `  void addReturnOrder(returnDate :Date, products :Array<String>, restockOrderId :Integer)`  
 Fetches from the database the restock order whose id matches the one in input by calling db.loadRestockOrder(restockOrderId).
-Then, creates a new ReturnOrder object by calling its constructor [the constructor will take care of checking the consistency between the products to be returned and the one which have been received, as well as calling updateAvailableQuantity(-1) for each SKUitem]. Finally, if no exceptions have been raised, the order is added in the database by calling db.insertReturnOrder().
+Then, checks the consistency between the products to be returned and the one which have been received, and creates a new ReturnOrder object by calling its constructor. Then, it deletes each SKUitem by calling this.deleteSKUitem(rfid). Finally, if no exceptions have been raised, the order is added in the database by calling db.insertReturnOrder().
 
 `  void deleteReturnOrder(orderId :Integer)`  
 Calls db.deleteReturnOrder(orderId).
@@ -296,10 +294,10 @@ Returns the requested InternalOrder.
 
 `  void addInternalOrder (issueDate :Date, products: Array<String>, customerId :Integer)`  
 Fetches from the database the customer whose id matches the one in input by calling usr = db.loadUser(customerId, type = CUSTOMER).
-Then, creates a new InternalOrder object by calling its constructor [the constructor will take care of checking there are enough SKUs by calling modify(-qty) for each SKU]. Finally, if no exceptions have been raised, the order is added in the database by calling db.insertInternalOrder().
+Then, it asserts there are enough SKUs by calling modify(-qty) for each SKU, and creates a new InternalOrder object by calling its constructor. Finally, if no exceptions have been raised, the order is added in the database by calling db.insertInternalOrder().
 
 `  void modifyInternalOrderState(orderId :Integer, newState :String, products :Array<String>)`  
-Fetches from the the database the requested internal order internal = db.loadInternalOrder(orderId). Then, calls internal.setState(newState, products). If newState == CANCELED || REFUSED, call modify(+qty) for each SKU].Finally, if no exceptions have been raised, the order is updated by calling db.updateRestockOrder(internal).
+Fetches from the the database the requested internal order internal = db.loadInternalOrder(orderId). Then, calls internal.setState(newState, products). If newState == CANCELED || REFUSED, call modify(+qty) for each SKU.Finally, if no exceptions have been raised, the order is updated by calling db.updateRestockOrder(internal).
 
 `  void deleteInternalOrder(orderId :Integer)`  
 Calls db.deleteInternalOrder(orderId).
@@ -467,7 +465,7 @@ Delete from the database the Item with matching skuId.
 SELECT skuId INTO skuIdVar  
 FROM POSITIONS P  
 WHERE P.positionId = positionId  
-If skuIdVar is empty, raise IDValidationFailedException.  
+If skuIdVar is empty, raise UndefinedSKUException.  
 SELECT (rfid, skuId, isAvailable, dateOfStock) INTO skuVar  
 FROM SKU-ITEMS SI  
 WHERE SI.isAvailable = true AND SI.dateOfStock = (  
