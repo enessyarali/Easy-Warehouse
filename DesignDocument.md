@@ -192,10 +192,10 @@ Searches in the database the test result whose pair (rfid, id) matches the one i
 Returns the requested TestResult.
 
 `  void addTestResult (rfid :String, testId :Integer, testDescription :String, date :Date, result :Boolean)`  
-Fetches from the database the SKUitem whose rfid matches the one in input by calling skuItem = db.loadSKUitem(rfid) and the descriptor whose id matches the one in input by calling test = db.loadTestDescriptor(testId). Then, creates a new TestResult object by calling its constructor [the constructor will take care of checking the test.getSkuId() == skuItem.getSkuId()]. Finally, if no exceptions have been raised, the descriptor is added in the database by calling db.intertTestDescriptor().
+Fetches from the database the SKUitem whose rfid matches the one in input by calling skuItem = db.loadSKUitem(rfid) and the descriptor whose id matches the one in input by calling test = db.loadTestDescriptor(testId). Then, checks whether test.getSkuId() == skuItem.getSkuId() and creates a new TestResult object by calling its constructor. Finally, if no exceptions have been raised, the descriptor is added in the database by calling db.intertTestDescriptor().
 
 `  void modifyTestResult (rfid :String, resultId :Integer, newTestDescription :String, newDate :Date, newResult :Boolean)`  
-Creates a new test result object by calling the unsafe constructor (which performs no checks), then calls db.updateTestResult().
+Creates a new test result, then calls db.updateTestResult().
 
 `  void deleteTestResult(rfid :String, resultId :Integer)`  
 Simply calls db.deleteTestResult(rfid, resultId).
