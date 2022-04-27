@@ -5,7 +5,7 @@ Authors: Ilaria Pilo, Marco Sacchet, Luca Scibetta, Enes Yarali
 
 Date: 27 April 2022
 
-Version: 1.5
+Version: 1.7
 
 
 # Contents
@@ -36,7 +36,7 @@ Hence, we will not focus on it.
 ## Back End
 The back end is further divided into 3 different packages:
 - `warehouse`, which is used as a façade by the front end
-- `model`, containing all classes needed to manage and process data
+- `model`, containing all classes needed to manage and process data, as well as a façade to interact with the database
 - `exceptions`, to handle any incorrect action triggered either by a user or the system itself
 
 # Low level design
@@ -46,54 +46,51 @@ The back end is further divided into 3 different packages:
 Whenever the system reaches an incorrect state, a proper exception is raised, in order to notify and possibly fix such state. Notice that the same exception can be used to raise different type of errors, depending on the case.
 
 ```
-class NotAuthorizedException
-class AlreadyAddedSupplierException
-class AlreadyAddedItemException
-class OutOfSpaceException
-class ItemQuantityUnderThresholdException
-class NotEnoughItemsException
-class WrongUsernameException
-class WrongIdException
-class WrongPasswordException
-class NonPassedQualityCheckException
-class ItemRejectedException
-class ExternalOrderAlreadyException
-class SystemErrorException
-class UnexistingSKUException 
-class UnexistingItemException
 class NotLoggedInException
-class IDValidationFailedException
-class RFIDValidationFailedException
-class RequestBodyFailedException
-class RequestIDFailedException
-class VolumeWeightException
+class NotAuthorizedException
+
+class UndefinedSKUException 
+class UndefinedSKUitemException 
+class UndefinedPositionException 
+class UndefinedTestDescriptorException
+class UndefinedTestResultException
+class UndefinedRestockOrderException
+class UndefinedReturnOrderException
+class UndefinedInternalOrderException
+class UndefinedItemException
+class UndefinedUserException
+
+class AlreadyAddedUserException
+class AlreadyAddedItemException
+
 class PositionAlreadyAssignedException
-class PositionValidationFailedException
-class UnassociatedRFIDException
-class UnassociatedIDException
-class UnassociatedPositionIDExeption
-class RequestbodyValidationException
-class PositionIdValidationException
-class UnassociatedTestDescriptorException
-class EmailAlreadyUsedException
-class SameTypeUserExistsException
-class UserDontExistException
-class UsernameValidationFailedException
-class ModifyRightsFailedException
-class DeleteAttemptFaieldException
-class UnassociatedRestockOrderException
-class ResctockAlreadyCompletedException
+class OutOfSpaceException
+
+class WrongPositionFormatException
+class WrongDataFormatException
+class WrongPasswordFormatException
+
+class ManagerException
+class WrongUsernameException
+class WrongPasswordException
+
 class WrongOrderStateException
 class DeliveryDateBeforeIssueDateException
+
+class NotEnoughItemsException
+
+class SystemErrorException
 ```
 ## Warehouse & Model
 ![Design class diagram](./Design-diagrams/Class-diagram-design.svg "Design class diagram")
 
 Apart from the listed methods, all classes have:
 - one / many personalized constructors to initialize (part of) its attributes and possibly performing some consistency checks. 
-- getters for all attributes  
+- getters for all attributes. 
 
-which have been omitted for the sake of brevity.
+which have been omitted for the sake of brevity.  
+
+Notice that all classes have few methods, except for `EzWhInterface` and `DatabaseUtilities`, which are way more complex. This is a direct consequence of the fact that, as we will better show in the following part of the document, they are used as façades with the front end and the database, respectively (they are, by nature, longer).
 
 ### EzWhInterface & EzWh
 The `EzWhInterface` interface, which in our case is implemented by the `EzWh` class, is the façade used by the front end to interact with the back end.  
@@ -103,7 +100,7 @@ Its role is mainly _translational_, since every function
 3. Possibly converts the result from custom classes to JSON  
 
 ------------------------------------------------------------
-#### SKU
+ **SKU**  
 `Array<String> getAllSKUs()`  
 Returns a list of all the SKUs in the database, by calling db.loadSKU(null).
 
@@ -124,7 +121,7 @@ Fetches the SKU and the position from the database by calling sku = db.loadSKU(s
 Fetches the SKU and its assigned position - if any - from the database by calling first sku = db.loadSKU(skuId) and then p = db.loadPosition(sku.getPosition()). Then, it possibly calls p.setSKU(null). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updatePosition(p) and the SKU is deleted by calling db.deleteSKU(sku.getId()). 
 
 ------------------------------------------------------------
-#### SKUitem
+**SKUitem**  
 
 `Array<String> getAllSKUitems()`  
 Returns a list of all the SKUitems in the database, by calling db.loadSKUitem(null).
@@ -147,7 +144,7 @@ Fetches the SKUitem from the database by calling skuItem = db.loadSKUitem(rfid),
 Calls db.deleteSKUitem(rfid).
 
 ------------------------------------------------------------
-#### Position
+**Position**
 
 `Array<String> getAllPositions()`  
 Returns a list of all the positions in the database, by calling db.loadPosition(null).
@@ -165,7 +162,7 @@ Fetches the position from the database by calling p = db.loadPosition(oldPositio
 Removes a SKUitem from the position identified by positionId. In particular, the SKUitem with the lowest date of stock must be selected, to apply a FIFO-like criteria. To do so, db.fifoPopSKUitemFromPosition(positionId) is called.
 
 ------------------------------------------------------------
-#### TestDescriptor
+**TestDescriptor**
 
 `Array<String> getAllTestDescriptors()`  
 Returns a list of all the test descriptors in the database, by calling db.loadTestDescriptor(null).
@@ -184,7 +181,7 @@ Fetches from the database the test descriptor and SKU whose ids match the ones i
 Simply calls db.deleteTestDescriptor(testId). 
 
 ------------------------------------------------------------
-#### TestResult
+**TestResult**
 
 `  Array<String> getTestResultsByRfid(rfid :String)`  
 Returns a list of all the test results in the database correspondent to a SKUitem whose rfid matches the one in input, by calling db.loadTestResult(rfid).
@@ -203,7 +200,7 @@ Creates a new test result object by calling the unsafe constructor (which perfor
 Simply calls db.deleteTestResult(rfid, resultId).
 
 ------------------------------------------------------------
-#### TestResult
+**TestResult**
 
 `  String getUserInfo()`  
 Returns the content of currentlyLoggedUser. If no user is logged in, it throws NotLoggedInException.
@@ -230,7 +227,7 @@ Fetches from the the database usr = db.loadUser(username, oldType), then calls u
 Calls db.deleteUser(username, type). If type = MANAGER, ManagerException is raised. 
 
 ------------------------------------------------------------
-#### RestockOrder
+**RestockOrder**
 
 `  Array<String> getAllRestockOrders()`  
 Returns a list of all the restock orders in the database by calling db.loadRestockOrder().
@@ -265,7 +262,7 @@ To keep the order history explicit, we do not automatically delete return orders
 More in general, when treating orders, we never perform automatic deletion (e.g., if an item is deleted, all orders referencing that item are still kept in the database).
 
 ------------------------------------------------------------
-#### ReturnOrder
+**ReturnOrder**
 
 `  Array<String> getAllReturnOrders()`  
 Returns a list of all the return orders in the database by calling db.loadReturnOrder(null).
@@ -282,7 +279,7 @@ Then, creates a new ReturnOrder object by calling its constructor [the construct
 Calls db.deleteReturnOrder(orderId).
 
 ------------------------------------------------------------
-#### InternalOrder
+**InternalOrder**
 
 `  Array<String> getAllInternalOrders()`  
 Returns a list of all the internal orders in the database by calling db.loadInternalOrder().
@@ -308,7 +305,7 @@ Fetches from the the database the requested internal order internal = db.loadInt
 Calls db.deleteInternalOrder(orderId).
 
 ------------------------------------------------------------
-#### Item
+**Item**
 
 `  Array<String> getAllItems()`  
 Returns a list of all the items in the database by calling db.loadItem(null).
@@ -330,7 +327,8 @@ Simply calls db.deleteItem(itemId).
 ### DatabaseUtilities
 
 This class will be used as an interface towards the database storing information needed by the application. All functions are generally simple and low-level, except for few cases. Given that, pseudo-code is explicitly written just for most complex queries.  
-Given the possibility to modify SKUItem's Id, a fixed Id is provided to maintain database's internal consistency.
+Given the possibility to modify SKUitem RFID, a fixed Id is provided to maintain database's internal consistency.  
+For delete functions, additional parameters are provided to delete entries according to object they reference, to be used for maintaining consistency. However, since such behaviours have not been specified in the official requirements, they will not be explicitly used in the design.
 
 `  void createConnection ()`  
 Establish a connection between database and the program.
@@ -340,14 +338,16 @@ Close the connection between database and the program.
 
 `  Array<SKU> loadSKU (skuId :Integer=null)`  
 Select all SKU with the given skuId. If no skuId is provided, it returns all skus in the database.
-For every SKU selected, all testDescriptors'id with matching skuId are returned.
-For every SKU selected, positionId with matching skuId are returned.
+For every SKU selected, all testDescriptor ids with matching skuId are returned.
 
 `  Array<SKUitem> loadSKUitem (rfid :String=null, skuId :Integer=null)`  
-Select alla SKUitem with the given skuId and rfId. If no id is provided, it returns all SKUitems in the database with Available equals to true.
+Select all SKUitem with the given skuId and rfId. If no id is provided, it returns all SKUitems in the database with Available equals to true.
 
-`  Array<Position> loadPosition(positionId :String=null)
-Select all Position with the given positionId. If no positionId is provided, it returns all Positions in the database.`  
+`  Array<Position> loadPosition(positionId :String=null, skuId :Integer=null)`  
+Select the Position with the given positionId.
+Select the Position storing the SKU with the given skuId.
+If no positionId / skuId is provided, it returns all Positions in the database.
+
 
 `  Array<TestDescriptor> loadTestDescriptor (testId :Integer=null)`  
 Select all TestDescriptor with the given testId. If no testId is provided, it returns all TestDescriptor in the database.
@@ -485,7 +485,7 @@ WHERE rfid = skuVar.rfid
 SELECT order INTO orderVar  
 FROM RESTOCK-ORDERS RO  
 WHERE RO.id = orderId  
-If orderVar is empty, raise. UnassociatedIDException.  
+If orderVar is empty, raise UndefinedRestockOrderException.  
 If orderVar.state != COMPLETEDRETURN, raise  WrongOrderStateException.  
 SELECT skuItem INTO skuItemsArray  
 FROM SKU-ITEMS SI  
@@ -530,7 +530,7 @@ Computes new, temporary values for p.occupiedWeight and p.occupiedVolume.If they
 
 `  setSKU(sku :SKU)`  
 **if sku!=null**  
-First, checks if it is already assigned to a different SKU. If yes, IDValidationFailedException is raised. If no, checks if it is able to store the available SKU in terms of weight and volume. If yes, the SKU is set. If no, OutOfSpaceException is raised.  
+First, checks if it is already assigned to a different SKU. If yes, PositionAlreadyAssignedException is raised. If no, checks if it is able to store the available SKU in terms of weight and volume. If yes, the SKU is set. If no, OutOfSpaceException is raised.  
 **if sku==null**  
 Resets the position to its initial state.
 
@@ -590,6 +590,7 @@ For our sequence diagrams, we have focused on different scenarios, to show vario
 
 ## Scenario 1-3, modify SKU weight and volume
 We are assuming that the SKU is already associated to a position, hence the system should also automatically updates the occupied weight and volume of such position.
+
 ![Scenario 1-3](./Design-diagrams/scenario1-3.svg "Scenario 1-3")
 
 ## Scenario 5-2-1, record positive test results of all SKU items of a RestockOrder
