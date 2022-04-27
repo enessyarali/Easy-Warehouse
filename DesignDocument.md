@@ -201,7 +201,7 @@ Creates a new test result object by calling the unsafe constructor (which perfor
 Simply calls db.deleteTestResult(rfid, resultId).
 
 ------------------------------------------------------------
-**TestResult**
+**User**
 
 `  String getUserInfo()`  
 Returns the content of currentlyLoggedUser. If no user is logged in, it throws NotLoggedInException.
@@ -603,6 +603,9 @@ We are assuming that the SKU is already associated to a position, hence the syst
 
 ## Scenario 6-1, return order of SKUitems which did not pass any quality test
 ![Scenario 6-1](./Design-diagrams/scenario6-1.svg "Scenario 6-1")
+
+## Scenario 9-2, return order of SKUitems which did not pass any quality test
+![Scenario 9-2](./Design-diagrams/scenario9-2.svg "Scenario 9-2")
 
 ## Scenario 12-3, delete test descriptor
 ![Scenario 12-3](./Design-diagrams/scenario12-3.svg "Scenario 12-3")
