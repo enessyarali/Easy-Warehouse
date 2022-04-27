@@ -254,7 +254,7 @@ Calls db.selectReturnItems(orderId). This function is done at a lower level to a
 
     void addRestockOrder(issueDate :Date, products :Array<String>, supplierId :Integer)
 Fetches from the database the supplier whose id matches the one in input by calling usr = db.loadUser(supplierId, type = SUPPLIER).
-Then, creates a new RestockOrder object by calling its constructor [the constructor will take care of checking that we are not ordering more items than what the warehouse is capable of storing]. Finally, if no exceptions have been raised, the order is added in the database by calling db.insertRestockOrder().
+Then, creates a new RestockOrder object by calling its constructor [the constructor will take care of checking that we are not ordering more items than what the warehouse is capable of storing, and that all selected items are provided by the same supplier]. Finally, if no exceptions have been raised, the order is added in the database by calling db.insertRestockOrder().
 
     void modifyRestockOrderState(orderId :Integer, newState :String)
 Fetches from the the database the requested restock order restock = db.loadRestockOrder(orderId). Then, calls restock.setState(newState). Finally, if no exceptions have been raised, the order is updated by calling db.updateRestockOrder(restock).
@@ -273,8 +273,19 @@ More in general, when treating orders, we never perform automatic deletion (e.g.
 
 ************************* ReturnOrder *************************
 
+    Array<String> getAllReturnOrders()
+Returns a list of all the return orders in the database by calling db.loadReturnOrder(null).
 
+    String getReturnOrderById(orderId :Integer)
+Searches in the database the return order whose id matches the one in input, by calling db.loadReturnOrder(orderId).
+Returns the requested ReturnOrder.
 
+    void addReturnOrder(returnDate :Date, products :Array<String>, restockOrderId :Integer)
+Fetches from the database the restock order whose id matches the one in input by calling db.loadRestockOrder(restockOrderId).
+Then, creates a new ReturnOrder object by calling its constructor [the constructor will take care of checking the consistency between the products to be returned and the one which have been received]. Finally, if no exceptions have been raised, the order is added in the database by calling db.insertReturnOrder().
+
+    void deleteReturnOrder(orderId :Integer)
+Calls db.deleteReturnOrder(orderId).
 
 ************************* InternalOrder *************************
 
@@ -419,14 +430,13 @@ If orderVar is empty, raise ------------------------------------.
 If orderVar.state != COMPLETEDRETURN, raise ------------------------------------.
 SELECT skuItem INTO skuItemsArray
 FROM SKU-ITEMS SI
-WHERE SI.rfid 
+WHERE orderVar.skuItems.contains(SI.rfid) AND NOT EXISTS (
+    SELECT TR.id
+    FROM TEST-RESULTS TR
+    WHERE SI.rfid = TR.rfid AND TR.result = true
+)
 
 ```
-
-
-
-If there is not an SKU with an id matching the input, the system throws the UnexistingSKUException.
-
 
 ### SKU
 
@@ -515,6 +525,13 @@ Changes the value of the transportNote attribute.
        void setState(state :InternalOrderState, products :Array<String>)
 Changes the value of the attributes.
 If state == COMPLETED, products are updated by adding the rfid information, otherwise they are ignored.
+
+```
+
+### User
+```
+       void setType(type :Role)
+Changes the value of the type attributes.
 
 ```
 
