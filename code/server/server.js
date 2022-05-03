@@ -1,10 +1,14 @@
 'use strict';
 const express = require('express');
+
+const skuRoute = require('./api/skuApi.js');
+
 // init express
 const app = new express();
 const port = 3001;
 
 app.use(express.json());
+app.use('/', skuRoute);
 
 //GET /api/test
 app.get('/api/hello', (req,res)=>{
@@ -18,5 +22,3 @@ app.get('/api/hello', (req,res)=>{
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });
-
-module.exports = app;

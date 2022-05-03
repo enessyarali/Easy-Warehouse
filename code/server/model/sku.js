@@ -28,3 +28,5 @@ class SKU {
     }
 
 }
+
+module.exports = SKU;
