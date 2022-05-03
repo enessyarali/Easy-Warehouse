@@ -8,7 +8,7 @@
 2. In code folder run cmd `cd server`
 3. Run cmd `npm install -g nodemon`
 4. Run cmd `npm install` to install all modules
-5. Run cmd `nodemon server.js`
+5. Run cmd `node server.js`
 
 Steps 3 and 4 need to be executed ONLY THE FIRST TIME you start the server. Then just skip them and follow step 1,2,5.
 
