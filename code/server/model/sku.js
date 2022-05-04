@@ -40,6 +40,7 @@ class SKU {
         this.availableQuantity = newAvailableQuantity;
     }
 
+
 }
 
 module.exports = SKU;

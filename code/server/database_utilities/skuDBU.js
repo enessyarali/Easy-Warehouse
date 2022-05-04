@@ -55,8 +55,8 @@ class SkuDBU {
     // return -> void
     insertSKU(description, weight, volume, notes, price, availableQuantity) {
         return new Promise((resolve, reject) => {
-            const insert = 'INSERT INTO SKUS (description, weight, volume, notes, price, availableQuantity) VALUES(?,?,?,?,?,?)';
-            this.db.run(insert, [description, weight, volume, notes, price, availableQuantity], (err) => {
+            const sqlInsert = 'INSERT INTO SKUS (description, weight, volume, notes, price, availableQuantity) VALUES(?,?,?,?,?,?)';
+            this.db.run(sqlInsert, [description, weight, volume, notes, price, availableQuantity], (err) => {
                 if (err) {
                     reject(err);
                     return;
@@ -68,8 +68,21 @@ class SkuDBU {
     // this function returns the number of rows which has been modified
     updateSKU(sku) {
         return new Promise((resolve, reject) => {
-            const insert = 'UPDATE SKUS SET description=?, weight=?, volume=?, notes=?, price=?, availableQuantity=? WHERE id=?';
-            this.db.run(insert, [sku.description, sku.weight, sku.volume, sku.notes, sku.price, sku.availableQuantity, sku.id], function (err) {
+            const sqlUpdate = 'UPDATE SKUS SET description=?, weight=?, volume=?, notes=?, price=?, availableQuantity=? WHERE id=?';
+            this.db.run(sqlUpdate, [sku.description, sku.weight, sku.volume, sku.notes, sku.price, sku.availableQuantity, sku.id], function (err) {
+                if (err) {
+                    reject(err);
+                    return;
+                } else resolve(this.changes);
+            });
+        });
+    }
+
+    deleteSKU(id) {
+        // delete other things to keep consistency - TODO
+        return new Promise((resolve, reject) => {
+            const sqlDelete = 'DELETE FROM SKUS WHERE id=?';
+            this.db.run(sqlDelete, [id], function (err) {
                 if (err) {
                     reject(err);
                     console.log(err);
