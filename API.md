@@ -1,8 +1,13 @@
 # List of API
 
-Version: 0.5
+Version: 1.0
 
-Date: 21 February 2022
+Date: 03 May 2022
+
+| Change | Description |
+|---|------|
+| issue 2 | fixed comment, 'delete a position receiving its positionId |
+| issue 11 | fixed POST /api/item,  now receives both SKU.id and Item.id |
 
 ## INDEX
 [SKU](#sku)
@@ -420,7 +425,7 @@ Example of Request body
 
 #### **/api/position/:positionID**
 
-- **Delete a SKU item receiving his positionID.**
+- **Delete a position receiving its positionID.**
 - **Request header** : req.params.positionID to retrieve positionID
 - **Request body**: none
 - **Response header**:  `204 No Content` (success).
@@ -1261,7 +1266,7 @@ Returns an array of all restock orders in state = ISSUED. Example:
 
 - **Response header**:  `200 OK` (success). 
 - **Response body**: none.
-- **Permissions allowed**:  Manager, Delivery Employee
+- **Permissions allowed**:  Manager, Delivery Employee, Internal Customer
 - **Error responses**: `401 Unauthorized` (not logged in or wrong permissions),`404 Not Found` (no internal order associated to id), `422 Unprocessable Entity` (validation of request body or of id failed), `503 Service Unavailable` (generic error).
 
 ### DELETE
@@ -1335,11 +1340,12 @@ Returns an array of all restock orders in state = ISSUED. Example:
 
 - **Creates a new Item**
 - **Request header** has a line: `Content-Type: application/json`.
-- **Request body**: a JSON object containing description, price, SKUId, supplierId.
+- **Request body**: a JSON object containing id, description, price, SKUId, supplierId.
  Example of Request body
 
     ```
         {
+            "id" : 12,
             "description" : "a new item",
             "price" : 10.99,
             "SKUId" : 1,
@@ -1351,7 +1357,7 @@ Returns an array of all restock orders in state = ISSUED. Example:
 - **Response header**:  `201 Created` (success). 
 - **Response body**: none.
 - **Permissions allowed**: Supplier
-- **Error responses**: `401 Unauthorized` (not logged in or wrong permissions),`404 Not Found` (Sku not found), `422 Unprocessable Entity` (validation of request body failed or this supplier already sells an item with the same SKUId), `503 Service Unavailable` (generic error).
+- **Error responses**: `401 Unauthorized` (not logged in or wrong permissions),`404 Not Found` (Sku not found), `422 Unprocessable Entity` (validation of request body failed or this supplier already sells an item with the same SKUId or supplier already sells an Item with the same ID), `503 Service Unavailable` (generic error).
 
 
 ### PUT
