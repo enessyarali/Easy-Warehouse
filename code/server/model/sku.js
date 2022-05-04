@@ -28,6 +28,18 @@ class SKU {
         this.testDescriptors = testDescriptors;
     }
 
+    modify(newDescription, newWeight, newVolume, newNotes, newPrice, newAvailableQuantity) {
+        if(this.position && newWeight!=this.weight && newVolume!=this.volume && newAvailableQuantity!=this.availableQuantity) {
+            // do something, eventually throw exception
+        }
+        this.description = newDescription;
+        this.weight = newWeight;
+        this.volume = newVolume;
+        this.notes = newNotes;
+        this.price = newPrice;
+        this.availableQuantity = newAvailableQuantity;
+    }
+
 }
 
 module.exports = SKU;

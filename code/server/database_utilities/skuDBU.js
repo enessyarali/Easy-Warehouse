@@ -53,29 +53,31 @@ class SkuDBU {
     }
 
     // return -> void
-    /*
-    insertSKU(sku) {
+    insertSKU(description, weight, volume, notes, price, availableQuantity) {
         return new Promise((resolve, reject) => {
-            const create = 'CREATE TABLE IF NOT EXISTS skus ( id INTEGER NOT NULL, description TEXT NOT NULL, weight INTEGER NOT NULL, volume INTEGER NOT NULL, notes TEXT NOT NULL, position TEXT, availableQuantity INTEGER NOT NULL, price REAL NOT NULL, PRIMARY KEY(id AUTOINCREMENT)';
-            const insert = 'INSERT INTO skus ( description, weight, volume, notes, price, availableQuantity) VALUES(?,?,?,?,?,?)';
-            this.db.all(skuId!==null ? sql : sqlNull, skuId!==null ? [skuId] : [], (err, rows) => {
+            const insert = 'INSERT INTO SKUS (description, weight, volume, notes, price, availableQuantity) VALUES(?,?,?,?,?,?)';
+            this.db.run(insert, [description, weight, volume, notes, price, availableQuantity], (err) => {
                 if (err) {
                     reject(err);
                     return;
-                }
-                const skus = rows.map((s) => {
-                    const sku = new SKU(s.id, s.description, s.weight, s.volume, s.notes, s.position, s.price, s.availableQuality);
-                    // const sqlTests = 'SELECT id FROM TEST-DESCRIPTORS WHERE skuId=?';
-                    // fetch test descriptors from db
-                    // this.db.all(sqlTests, [s.id])
-                    return sku;
-                });
-                resolve(skus);
+                } else resolve('Done');
             });
         });
+    }
 
-    }*/
-
+    // this function returns the number of rows which has been modified
+    updateSKU(sku) {
+        return new Promise((resolve, reject) => {
+            const insert = 'UPDATE SKUS SET description=?, weight=?, volume=?, notes=?, price=?, availableQuantity=? WHERE id=?';
+            this.db.run(insert, [sku.description, sku.weight, sku.volume, sku.notes, sku.price, sku.availableQuantity, sku.id], function (err) {
+                if (err) {
+                    reject(err);
+                    console.log(err);
+                    return;
+                } else resolve(this.changes);
+            });
+        });
+    }
 
     // private method to get test descriptors for a given skuId 
    #getTestDescriptors(id) {
