@@ -24,23 +24,23 @@ router.get('/api/skus', async (req,res) => {
 // POST /api/sku
 // add a new sku to the database
 router.post('/api/sku', async (req,res) => {
-    if (req.body === undefined || req.body.description === undefined || req.body.weight === undefined || 
-        req.body.volume === undefined || req.body.price == undefined || req.body.notes === undefined || 
-        req.body.availableQuantity === undefined ) {
-      return res.status(422).json({error: `Invalid SKU data.`});
-    }
-    try{
-        const db = new SkuDBU('ezwh.db');
-        await db.insertSKU(req.body.description, req.body.weight, req.body.volume, req.body.notes, req.body.price, req.body.availableQuantity);
-        return res.status(201).end();
-    }
-    catch(err){
-      return res.status(503).json({error: `Something went wrong...`});
-    }
+  if (req.body === undefined || req.body.description === undefined || req.body.weight === undefined || 
+      req.body.volume === undefined || req.body.price == undefined || req.body.notes === undefined || 
+      req.body.availableQuantity === undefined ) {
+    return res.status(422).json({error: `Invalid SKU data.`});
+  }
+  try{
+      const db = new SkuDBU('ezwh.db');
+      await db.insertSKU(req.body.description, req.body.weight, req.body.volume, req.body.notes, req.body.price, req.body.availableQuantity);
+      return res.status(201).end();
+  }
+  catch(err){
+    return res.status(503).json({error: `Something went wrong...`});
+  }
 });
 
 
-// PUT /api/sku
+// PUT /api/sku/:id
 // modify a sku in the database
 router.put('/api/sku/:id', async (req,res) => {
   if (req.body === undefined || req.body.newDescription === undefined || req.body.newWeight === undefined || 
@@ -64,6 +64,23 @@ router.put('/api/sku/:id', async (req,res) => {
       }
       await db.updateSKU(sku);
       return res.status(200).end();
+  }
+  catch(err){
+    return res.status(503).json({error: `Something went wrong...`});
+  }
+});
+
+
+// DELETE /api/sku
+// remove a sku from the database
+router.delete('/api/sku/:id', async (req,res) => {
+  if (req.params === undefined || req.params.id === undefined) {
+    return res.status(422).json({error: `Validation of id failed`});
+  }
+  try{
+      const db = new SkuDBU('ezwh.db');
+      await db.deleteSKU(req.params.id);
+      return res.status(204).end();
   }
   catch(err){
     return res.status(503).json({error: `Something went wrong...`});
