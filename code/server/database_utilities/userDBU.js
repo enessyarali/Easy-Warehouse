@@ -27,18 +27,41 @@ class UserDBU {
         } catch(err) {  // if the database access generates an exception, propagate it
             throw(err);
         }
-        if(!info || !info.salt || !info.password)
-            throw({error: 'No matching user!\n'});
+        if(!info)
+            throw({error: 'No matching user!'});
 
         return saltHash.verifySaltHash(info.salt, info.password, password);
     }
 
     loadUser(username=undefined, type=undefined, id=undefined) {
+        const sqlUser = 'SELECT * FROM USERS WHERE email=? AND type=?';
+        const sqlType = 'SELECT * FROM USERS WHERE type=?';
+        const sqlAll = 'SELECT * FROM USERS WHERE type<>"manager"';
+        const sqlId = 'SELECT * FROM USERS WHERE id=?'
+
+        let sqlInfo = {sql: undefined, values: undefined};
+
+        if(!username && !type && !id) {
+            // get all users, except managers
+            sqlInfo.sql = sqlAll;
+            sqlInfo.values = [];
+        } else if(id && !username && !type) {
+            // get user by id
+            sqlInfo.sql = sqlId;
+            sqlInfo.values = [id];
+        } else if(type && !username) {
+            // get users by type
+            sqlInfo.sql = sqlType;
+            sqlInfo.values = [type];
+        } else {
+            // get user by (username, type) pair
+            sqlInfo.sql = sqlUser;
+            sqlInfo.values = [username, type];
+        }
+
         return new Promise((resolve, reject) => {
-            const user = 'SELECT * FROM USERS WHERE email=? AND type=?';
-            //const sqlNull = 'SELECT * FROM skus';
-            //this.db.all(skuId ? sql : sqlNull, skuId ? [skuId] : [], (err, rows) => {
-                this.db.all(user, [username, type], (err, rows) => {
+            
+            this.db.all(sqlInfo.sql, sqlInfo.values, (err, rows) => {
                 if (err) {
                     reject(err);
                     return;
@@ -61,7 +84,7 @@ class UserDBU {
                 reject(err);
                 return;
             }
-            resolve({salt: row.salt, password: row.password});
+            resolve(row ? {salt: row.salt, password: row.password} : undefined);
             });
         });
     }
