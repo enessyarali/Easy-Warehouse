@@ -17,7 +17,7 @@ router.get('/api/skus', async (req,res) => {
     const skuList = await db.loadSKU();
     return res.status(200).json(skuList);
   } catch (err) {
-      return res.status(500).json({error: `Something went wrong...`});
+      return res.status(500).json({error: `Something went wrong...`, message: err.message});
   }
 });
 
@@ -35,7 +35,7 @@ router.post('/api/sku', async (req,res) => {
       return res.status(201).end();
   }
   catch(err){
-    return res.status(503).json({error: `Something went wrong...`});
+    return res.status(503).json({error: `Something went wrong...`, message: err.message});
   }
 });
 
@@ -66,7 +66,7 @@ router.put('/api/sku/:id', async (req,res) => {
       return res.status(200).end();
   }
   catch(err){
-    return res.status(503).json({error: `Something went wrong...`});
+    return res.status(503).json({error: `Something went wrong...`, message: err.message});
   }
 });
 
@@ -83,7 +83,7 @@ router.delete('/api/sku/:id', async (req,res) => {
       return res.status(204).end();
   }
   catch(err){
-    return res.status(503).json({error: `Something went wrong...`});
+    return res.status(503).json({error: `Something went wrong...`, message: err.message});
   }
 });
   

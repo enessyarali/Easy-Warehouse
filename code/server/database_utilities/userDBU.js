@@ -1,5 +1,6 @@
 'use strict';
-const User = require('../model/user.js');
+const User = require('../model/user');
+const Error = require('../model/error')
 const sqlite = require('sqlite3');
 const saltHash = require('password-salt-and-hash');
 
@@ -28,7 +29,7 @@ class UserDBU {
             throw(err);
         }
         if(!info)
-            throw({error: 'No matching user!'});
+            throw(new Error('No matching user!', 1));
 
         return saltHash.verifySaltHash(info.salt, info.password, password);
     }
@@ -60,7 +61,6 @@ class UserDBU {
         }
 
         return new Promise((resolve, reject) => {
-            
             this.db.all(sqlInfo.sql, sqlInfo.values, (err, rows) => {
                 if (err) {
                     reject(err);
@@ -74,6 +74,53 @@ class UserDBU {
             });
         });
     }
+
+    async insertUser(username, name, surname, password, type) {
+        // check whether a user already exist
+        const userList = await this.loadUser(username, type);
+        if (userList.length !== 0) {
+            throw(new Error('User already exists.', 2));
+        }
+        // encrypt the password
+        const hashPassword = saltHash.generateSaltHash(password);
+        return new Promise((resolve, reject) => {
+            const sqlInsert = 'INSERT INTO USERS (name, surname, email, type, password, salt) VALUES(?,?,?,?,?,?)';
+            this.db.run(sqlInsert, [name, surname, username, type, hashPassword.password, hashPassword.salt], (err) => {
+                if (err) {
+                    reject(err);
+                    return;
+                } else resolve('Done');
+            });
+        });
+    }
+
+    // this function returns the number of rows which has been modified
+    updateUser(user) {
+        return new Promise((resolve, reject) => {
+            const sqlUpdate = 'UPDATE USERS SET name=?, surname=?, email=?, type=? WHERE id=?';
+            this.db.run(sqlUpdate, [user.name, user.surname, user.email, user.type, user.id], function (err) {
+                if (err) {
+                    reject(err);
+                    return;
+                } else resolve(this.changes);
+            });
+        });
+    }
+
+    deleteUser(username, type) {
+        // delete other things to keep consistency - TODO
+        return new Promise((resolve, reject) => {
+            const sqlDelete = 'DELETE FROM USERS WHERE username=? AND type=?';
+            this.db.run(sqlDelete, [username, type], function (err) {
+                if (err) {
+                    reject(err);
+                    console.log(err);
+                    return;
+                } else resolve(this.changes);
+            });
+        });
+    }
+
 
     // private method to load password information
     #loadPassword(username, type) {
