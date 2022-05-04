@@ -1,4 +1,12 @@
 *.DS_Store
 code/server/coverage/
-code/server/node_modules/
+
+!code/
+code/*
+!code/server/
+code/server/*
+!code/server/node_modules/
+code/server/node_modules/*
+!code/server/node_modules/password-salt-and-hash
+
 code/client/node_modules/
