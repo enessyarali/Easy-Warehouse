@@ -19,22 +19,35 @@ class SkuDBU {
     }
 
     loadSKU(skuId=undefined) {
+
+        const sqlSku = 'SELECT * FROM SKUS WHERE id=?';
+        const sqlAll = 'SELECT * FROM SKUS';
+
+        let sqlInfo = {sql: undefined, values: undefined};
+
+        if(!skuId) {
+            // get all skus
+            sqlInfo.sql = sqlAll;
+            sqlInfo.values = [];
+        } else {
+            // get sku by id
+            sqlInfo.sql = sqlSku;
+            sqlInfo.values = [skuId];
+        }
+
         return new Promise((resolve, reject) => {
-            const sql = 'SELECT * FROM SKUS WHERE id=?';
-            const sqlNull = 'SELECT * FROM skus';
-            this.db.all(skuId ? sql : sqlNull, skuId ? [skuId] : [], (err, rows) => {
+            this.db.all(sqlInfo.sql, sqlInfo.values, (err, rows) => {
                 if (err) {
                     reject(err);
                     return;
                 }
-                const skus = rows.map((s) => {
-                    const sku = new SKU(s.id, s.description, s.weight, s.volume, s.notes, s.position, s.price, s.availableQuality);
-                    // const sqlTests = 'SELECT id FROM TEST-DESCRIPTORS WHERE skuId=?';
-                    // fetch test descriptors from db
-                    // this.db.all(sqlTests, [s.id], )
+                const skus = rows.map(async (s) => {
+                    const sku = new SKU(s.id, s.description, s.weight, s.volume, s.notes, s.position, s.price, s.availableQuantity);
+                    const tests = await this.#getTestDescriptors(s.id);
+                    sku.setTestDescriptors(tests);
                     return sku;
                 });
-                resolve(skus);
+                Promise.all(skus).then((skus) => resolve(skus));
             });
         });
     }
@@ -64,22 +77,20 @@ class SkuDBU {
     }*/
 
 
-    /*
-    CREATE TABLE "SKUS" (
-	"id"	INTEGER NOT NULL,
-	"description"	TEXT NOT NULL,
-	"weight"	INTEGER NOT NULL,
-	"volume"	INTEGER NOT NULL,
-	"notes"	TEXT NOT NULL,
-	"position"	TEXT,
-	"availableQuantity"	INTEGER NOT NULL,
-	"price"	REAL NOT NULL,
-	PRIMARY KEY("id" AUTOINCREMENT)
-)
-    */
-
-
-
+    // private method to get test descriptors for a given skuId 
+   #getTestDescriptors(id) {
+        return new Promise((resolve, reject) => {
+            const test = 'SELECT id FROM "TEST-DESCRIPTORS" WHERE idSKU=?';
+            this.db.all(test, [id], (err, rows) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            const tests = rows.map((t) => t.id);
+            resolve(tests);;
+            });
+        });
+   }
 
     
 }

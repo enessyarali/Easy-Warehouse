@@ -24,7 +24,7 @@ class SKU {
         this.availableQuantity = availableQuantity;
     }
 
-    set testDescriptors(testDescriptors) {
+    setTestDescriptors(testDescriptors) {
         this.testDescriptors = testDescriptors;
     }
 
