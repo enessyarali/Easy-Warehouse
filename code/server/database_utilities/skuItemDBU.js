@@ -18,6 +18,9 @@ class SkuItemDBU {
             this.db = db;
         } 
     }
+    close() {
+        this.db.close();
+    }
 
     loadSKUitem(rfid=undefined, skuId=undefined) {
 

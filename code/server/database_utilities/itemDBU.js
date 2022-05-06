@@ -19,6 +19,9 @@ class ItemDBU {
             this.db = db;
         } 
     }
+    close() {
+        this.db.close();
+    }
 
 // get item(s) from the ITEM table and return it/them as an Item object
     loadItem(id = undefined) {

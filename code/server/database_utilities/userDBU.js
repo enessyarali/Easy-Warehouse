@@ -19,6 +19,9 @@ class UserDBU {
             this.db = db;
         } 
     }
+    close() {
+        this.db.close();
+    }
 
     // returns true if the password matches, false otherwise
     // if no user matches the pair username, type, an exception is thrown

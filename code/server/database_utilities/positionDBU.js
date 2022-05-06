@@ -19,6 +19,9 @@ class PositionDBU {
             this.db = db;
         } 
     }
+    close() {
+        this.db.close();
+    }
 
     loadPosition(positionId=undefined) {
 
