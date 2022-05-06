@@ -5,6 +5,7 @@ class Error {
     // defined error codes
     // 1 - user does not exist
     // 2 - user already exist
+    // 3 - sku does not exist
 
     // 10 - No Argument Passed
 
