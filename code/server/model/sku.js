@@ -40,6 +40,12 @@ class SKU {
         this.availableQuantity = newAvailableQuantity;
     }
 
+    delete() {
+        if (position) {
+            // fetch position and do stuff
+        }
+    }
+
 
 }
 

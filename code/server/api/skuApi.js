@@ -79,6 +79,15 @@ router.delete('/api/sku/:id', async (req,res) => {
   }
   try{
       const db = new SkuDBU('ezwh.db');
+      // get the sku to be deleted
+      const skuList = await db.loadSKU(req.params.id);
+      const sku = skuList.pop();
+      if (!sku) {
+        // then the inserted id did not match any sku
+        return res.status(404).json({error: `No SKU matches the id ${req.params.id}.`});
+      }
+      sku.delete();
+      // now, delete the sku
       await db.deleteSKU(req.params.id);
       return res.status(204).end();
   }
