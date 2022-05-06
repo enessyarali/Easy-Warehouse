@@ -8,15 +8,16 @@ class UserDBU {
 
     // attributes
     // - db (Database)
-    // - dbname (string)
 
     // constructor
-    constructor(dbname) {
-        this.dbname = dbname;
-        this.db = new sqlite.Database(dbname, (err) => {
-            if (err) throw err;
-        });
-        
+    constructor(dbname, db=undefined) {
+        if (!db) {
+            this.db = new sqlite.Database(dbname, (err) => {
+                if (err) throw err;
+            });
+        } else {
+            this.db = db;
+        } 
     }
 
     // returns true if the password matches, false otherwise
