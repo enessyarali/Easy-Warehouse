@@ -118,7 +118,6 @@ class SkuItemDBU {
             this.db.run(sqlInfo.sql, sqlInfo.values, function (err) {
                 if (err) {
                     reject(err);
-                    console.log(err);
                     return;
                 } else resolve(this.changes);
             });

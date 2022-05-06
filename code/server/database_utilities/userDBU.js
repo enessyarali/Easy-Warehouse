@@ -118,7 +118,6 @@ class UserDBU {
             this.db.run(sqlDelete, [username, type], function (err) {
                 if (err) {
                     reject(err);
-                    console.log(err);
                     return;
                 } else resolve(this.changes);
             });

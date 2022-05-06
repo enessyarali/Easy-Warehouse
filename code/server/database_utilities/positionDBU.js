@@ -26,7 +26,7 @@ class PositionDBU {
     loadPosition(positionId=undefined) {
 
         const sqlId = 'SELECT * FROM positions WHERE positionId=?';
-        const sqlAll = 'SELECT * FROM ';
+        const sqlAll = 'SELECT * FROM positions';
 
         let sqlInfo = {sql: undefined, values: undefined};
 
@@ -102,7 +102,7 @@ class PositionDBU {
     updatePosition(oldPositionId, newPosition) {
         return new Promise((resolve, reject) => {
             const update = 'UPDATE positions SET positionId=?, aisleId=?, row=?, col=?, maxWeight=?, maxVolume=?, occupiedWeight=?, occupiedVolume=? WHERE positionId=?';
-            this.db.run(update, [newPosition.positionID, newPosition.aisleId, newPosition.row, newPosition.col, newPosition.maxWeight, newPosition.maxVolume, newPosition.occupiedWeight, newPosition.occupiedVolume, oldPositionId], function (err) {
+            this.db.run(update, [newPosition.positionID, newPosition.aisleID, newPosition.row, newPosition.col, newPosition.maxWeight, newPosition.maxVolume, newPosition.occupiedWeight, newPosition.occupiedVolume, oldPositionId], function (err) {
                 if (err) {
                     reject(err);
                     return;
@@ -118,7 +118,6 @@ class PositionDBU {
             this.db.run(sqlDelete, [positionId], function (err) {
                 if (err) {
                     reject(err);
-                    console.log(err);
                     return;
                 } else resolve(this.changes);
             });

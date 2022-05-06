@@ -43,7 +43,6 @@ class SkuDBU {
                     return;
                 }
                 const skus = rows.map(async (s) => {
-                    console.log(s);
                     const sku = new SKU(s.id, s.description, s.weight, s.volume, s.notes, s.position, s.price, s.availableQuantity);
                     const tests = await this.#getTestDescriptors(s.id);
                     sku.setTestDescriptors(tests);
@@ -68,10 +67,15 @@ class SkuDBU {
     }
 
     // this function returns the number of rows which has been modified
-    updateSKU(sku) {
+    async updateSKU(sku) {
+        // get position, if defined
+        let posId = sku.position;
+        if (sku.position) {
+            posId = await this.#getPositionIncrementalId(sku.position);
+        }
         return new Promise((resolve, reject) => {
-            const sqlUpdate = 'UPDATE SKUS SET description=?, weight=?, volume=?, notes=?, price=?, availableQuantity=? WHERE id=?';
-            this.db.run(sqlUpdate, [sku.description, sku.weight, sku.volume, sku.notes, sku.price, sku.availableQuantity, sku.id], function (err) {
+            const sqlUpdate = 'UPDATE SKUS SET description=?, weight=?, volume=?, notes=?, price=?, availableQuantity=?, position=? WHERE id=?';
+            this.db.run(sqlUpdate, [sku.description, sku.weight, sku.volume, sku.notes, sku.price, sku.availableQuantity, posId, sku.id], function (err) {
                 if (err) {
                     reject(err);
                     return;
@@ -87,11 +91,25 @@ class SkuDBU {
             this.db.run(sqlDelete, [id], function (err) {
                 if (err) {
                     reject(err);
-                    console.log(err);
                     return;
                 } else resolve(this.changes);
             });
         });
+    }
+
+    // returns true if the position is assigned to a sku, false otherwise
+    searchAssignedPosition(positionId) {
+        const sql = 'SELECT positions.positionId AS position FROM SKUS INNER JOIN POSITIONS ON skus.position=positions.id WHERE positions.positionId=?';
+        return new Promise((resolve, reject) => {
+            this.db.get(sql, [positionId], (err, row) => {
+                if(err) {
+                    reject(err);
+                    return;
+                }
+                resolve(row ? true : false);
+            })
+        });
+        
     }
 
     // private method to get test descriptors for a given skuId 
@@ -106,6 +124,19 @@ class SkuDBU {
             const tests = rows.map((t) => t.id);
             resolve(tests);;
             });
+        });
+   }
+
+   #getPositionIncrementalId(positionId) {
+        const sql = 'SELECT id FROM positions WHERE positionId=?'
+        return new Promise((resolve, reject) => {
+            this.db.get(sql, [positionId], (err, row) => {
+                if(err) {
+                    reject(err);
+                    return;
+                }
+                resolve(row ? row.id : undefined);
+            })
         });
    }
 

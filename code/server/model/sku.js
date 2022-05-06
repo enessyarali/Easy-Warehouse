@@ -1,6 +1,7 @@
 'use strict';
 
-const PositionDBU = require('../database_utilities/positionDBU')
+const PositionDBU = require('../database_utilities/positionDBU');
+const ErrorCode = require('./error');
 
 class SKU {
 
@@ -30,22 +31,13 @@ class SKU {
         this.testDescriptors = testDescriptors;
     }
 
-    async modify(openDB, newDescription, newWeight, newVolume, newNotes, newPrice, newAvailableQuantity) {
+    modify(openDB, newDescription, newWeight, newVolume, newNotes, newPrice, newAvailableQuantity) {
         if(this.position && newAvailableQuantity!=this.availableQuantity) {
-            try {
-                // fetch position
-                const db = new PositionDBU(openDB);
-                const posList = await db.loadPosition(position);
-                const pos = posList.pop();
-                // update occupiedWeight and Volume
-                pos.updateOccupiedWeightAndVolume(newAvailableQuantity*newWeight, newAvailableQuantity*newVolume);
-                // update position
-                await db.updatePosition(pos.positionID, pos);
+            try{
+                this.#propagatePosition(openDB, newAvailableQuantity*newWeight, newAvailableQuantity*newVolume);
             } catch(err) {
-                // if there is some exception, propagate it
+                // propagate exception
                 throw(err);
-            } finally {
-                db.close();
             }
         }
         this.description = newDescription;
@@ -57,22 +49,57 @@ class SKU {
     }
 
     async delete(openDB) {
-        if (position) {
+        if (this.position) {
             try {
-                // fetch position
-                const db = new PositionDBU(openDB);
-                const posList = await db.loadPosition(position);
-                const pos = posList.pop();
-                // reset occupiedWeight and Volume
-                pos.updateOccupiedWeightAndVolume();
-                // update position
-                await db.updatePosition(pos.positionID, pos);
+                this.#propagatePosition(openDB);
             } catch(err) {
                 // if there is some exception, propagate it
                 throw(err);
-            } finally {  
-                db.close();
             }
+        }
+    }
+
+    async setPosition(openDB, newPositionId) {
+        // here, we suppose we have already checked if the position is assigned to another sku
+        if (newPositionId && newPositionId!=this.position) {
+            try {
+                await this.#propagatePosition(openDB, newPositionId, this.availableQuantity*this.weight, this.availableQuantity*this.volume);     
+            } catch(err) {
+                // if there is some exception, propagate it
+                throw(err);
+            }
+        }
+        if (this.position) {
+            // reset the current position
+            try {
+                await this.#propagatePosition(openDB);
+            } catch(err) {
+                // if there is some exception, propagate it
+                throw(err);
+            }
+        }
+        this.position = newPositionId;
+    }
+
+    async #propagatePosition(openDB, position=this.position, occupiedWeight=0, occupiedVolume=0) {
+        let db;
+        try {
+            // fetch position
+            db = new PositionDBU(null, openDB);
+            const posList = await db.loadPosition(position);
+            if(posList.lenght==0) {
+                throw(new Error("The provided position does not exist.", 5));
+            }
+            const pos = posList.pop();
+            // update occupiedWeight and Volume
+            pos.updateOccupiedWeightAndVolume(occupiedWeight, occupiedVolume);
+            // update position
+            await db.updatePosition(pos.positionID, pos);
+        } catch(err) {
+            // if there is some exception, propagate it
+            throw(err);
+        } finally {
+            db.close();
         }
     }
 

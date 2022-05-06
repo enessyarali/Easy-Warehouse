@@ -1,5 +1,7 @@
 'use strict';
 
+const Error = require('./error');
+
 class Positon {
 
     constructor(positionID, aisleID, row, col, maxWeight, maxVolume, occupiedWeight=0, occupiedVolume=0) {
