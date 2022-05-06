@@ -1,27 +1,28 @@
 'use strict';
 const SKUitem = require('../model/skuItem.js');
-
+const Error = require('../model/error')
 const sqlite = require('sqlite3');
 
 class SkuItemDBU {
 
     // attributes
     // - db (Database)
-    // - dbname (string)
 
     // constructor
-    constructor(dbname) {
-        this.dbname = dbname;
-        this.db = new sqlite.Database(dbname, (err) => {
-            if (err) throw err;
-        });
-        
+    constructor(dbname, db=undefined) {
+        if (!db) {
+            this.db = new sqlite.Database(dbname, (err) => {
+                if (err) throw err;
+            });
+        } else {
+            this.db = db;
+        } 
     }
 
     loadSKUitem(rfid=undefined, skuId=undefined) {
 
         const sqlId = 'SELECT * FROM "SKU-ITEMS" WHERE rfid=?';
-        const sqlSku = 'SELECT * FROM "SKU-ITEMS" WHERE skuId=?';
+        const sqlSku = 'SELECT * FROM "SKU-ITEMS" WHERE skuId=? AND available=1';
         const sqlAll = 'SELECT * FROM "SKU-ITEMS"';
 
         let sqlInfo = {sql: undefined, values: undefined};
@@ -46,21 +47,29 @@ class SkuItemDBU {
                     reject(err);
                     return;
                 }
-                const skuItems = rows.map(async (s) => {
-                    const skuItem = new SKUitem(s.rfid, s.skuId, s.Available, s.DateOfStock);
+                const skuItems = rows.map((s) => {
+                    const skuItem = new SKUitem(s.RFID, s.SKUId, s.Available, s.DateOfStock);
                     return skuItem;
                 });
                 resolve(skuItems);
             });
         });
     }
-///////////////////////////////// TODO //////////////////////////////////////////
 
-    // return -> void
-    insertSKUitem(rfid, skuId, ) {
+    async insertSKUitem(rfid, skuId, dateOfStock=null) {
+        // check if skuId matches an existing sku
+        let isSKU;
+        try{
+            isSKU = await this.#checkSkuId(skuId);
+        } catch(err) {  // if the database access generates an exception, propagate it
+            throw(err);
+        }
+        if(!isSKU)
+            throw(new Error("Provided id does not match any SKU", 3));
+
         return new Promise((resolve, reject) => {
-            const sqlInsert = 'INSERT INTO SKUS (description, weight, volume, notes, price, availableQuantity) VALUES(?,?,?,?,?,?)';
-            this.db.run(sqlInsert, [description, weight, volume, notes, price, availableQuantity], (err) => {
+            const sqlInsert = 'INSERT INTO "SKU-ITEMS" (rfid, skuId, available, dateOfStock) VALUES(?,?,0,?)';
+            this.db.run(sqlInsert, [rfid, skuId, dateOfStock], (err) => {
                 if (err) {
                     reject(err);
                     return;
@@ -70,10 +79,20 @@ class SkuItemDBU {
     }
 
     // this function returns the number of rows which has been modified
-    updateSKU(sku) {
+    async updateSKUitem(oldRfid, skuItem) {
+        // check if skuId matches an existing sku
+        let isSKU;
+        try{
+            isSKU = await this.#checkSkuId(skuItem.SKUId);
+        } catch(err) {  // if the database access generates an exception, propagate it
+            throw(err);
+        }
+        if(!isSKU)
+            throw(new Error("Provided id does not match any SKU", 3));
+
         return new Promise((resolve, reject) => {
-            const sqlUpdate = 'UPDATE SKUS SET description=?, weight=?, volume=?, notes=?, price=?, availableQuantity=? WHERE id=?';
-            this.db.run(sqlUpdate, [sku.description, sku.weight, sku.volume, sku.notes, sku.price, sku.availableQuantity, sku.id], function (err) {
+            const sqlUpdate = 'UPDATE "SKU-ITEMS" SET rfid=?, skuId=?, available=?, dateOfStock=? WHERE rfid=?';
+            this.db.run(sqlUpdate, [skuItem.RFID, skuItem.SKUId, skuItem.Available, skuItem.DateOfStock, oldRfid], function (err) {
                 if (err) {
                     reject(err);
                     return;
@@ -82,11 +101,28 @@ class SkuItemDBU {
         });
     }
 
-    deleteSKU(id) {
+    // this function returns the number of rows which has been modified
+    deleteSKUitem(rfid, skuId=undefined) {
+        const sqlId = 'DELETE FROM "SKU-ITEMS" WHERE rfid=?';
+        const sqlSku = 'DELETE FROM "SKU-ITEMS" WHERE skuId=?';
+
+        let sqlInfo = {sql: undefined, values: undefined};
+
+        if(!rfid && !skuId) {
+            // unexisting behaviour
+            throw(new Error("Cannot call delete without parameters", 10))
+        } else if (rfid) { 
+            // delete sku item by rfid
+            sqlInfo.sql = sqlId;
+            sqlInfo.values = [rfid];
+        } else {
+            // delete sku items belonging to a given sku
+            sqlInfo.sql = sqlSku;
+            sqlInfo.values = [skuId];
+        }
         // delete other things to keep consistency - TODO
         return new Promise((resolve, reject) => {
-            const sqlDelete = 'DELETE FROM SKUS WHERE id=?';
-            this.db.run(sqlDelete, [id], function (err) {
+            this.db.run(sqlInfo.sql, sqlInfo.values, function (err) {
                 if (err) {
                     reject(err);
                     console.log(err);
@@ -96,22 +132,19 @@ class SkuItemDBU {
         });
     }
 
-    // private method to get test descriptors for a given skuId 
-   #getTestDescriptors(id) {
+    #checkSkuId(skuId) {
         return new Promise((resolve, reject) => {
-            const test = 'SELECT id FROM "TEST-DESCRIPTORS" WHERE idSKU=?';
-            this.db.all(test, [id], (err, rows) => {
+            const sku = 'SELECT id FROM SKUS WHERE id=?';
+            this.db.get(sku, [skuId], (err, row) => {
             if (err) {
                 reject(err);
                 return;
             }
-            const tests = rows.map((t) => t.id);
-            resolve(tests);;
+            resolve(row ? true : undefined);
             });
         });
-   }
+    }
 
-    
 }
 
 module.exports = SkuItemDBU;

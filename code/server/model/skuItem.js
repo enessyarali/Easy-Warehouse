@@ -3,10 +3,10 @@
 class SKUitem {
 
     constructor(rfid, skuId, isAvailable, dateOfStock) {
-        this.rfid = rfid;
-        this.skuId = skuId;
-        this.isAvailable = isAvailable;
-        this.dateOfStock = dateOfStock;
+        this.RFID = rfid;
+        this.SKUId = skuId;
+        this.Available = isAvailable;
+        this.DateOfStock = dateOfStock;
     }
 
 }
