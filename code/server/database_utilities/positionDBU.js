@@ -2,7 +2,7 @@
 const Positon = require('../model/position.js');
 
 const sqlite = require('sqlite3');
-const { getPositionCoordinates } = require('../model/position.js');
+const { getPositionCoordinates, getPositionId } = require('../model/position.js');
 
 class PositionDBU {
 
@@ -52,10 +52,10 @@ class PositionDBU {
         });
     }
 
-    // return -> void
+
     insertPosition(positionId, aisleId, row, col, maxWeight, maxVolume) {
         return new Promise((resolve, reject) => {
-            const sqlInsert = 'INSERT INTO positions (positionID, aisleID, row, col, maxWeight, maxVolume, occupiedWeight, occupiedVolume) VALUES(?,?,?,?,?,?,0,0)';
+            const sqlInsert = 'INSERT INTO positions (positionId, aisleId, row, col, maxWeight, maxVolume, occupiedWeight, occupiedVolume) VALUES(?,?,?,?,?,?,0,0)';
             this.db.run(sqlInsert, [positionId, aisleId, row, col, maxWeight, maxVolume], (err) => {
                 if (err) {
                     reject(err);
@@ -65,15 +65,28 @@ class PositionDBU {
         });
     }
 
-    ///////////////////////////////////////// TODO ///////////////////////////////////////////////
-
-    // VERSION 1 - only positionId is modified
+    // VERSION 1 - EXPLICIT VALUES
     // this function returns the number of rows which have been modified
-    updatePosition(oldPositionId, newPositionId) {
-        const coordinates = getPositionCoordinates(newPositionId);
+    updatePosition(oldPositionId, newPositionId, newAisleId=undefined, newRow=undefined, newCol=undefined, newMaxWeight=undefined, newMaxVolume=undefined, newOccupiedWeight=undefined, newOccupiedVolume=undefined) {
+        
+        const sqlId = 'UPDATE positions SET positionId=?, aisleId=?, row=?, col=? WHERE positionID=?';
+        const sqlAll = 'UPDATE positions SET positionId=?, aisleId=?, row=?, col=?, maxWeight=?, maxVolume=?, occupiedWeight=?, occupiedVolume=? WHERE positionId=?';
+
+        let sqlInfo = {sql: undefined, values: undefined};
+
+        if(!newPositionId) {
+            // update all fields
+            sqlInfo.sql = sqlAll;
+            sqlInfo.values = [getPositionId(newAisleId, newRow, newCol), newAisleId, newRow, newCol, newMaxWeight, newMaxVolume, newOccupiedWeight, newOccupiedVolume, oldPositionId];
+        } else {
+            // update only positionId
+            const coordinates = getPositionCoordinates(newPositionId);
+            sqlInfo.sql = sqlId;
+            sqlInfo.values =  [newPositionId, coordinates[0], coordinates[1], coordinates[2], oldPositionId];
+        }
+       
         return new Promise((resolve, reject) => {
-            const sqlUpdate = 'UPDATE positions SET positionId=?, aisleID=?, row=?, col=? WHERE positionId=?';
-            this.db.run(sqlUpdate, [newPositionId, coordinates[0], coordinates[1], coordinates[2], oldPositionId], function (err) {
+            this.db.run(sqlInfo.sql, sqlInfo.values, function (err) {
                 if (err) {
                     reject(err);
                     return;
@@ -82,11 +95,24 @@ class PositionDBU {
         });
     }
 
-    deleteSKU(id) {
+    // VERSION 2 - OBJECT
+    updatePosition(oldPositionId, newPosition) {
+        return new Promise((resolve, reject) => {
+            const update = 'UPDATE positions SET positionId=?, aisleId=?, row=?, col=?, maxWeight=?, maxVolume=?, occupiedWeight=?, occupiedVolume=? WHERE positionId=?';
+            this.db.run(update, [newPosition.positionID, newPosition.aisleId, newPosition.row, newPosition.col, newPosition.maxWeight, newPosition.maxVolume, newPosition.occupiedWeight, newPosition.occupiedVolume, oldPositionId], function (err) {
+                if (err) {
+                    reject(err);
+                    return;
+                } else resolve(this.changes);
+            });
+        });
+    }
+
+    deletePosition(positionId) {
         // delete other things to keep consistency - TODO
         return new Promise((resolve, reject) => {
-            const sqlDelete = 'DELETE FROM SKUS WHERE id=?';
-            this.db.run(sqlDelete, [id], function (err) {
+            const sqlDelete = 'DELETE FROM positions WHERE positionId=?';
+            this.db.run(sqlDelete, [positionId], function (err) {
                 if (err) {
                     reject(err);
                     console.log(err);
@@ -95,21 +121,6 @@ class PositionDBU {
             });
         });
     }
-
-    // private method to get test descriptors for a given skuId 
-   #getTestDescriptors(id) {
-        return new Promise((resolve, reject) => {
-            const test = 'SELECT id FROM "TEST-DESCRIPTORS" WHERE idSKU=?';
-            this.db.all(test, [id], (err, rows) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-            const tests = rows.map((t) => t.id);
-            resolve(tests);;
-            });
-        });
-   }
 
     
 }
