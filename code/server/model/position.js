@@ -13,9 +13,11 @@ class Positon {
         this.occupiedVolume = occupiedVolume;
     }
 
-    updateOccupiedWeightAndVolume(weightOffset=-this.occupiedWeight, volumeOffset=-this.occupiedVolume) {
-        this.occupiedWeight += weightOffset;
-        this.occupiedVolume += volumeOffset; 
+    updateOccupiedWeightAndVolume(newWeight=0, newVolume=0) {
+        if (newWeight>this.maxWeight || newVolume>this.maxVolume)
+            throw(new Error("Position cannot store the required SKU. Operation aborted.", 4));
+        this.occupiedWeight = newWeight;
+        this.occupiedVolume = newVolume;
     }
 
     // divides the positionId in aisleId, row and col

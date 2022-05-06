@@ -1,5 +1,7 @@
 'use strict';
 
+const PositionDBU = require('../database_utilities/positionDBU')
+
 class SKU {
 
     // attributes
@@ -28,9 +30,23 @@ class SKU {
         this.testDescriptors = testDescriptors;
     }
 
-    modify(newDescription, newWeight, newVolume, newNotes, newPrice, newAvailableQuantity) {
-        if(this.position && newWeight!=this.weight && newVolume!=this.volume && newAvailableQuantity!=this.availableQuantity) {
-            // do something, eventually throw exception
+    async modify(openDB, newDescription, newWeight, newVolume, newNotes, newPrice, newAvailableQuantity) {
+        if(this.position && newAvailableQuantity!=this.availableQuantity) {
+            try {
+                // fetch position
+                const db = new PositionDBU(openDB);
+                const posList = await db.loadPosition(position);
+                const pos = posList.pop();
+                // update occupiedWeight and Volume
+                pos.updateOccupiedWeightAndVolume(newAvailableQuantity*newWeight, newAvailableQuantity*newVolume);
+                // update position
+                await db.updatePosition(pos.positionID, pos);
+            } catch(err) {
+                // if there is some exception, propagate it
+                throw(err);
+            } finally {
+                db.close();
+            }
         }
         this.description = newDescription;
         this.weight = newWeight;
@@ -40,12 +56,25 @@ class SKU {
         this.availableQuantity = newAvailableQuantity;
     }
 
-    delete() {
+    async delete(openDB) {
         if (position) {
-            // fetch position and do stuff
+            try {
+                // fetch position
+                const db = new PositionDBU(openDB);
+                const posList = await db.loadPosition(position);
+                const pos = posList.pop();
+                // reset occupiedWeight and Volume
+                pos.updateOccupiedWeightAndVolume();
+                // update position
+                await db.updatePosition(pos.positionID, pos);
+            } catch(err) {
+                // if there is some exception, propagate it
+                throw(err);
+            } finally {  
+                db.close();
+            }
         }
     }
-
 
 }
 

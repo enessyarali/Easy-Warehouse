@@ -6,7 +6,7 @@ class Error {
     // 1 - user does not exist
     // 2 - user already exist
     // 3 - sku does not exist
-
+    // 4 - position cannot store SKU
     // 10 - No Argument Passed
 
     constructor(message, code=undefined) {
