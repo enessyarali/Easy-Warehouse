@@ -79,20 +79,10 @@ class SkuItemDBU {
     }
 
     // this function returns the number of rows which has been modified
-    async updateSKUitem(oldRfid, skuItem) {
-        // check if skuId matches an existing sku
-        let isSKU;
-        try{
-            isSKU = await this.#checkSkuId(skuItem.SKUId);
-        } catch(err) {  // if the database access generates an exception, propagate it
-            throw(err);
-        }
-        if(!isSKU)
-            throw(new Error("Provided id does not match any SKU", 3));
-
+    async updateSKUitem(oldRfid, newRfid, newAvailable, newDateOfStock) {
         return new Promise((resolve, reject) => {
-            const sqlUpdate = 'UPDATE "SKU-ITEMS" SET rfid=?, skuId=?, available=?, dateOfStock=? WHERE rfid=?';
-            this.db.run(sqlUpdate, [skuItem.RFID, skuItem.SKUId, skuItem.Available, skuItem.DateOfStock, oldRfid], function (err) {
+            const sqlUpdate = 'UPDATE "SKU-ITEMS" SET rfid=?, available=?, dateOfStock=? WHERE rfid=?';
+            this.db.run(sqlUpdate, [newRfid, newAvailable, newDateOfStock, oldRfid], function (err) {
                 if (err) {
                     reject(err);
                     return;
