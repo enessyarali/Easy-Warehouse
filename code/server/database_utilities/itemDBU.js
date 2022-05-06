@@ -1,9 +1,10 @@
 'use strict';
 const ITEM = require('../model/item.js');
+const Error = require('../model/error.js');
 
 const sqlite = require('sqlite3');
 
-class itemDBU {
+class ItemDBU {
 
     // attributes
     // - db (Database)
@@ -17,7 +18,7 @@ class itemDBU {
         });
 
     }
-
+// get item(s) from the ITEM table and return it/them as an Item object
     loadItem(id = undefined) {
         return new Promise((resolve, reject) => {
             const sqlNull = 'SELECT * FROM ITEMS';
@@ -36,6 +37,7 @@ class itemDBU {
         });
     }
 
+// insert a new Item inside the ITEM table -> if the table doesn't exist, it will be created
     insertItem(item) {
         return new Promise((resolve, reject) => {
            const sqlCreate ='CREATE TABLE IF NOT EXISTS ITEMS ( id INTEGER NOT NULL, description TEXT NOT NULL, price REAL NOT NULL, SKUId INTEGER NOT NULL, supplierId INTEGER NOT NULL, PRIMARY KEY(id AUTOINCREMENT))';
@@ -44,28 +46,67 @@ class itemDBU {
                     reject(err);
                     return;
                 }
-                resolve(1);
+                resolve('Done');
             });
             const sqlInsert = 'INSERT INTO ITEMS (description,price,SKUId,supplierId) VALUES(?,?,?,?);';
-            this.db.all(sqlInsert, [item.description, item.price, item.SKUId, item.supplierId], (err, rows) => {
+            this.db.all(sqlInsert, [item.description, item.price, item.SKUId, item.supplierId], (err) => {
                 if (err) {
                     reject(err);
                     return;
                 }
-                resolve(1);
+                resolve('Done');
             });
         });
     }
 
+// update a selected Item in the ITEM table. Return number of rows modified
     updateItem(item) {
         return new Promise((resolve, reject) => {
             const sqlUpdate = 'UPDATE ITEMS SET description = ?, price = ? WHERE id == ?;'
-            this.db.all(sqlUpdate, [item.description, item.price, item.id], (err) => {
+            this.db.all(sqlUpdate, [item.description, item.price, item.id], function (err) {
                 if(err) {
                     reject(err);
                     return;
                 }
-                resolve(1);
+                else {
+                    resolve(this.changes);
+                }
+            })
+        })
+    }
+
+// delete one or more Item from the ITEM table given different input. Return number of rows modified
+    deleteItem(itemId=undefined,supplierId=undefined,skuId=undefined) {        
+        let sqlInfo = {sql: undefined, values: undefined};
+
+        if(itemId) {
+            const sqlDeleteFromItem = 'DELETE FROM ITEMS WHERE id == ?';
+            sqlInfo.sql = sqlDeleteFromItem;
+            sqlInfo.values = [itemId];
+        }
+        else if(supplierId) {
+            const sqlDeleteFromSupplier = 'DELETE FROM ITEMS WHERE supplierId == ?';
+            sqlInfo.sql = sqlDeleteFromSupplier;
+            sqlInfo.values = [supplierId];
+        }
+        else if(skuId) {
+            const sqlDeleteFromSKU = 'DELETE FROM ITEMS WHERE SKUid == ?';
+            sqlInfo.sql = sqlDeleteFromSKU;
+            sql.values = [skuId];
+        }
+        else {
+            throw( new Error("No Argument Passed", 10));
+        }
+        
+        return new Promise((resolve, reject) => {
+            this.db.all(sqlInfo.sql,sqlInfo.values, function (err) {
+                if(err) {
+                    reject(err);
+                    return;
+                }
+                else {
+                    resolve(this.changes);
+                }
             })
         })
     }
