@@ -21,8 +21,8 @@ class SkuDBU {
 
     loadSKU(skuId=undefined) {
 
-        const sqlSku = 'SELECT * FROM SKUS WHERE id=?'; // add join on position
-        const sqlAll = 'SELECT * FROM SKUS';
+        const sqlSku = 'SELECT skus.id AS id, skus.description AS description, skus.weight AS weight, skus.volume AS volume, skus.notes AS notes, positions.positionId AS position, skus.price AS price, skus.availableQuantity AS availableQuantity FROM skus LEFT JOIN positions ON skus.position=positions.id WHERE skus.id=?';
+        const sqlAll = 'SELECT skus.id AS id, skus.description AS description, skus.weight AS weight, skus.volume AS volume, skus.notes AS notes, positions.positionId AS position, skus.price AS price, skus.availableQuantity AS availableQuantity FROM SKUS LEFT JOIN POSITIONS ON skus.position=positions.id';
 
         let sqlInfo = {sql: undefined, values: undefined};
 
@@ -43,7 +43,8 @@ class SkuDBU {
                     return;
                 }
                 const skus = rows.map(async (s) => {
-                    const sku = new SKU(s.id, s.description, s.weight, s.volume, s.notes, pos, s.price, s.availableQuantity);
+                    console.log(s);
+                    const sku = new SKU(s.id, s.description, s.weight, s.volume, s.notes, s.position, s.price, s.availableQuantity);
                     const tests = await this.#getTestDescriptors(s.id);
                     sku.setTestDescriptors(tests);
                     return sku;
