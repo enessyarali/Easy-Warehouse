@@ -67,7 +67,7 @@ class ItemDBU {
 // update a selected Item in the ITEM table. Return number of rows modified
     updateItem(item) {
         return new Promise((resolve, reject) => {
-            const sqlUpdate = 'UPDATE ITEMS SET description = ?, price = ? WHERE id == ?;'
+            const sqlUpdate = 'UPDATE ITEMS SET description = ?, price = ? WHERE id = ?;'
             this.db.all(sqlUpdate, [item.description, item.price, item.id], function (err) {
                 if(err) {
                     reject(err);
@@ -76,8 +76,8 @@ class ItemDBU {
                 else {
                     resolve(this.changes);
                 }
-            })
-        })
+            });
+        });
     }
 
 // delete one or more Item from the ITEM table given different input. Return number of rows modified
@@ -85,17 +85,17 @@ class ItemDBU {
         let sqlInfo = {sql: undefined, values: undefined};
 
         if(itemId) {
-            const sqlDeleteFromItem = 'DELETE FROM ITEMS WHERE id == ?';
+            const sqlDeleteFromItem = 'DELETE FROM ITEMS WHERE id = ?';
             sqlInfo.sql = sqlDeleteFromItem;
             sqlInfo.values = [itemId];
         }
         else if(supplierId) {
-            const sqlDeleteFromSupplier = 'DELETE FROM ITEMS WHERE supplierId == ?';
+            const sqlDeleteFromSupplier = 'DELETE FROM ITEMS WHERE supplierId = ?';
             sqlInfo.sql = sqlDeleteFromSupplier;
             sqlInfo.values = [supplierId];
         }
         else if(skuId) {
-            const sqlDeleteFromSKU = 'DELETE FROM ITEMS WHERE SKUid == ?';
+            const sqlDeleteFromSKU = 'DELETE FROM ITEMS WHERE SKUid = ?';
             sqlInfo.sql = sqlDeleteFromSKU;
             sql.values = [skuId];
         }
@@ -112,8 +112,8 @@ class ItemDBU {
                 else {
                     resolve(this.changes);
                 }
-            })
-        })
+            });
+        });
     }
 }
 
