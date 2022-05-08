@@ -120,6 +120,7 @@ class TestDescriptorDBU {
         });
     }
 }
+module.exports = TestDescriptorDBU;
 
 /*
 id 
