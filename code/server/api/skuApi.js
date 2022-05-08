@@ -30,7 +30,7 @@ router.get('/api/skus/:id', async (req,res) => {
     const skuList = await db.loadSKU(id);
     if(skuList.length === 0)
       return res.status(404).json({error: `No SKU with matching id.`});
-    return res.status(200).json(skuList);
+    return res.status(200).json(skuList.pop());
   } catch (err) {
       return res.status(500).json({error: `Something went wrong...`, message: err.message});
   }
@@ -46,7 +46,7 @@ router.post('/api/sku', async (req,res) => {
   }
   try{
       const db = new SkuDBU('ezwh.db');
-      const rowID = await db.insertSKU(req.body.description, req.body.weight, req.body.volume, req.body.notes, req.body.price, req.body.availableQuantity);
+      await db.insertSKU(req.body.description, req.body.weight, req.body.volume, req.body.notes, req.body.price, req.body.availableQuantity);
       return res.status(201).end();
   }
   catch(err){
