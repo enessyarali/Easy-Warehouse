@@ -15,7 +15,7 @@ function dateIsValid(dateStr) {
 
     const now = new Date();
     if(dateStr.match(regex2)){
-        const [date, time] = dateStr.split();
+        const [date, time] = dateStr.split(' ');
         const [year, month, day] = date.split('/');
         const [hour, minute] = time.split(':');
         const myDate = new Date(year, month - 1, day, hour, minute);
@@ -67,7 +67,7 @@ router.get('/api/skuitems/sku/:id', async (req,res) => {
 });
 
 // GET /api/skuitems/:rfid
-// retrieves an sku item from the database given its rfid
+// retrieves a sku item from the database given its rfid
 router.get('/api/skuitems/:rfid', async (req,res) => {
     try {
       const rfid = req.params.rfid;
@@ -85,11 +85,11 @@ router.get('/api/skuitems/:rfid', async (req,res) => {
 
 // POST /api/skuitem
 // add a new sku item to the database
-router.post('/api/sku', async (req,res) => {
+router.post('/api/skuitem', async (req,res) => {
   if (req.body === undefined || req.body.RFID === undefined || typeof(req.body.RFID) !== 'string' || 
-      req.body.SKUId === undefined || !Number.isInteger(req.body.SKUId) || req.body.SKUId < 0 ||
+      req.body.SKUId === undefined || !Number.isInteger(parseInt(req.body.SKUId)) || parseInt(req.body.SKUId) <= 0 ||
       (req.body.DateOfStock !== undefined && !dateIsValid(req.body.DateOfStock)) ) {
-    return res.status(422).json({error: `Invalid SKU data.`});
+    return res.status(422).json({error: `Invalid SKU Item data.`});
   }
   try{
       const db = new SkuItemDBU('ezwh.db');
@@ -103,6 +103,8 @@ router.post('/api/sku', async (req,res) => {
       return res.status(201).end();
   }
   catch(err){
+    if (err.code == 3)
+        return res.status(404).json({error: `Provided id [${req.body.SKUId}] does not match any SKU`});
     return res.status(503).json({error: `Something went wrong...`, message: err.message});
   }
 });
@@ -113,7 +115,7 @@ router.post('/api/sku', async (req,res) => {
 router.put('/api/skuitems/:rfid', async (req,res) => {
   const rfid = req.params.rfid;
   if (req.body === undefined || req.body.newRFID === undefined || typeof(req.body.newRFID) !== 'string' ||
-  req.body.newAvailable === undefined || !Number.isInteger(req.body.newAvailable) || req.body.newAvailable < 0 ||
+  req.body.newAvailable === undefined || !Number.isInteger(parseInt(req.body.newAvailable)) || parseInt(req.body.newAvailable) < 0 ||
   (req.body.newDateOfStock !== undefined && !dateIsValid(req.body.newDateOfStock)) ) {
     return res.status(422).json({error: `Invalid SKU item data.`});
   }
