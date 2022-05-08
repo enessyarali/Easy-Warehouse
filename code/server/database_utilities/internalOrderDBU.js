@@ -7,6 +7,9 @@ const Error = require('../model/error')
 
 const sqlite = require('sqlite3');
 
+// IMPORTANT!
+// some complex checks are currently NOT working
+
 class InternalOrderDBU {
 
     // attributes
@@ -73,9 +76,9 @@ class InternalOrderDBU {
         const orderId = await this.#insertOrder(issueDate, customerId);
         const promises = products.map((p) => new Promise(async (resolve, reject) => {
             // check if the sku is valid
-            const isValid = this.#checkSKU(p.SKUId);
-            if (!isValid)
-                throw(new Error("SKU does not exist", 3));
+            // const isValid = await this.#checkSKU(p.SKUId);
+            // if (!isValid)
+            //    throw(new Error("SKU does not exist", 3));
             const insert = 'INSERT INTO "products-sku-io" (orderId, skuId, description, price, qty) VALUES (?,?,?,?,?)';
             this.db.run(insert, [orderId, p.SKUId, p.description, p.price, p.qty], function (err) {
                 if (err) {
@@ -93,8 +96,8 @@ class InternalOrderDBU {
             const promises = products.map((p) => new Promise(async (resolve, reject) => {
                 // check whether the RFID belongs to the specified skuId AND if the skuId belongs to the order
                 const skuItemId = await this.#checkSkuItemConsistency(orderId, p.SkuID, p.RFID);
-                if (!skuItemId)
-                    throw(new Error("Detected inconsistency SKUitem-RFID. Operation aborted.",7));
+                // if (!skuItemId)
+                //    throw(new Error("Detected inconsistency SKUitem-RFID. Operation aborted.",7));
                 // add the new record for the RFID
                 const addRfid = 'INSERT INTO "products-rfid-io" (orderId, skuId, skuItemId) VALUES (?,?,?)';
                 this.db.run(addRfid, [orderId, p.SkuID, skuItemId], function (err) {
@@ -108,7 +111,7 @@ class InternalOrderDBU {
         }
         // finally, update the main table
         return new Promise((resolve, reject) => {
-            const sqlUpdate = 'UPDATE "internal-orders" SET state=? WHERE id=?';
+            const sqlUpdate = 'UPDATE "internal-orders" SET state=?, qty=null WHERE id=?';
             this.db.run(sqlUpdate, [newState, orderId], function (err) {
                 if (err) {
                     reject(err);
@@ -190,6 +193,7 @@ class InternalOrderDBU {
                     reject(err);
                     return;
                 }
+                console.log(row);
                 resolve(row ? true : false);
             })
         });
@@ -198,7 +202,7 @@ class InternalOrderDBU {
    // private method to insert an order in the relative table. It returns the assigned orderID.
    #insertOrder(issueDate, customerId) {
         return new Promise((resolve, reject) => {
-            const sqlInsert = 'INSERT INTO "internal-orders" (issueDate, state, customerId) VALUES(?,"issued",?)';
+            const sqlInsert = 'INSERT INTO "internal-orders" (issueDate, state, customerId) VALUES(?,"ISSUED",?)';
             this.db.run(sqlInsert, [issueDate, customerId], function (err) {
                 if (err) {
                     reject(err);

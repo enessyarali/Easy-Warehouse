@@ -6,6 +6,8 @@ const skuItemRoute = require('./api/skuItemApi');
 const positionRoute = require('./api/positionApi');
 const userRoute = require('./api/userApi');
 
+const internalOrderRoute = require('./api/internalOrderApi');
+
 // init express
 const app = new express();
 const port = 3001;
@@ -15,6 +17,7 @@ app.use('/', skuRoute);
 app.use('/', skuItemRoute);
 app.use('/', positionRoute);
 app.use('/', userRoute);
+app.use('/', internalOrderRoute);
 
 //GET /api/test
 app.get('/api/hello', (req,res)=>{
