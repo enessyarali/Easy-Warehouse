@@ -23,7 +23,7 @@ class UserDBU {
         this.db.close();
     }
 
-    // returns true if the password matches, false otherwise
+    // returns user info if the password matches, false otherwise
     // if no user matches the pair username, type, an exception is thrown
     async checkPassword(username, type, password) {
         let info;
@@ -32,10 +32,9 @@ class UserDBU {
         } catch(err) {  // if the database access generates an exception, propagate it
             throw(err);
         }
-        if(!info)
-            throw(new Error('No matching user!', 1));
-
-        return saltHash.verifySaltHash(info.salt, info.password, password);
+        if(info && saltHash.verifySaltHash(info.salt, info.password, password)) {
+            return info.user;
+        } else return false;
     }
 
     loadUser(username=undefined, type=undefined, id=undefined) {
@@ -128,13 +127,13 @@ class UserDBU {
     // private method to load password information
     #loadPassword(username, type) {
         return new Promise((resolve, reject) => {
-            const user = 'SELECT salt, password FROM USERS WHERE email=? AND type=?';
+            const user = 'SELECT * FROM USERS WHERE email=? AND type=?';
             this.db.get(user, [username, type], (err, row) => {
             if (err) {
                 reject(err);
                 return;
             }
-            resolve(row ? {salt: row.salt, password: row.password} : undefined);
+            resolve(row ? {user: {id: row.id, username: row.email, name: `${row.name} ${row.surname}`}, salt: row.salt, password: row.password} : undefined);
             });
         });
     }

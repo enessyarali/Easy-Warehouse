@@ -13,6 +13,10 @@ class User {
         this.type = type;
     }
 
+    setType(newType) {
+        this.type = newType;
+    }
+
 }
 
 module.exports = User;
