@@ -9,6 +9,7 @@ class Error {
     // 4 - position cannot store SKU
     // 5 - position does not exist
     // 6 - customer does not exist
+    // 7 - inconsistency skuItem-RFID in internal order
     // 10 - No Argument Passed
 
     constructor(message, code=undefined) {
