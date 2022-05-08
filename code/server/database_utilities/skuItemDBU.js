@@ -22,10 +22,10 @@ class SkuItemDBU {
         this.db.close();
     }
 
-    loadSKUitem(rfid=undefined, skuId=undefined) {
+    async loadSKUitem(rfid=undefined, skuId=undefined) {
 
-        const sqlId = 'SELECT * FROM "SKU-ITEMS" WHERE rfid=?';
-        const sqlSku = 'SELECT * FROM "SKU-ITEMS" WHERE skuId=? AND available=1';
+        const sqlId = 'SELECT * FROM "SKU-ITEMS" WHERE RFID=?';
+        const sqlSku = 'SELECT * FROM "SKU-ITEMS" WHERE SKUId=? AND Available=1';
         const sqlAll = 'SELECT * FROM "SKU-ITEMS"';
 
         let sqlInfo = {sql: undefined, values: undefined};
@@ -42,6 +42,15 @@ class SkuItemDBU {
             // get sku items belonging to a given sku
             sqlInfo.sql = sqlSku;
             sqlInfo.values = [skuId];
+            // check if skuId matches an existing sku
+            let isSKU;
+            try{
+                isSKU = await this.#checkSkuId(skuId);
+            } catch(err) {  // if the database access generates an exception, propagate it
+                throw(err);
+            }
+            if(!isSKU)
+                throw(new Error("Provided id does not match any SKU", 3));
         }
 
         return new Promise((resolve, reject) => {
@@ -71,7 +80,7 @@ class SkuItemDBU {
             throw(new Error("Provided id does not match any SKU", 3));
 
         return new Promise((resolve, reject) => {
-            const sqlInsert = 'INSERT INTO "SKU-ITEMS" (rfid, skuId, available, dateOfStock) VALUES(?,?,0,?)';
+            const sqlInsert = 'INSERT INTO "SKU-ITEMS" (RFID, SKUId, Available, DateOfStock) VALUES(?,?,0,?)';
             this.db.run(sqlInsert, [rfid, skuId, dateOfStock], (err) => {
                 if (err) {
                     reject(err);
@@ -84,7 +93,7 @@ class SkuItemDBU {
     // this function returns the number of rows which has been modified
     async updateSKUitem(oldRfid, newRfid, newAvailable, newDateOfStock) {
         return new Promise((resolve, reject) => {
-            const sqlUpdate = 'UPDATE "SKU-ITEMS" SET rfid=?, available=?, dateOfStock=? WHERE rfid=?';
+            const sqlUpdate = 'UPDATE "SKU-ITEMS" SET RFID=?, Available=?, DateOfStock=? WHERE RFID=?';
             this.db.run(sqlUpdate, [newRfid, newAvailable, newDateOfStock, oldRfid], function (err) {
                 if (err) {
                     reject(err);
@@ -96,8 +105,8 @@ class SkuItemDBU {
 
     // this function returns the number of rows which has been modified
     deleteSKUitem(rfid, skuId=undefined) {
-        const sqlId = 'DELETE FROM "SKU-ITEMS" WHERE rfid=?';
-        const sqlSku = 'DELETE FROM "SKU-ITEMS" WHERE skuId=?';
+        const sqlId = 'DELETE FROM "SKU-ITEMS" WHERE RFID=?';
+        const sqlSku = 'DELETE FROM "SKU-ITEMS" WHERE SKUId=?';
 
         let sqlInfo = {sql: undefined, values: undefined};
 
