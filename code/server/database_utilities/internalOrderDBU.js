@@ -3,6 +3,8 @@ const IO = require('../model/internalOrder');
 const InternalOrder = IO.InternalOrder;
 const ProductIO = IO.ProductIO;
 
+const Error = require('../model/error')
+
 const sqlite = require('sqlite3');
 
 class InternalOrderDBU {
@@ -60,20 +62,28 @@ class InternalOrderDBU {
         });
     }
 
-    /////////////////////////////// TO DO ///////////////////////////////////////////
-
     // return -> void
-    insertSKU(description, weight, volume, notes, price, availableQuantity) {
-        return new Promise((resolve, reject) => {
-            const sqlInsert = 'INSERT INTO SKUS (description, weight, volume, notes, price, availableQuantity) VALUES(?,?,?,?,?,?)';
-            this.db.run(sqlInsert, [description, weight, volume, notes, price, availableQuantity], (err) => {
+    async insertInternalOrder(issueDate, products, customerId) {
+        // fisrt, check whether the customer exists
+        const foundCustomer = await this.#checkCustomer(customerId);
+        if (!foundCustomer) {
+            throw(new Error("The provided id does not match any customer.", 6));
+        }
+        // then, insert the order record in internal-orders table
+        const orderId = await this.#insertOrder(issueDate, customerId);
+        const promises = products.map((p) => new Promise((resolve, reject) => {
+            const insert = 'INSERT INTO "products-sku-io" (orderId, skuId, description, price, qty) VALUES (?,?,?,?,?)';
+            this.db.run(insert, [orderId, p.skuId, p.description, p.price, p.qty], function (err) {
                 if (err) {
                     reject(err);
                     return;
                 } else resolve('Done');
             });
-        });
+        }));
+        return Promise.all(promises);
     }
+
+    /////////////////////////////// TO DO ///////////////////////////////////////////
 
     // this function returns the number of rows which has been modified
     async updateSKU(sku) {
@@ -106,25 +116,10 @@ class InternalOrderDBU {
         });
     }
 
-    // returns true if the position is assigned to a sku, false otherwise
-    searchAssignedPosition(positionId) {
-        const sql = 'SELECT positions.positionId AS position FROM SKUS INNER JOIN POSITIONS ON skus.position=positions.id WHERE positions.positionId=?';
-        return new Promise((resolve, reject) => {
-            this.db.get(sql, [positionId], (err, row) => {
-                if(err) {
-                    reject(err);
-                    return;
-                }
-                resolve(row ? true : false);
-            })
-        });
-        
-    }
-
     // private method to get products for a given orderId 
    #getProducts(id) {
         return new Promise((resolve, reject) => {
-            const sqlProd = 'SELECT S.skuId AS skuId, S.description AS description, S.price AS price, S.qty AS qty, R.rfid AS rfid FROM "products-sku-io" S LEFT JOIN "products-rfid-io" R ON (S.orderId = R.orderId AND S.skuId = R.skuId) WHERE S.orderId=?';
+            const sqlProd = 'SELECT S.skuId AS skuId, S.description AS description, S.price AS price, S.qty AS qty, SI.RFID AS rfid FROM "products-sku-io" S LEFT JOIN "products-rfid-io" R ON (S.orderId = R.orderId AND S.skuId = R.skuId) LEFT JOIN "sku-items" SI ON R.skuItemId = SI.id WHERE S.orderId=?';
             this.db.all(sqlProd, [id], (err, rows) => {
             if (err) {
                 reject(err);
@@ -136,20 +131,34 @@ class InternalOrderDBU {
         });
    }
 
-   #getPositionIncrementalId(positionId) {
-        const sql = 'SELECT id FROM positions WHERE positionId=?'
+   // private method to check whether customerId corresponds to an existing customer
+   #checkCustomer(customerId) {
+        const sql = 'SELECT id FROM users WHERE id=? AND type="customer"'
         return new Promise((resolve, reject) => {
-            this.db.get(sql, [positionId], (err, row) => {
+            this.db.get(sql, [customerId], (err, row) => {
                 if(err) {
                     reject(err);
                     return;
                 }
-                resolve(row ? row.id : undefined);
+                resolve(row ? true : false);
             })
+        });
+   }
+
+   // private method to insert an order in the relative table. It returns the assigned orderID.
+   #insertOrder(issueDate, customerId) {
+        return new Promise((resolve, reject) => {
+            const sqlInsert = 'INSERT INTO "internal-orders" (issueDate, state, customerId) VALUES(?,"issued",?)';
+            this.db.run(sqlInsert, [issueDate, customerId], function (err) {
+                if (err) {
+                    reject(err);
+                    return;
+                } else resolve(this.lastID);
+            });
         });
    }
 
     
 }
 
-module.exports = SkuDBU;
+module.exports = InternalOrderDBU;
