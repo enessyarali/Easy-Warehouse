@@ -24,10 +24,10 @@ router.get('/api/items/:id', async (req,res) => {
     if(!Number.isInteger(id) || id < 0)
       return res.status(422).json({error: `Invalid Item id.`});
     const db = new ItemDBU('ezwh.db');
-    const ItemList = await db.loadSKU(id);
+    const ItemList = await db.loadItem(id);
     if(ItemList.length === 0)
       return res.status(404).json({error: `No Item with matching id.`});
-    return res.status(200).json(skuList);
+    return res.status(200).json(itemList);
   } catch (err) {
       return res.status(500).json({error: `Something went wrong...`, message: err.message});
   }
@@ -36,10 +36,10 @@ router.get('/api/items/:id', async (req,res) => {
 
 // POST /api/item
 // add a new item to the database
-router.post('/api/sku', async (req,res) => {
+router.post('/api/item', async (req,res) => {
   if (req.body === undefined || req.body.description === undefined|| req.body.price == undefined || req.body.price > 0 ||
       req.body.skuId === undefined || req.body.supplierId === undefined) {
-    return res.status(422).json({error: `Invalid SKU data.`});
+    return res.status(422).json({error: `Invalid item data.`});
   }
   try{
       const db = new ItemDBU('ezwh.db');
@@ -67,7 +67,7 @@ router.put('/api/item/:id', async (req,res) => {
       if(itemList.length === 0)
         return res.status(404).json({error: `No item with matching id.`});
       item.modify(db.db, req.body.newDescription,req.body.newPrice, req.body.newAvailableQuantity)
-      await db.updateItem(sku);
+      await db.updateItem(item);
       return res.status(200).end();
   }
   catch(err){
@@ -78,8 +78,8 @@ router.put('/api/item/:id', async (req,res) => {
 });
 
 
-// DELETE /item/sku/:id
-// remove a sku from the database
+// DELETE /api/item/:id
+// remove a item from the database
 router.delete('/api/item/:id', async (req,res) => {
   const id = req.params.id;
   if (!Number.isInteger(id) || id < 0) {
@@ -92,7 +92,7 @@ router.delete('/api/item/:id', async (req,res) => {
       if(ItemList.length > 0){
         const item = ItemList.pop();
         item.delete(db.db);
-        // now, delete the sku
+        // now, delete the item
         await db.deleteItem(id);
       } else return res.status(404).json({error: `No Item with matching id.`});
       return res.status(204).end();
