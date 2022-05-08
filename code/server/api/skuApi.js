@@ -23,7 +23,7 @@ router.get('/api/skus', async (req,res) => {
 router.get('/api/skus/:id', async (req,res) => {
   // create connection with the db  
   try {
-    const id = req.params.id;
+    const id = parseInt(req.params.id);
     if(!Number.isInteger(id) || id < 0)
       return res.status(422).json({error: `Invalid SKU id.`});
     const db = new SkuDBU('ezwh.db');
@@ -39,14 +39,15 @@ router.get('/api/skus/:id', async (req,res) => {
 // POST /api/sku
 // add a new sku to the database
 router.post('/api/sku', async (req,res) => {
-  if (req.body === undefined || req.body.description === undefined || req.body.weight === undefined || req.body.weight > 0 || 
-      req.body.volume === undefined || req.body.volume > 0 || req.body.price == undefined || req.body.price > 0 ||
-      req.body.notes === undefined || req.body.availableQuantity === undefined || req.body.availableQuantity > 0 ) {
+  if (req.body === undefined || req.body.description === undefined || req.body.weight === undefined || req.body.weight <= 0 || 
+      req.body.volume === undefined || req.body.volume <= 0 || req.body.price == undefined || req.body.price < 0 ||
+      req.body.notes === undefined || req.body.availableQuantity === undefined || req.body.availableQuantity < 0 ) {
     return res.status(422).json({error: `Invalid SKU data.`});
   }
   try{
       const db = new SkuDBU('ezwh.db');
-      await db.insertSKU(req.body.description, req.body.weight, req.body.volume, req.body.notes, req.body.price, req.body.availableQuantity);
+      const rowID = await db.insertSKU(req.body.description, req.body.weight, req.body.volume, req.body.notes, req.body.price, req.body.availableQuantity);
+      console.log(rowID);
       return res.status(201).end();
   }
   catch(err){
@@ -58,10 +59,10 @@ router.post('/api/sku', async (req,res) => {
 // PUT /api/sku/:id
 // modify a sku in the database
 router.put('/api/sku/:id', async (req,res) => {
-  const id = req.params.id;
-  if (req.body === undefined || req.body.newDescription === undefined || req.body.newWeight === undefined || req.body.newWeight > 0 || 
-    req.body.newVolume === undefined || req.body.newVolume > 0 || req.body.newPrice == undefined || req.body.newPrice > 0 ||
-    req.body.newNotes === undefined || req.body.newAvailableQuantity === undefined || req.body.newAvailableQuantity > 0 || !Number.isInteger(id) || id < 0) {
+  const id = parseInt(req.params.id);
+  if (req.body === undefined || req.body.newDescription === undefined || req.body.newWeight === undefined || req.body.newWeight <= 0 || 
+    req.body.newVolume === undefined || req.body.newVolume <= 0 || req.body.newPrice == undefined || req.body.newPrice < 0 ||
+    req.body.newNotes === undefined || req.body.newAvailableQuantity === undefined || req.body.newAvailableQuantity < 0 || !Number.isInteger(id) || id < 0) {
     return res.status(422).json({error: `Invalid SKU data.`});
   }
   try{
@@ -85,7 +86,7 @@ router.put('/api/sku/:id', async (req,res) => {
 // PUT /api/sku/:id/position
 // assign a position to a sku
 router.put('/api/sku/:id/position', async (req,res) => {
-  const id = req.params.id;
+  const id = parseInt(req.params.id);
   if (req.body === undefined || req.body.position === undefined || !Number.isInteger(id) || id < 0) {
     return res.status(422).json({error: `Invalid data.`});
   }
@@ -118,7 +119,7 @@ router.put('/api/sku/:id/position', async (req,res) => {
 // DELETE /api/sku/:id
 // remove a sku from the database
 router.delete('/api/sku/:id', async (req,res) => {
-  const id = req.params.id;
+  const id = parseInt(req.params.id);
   if (!Number.isInteger(id) || id < 0) {
     return res.status(422).json({error: `Validation of id failed`});
   }
