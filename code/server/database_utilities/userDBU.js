@@ -133,7 +133,7 @@ class UserDBU {
                 reject(err);
                 return;
             }
-            resolve(row ? {user: {id: row.id, username: row.email, name: `${row.name} ${row.surname}`}, salt: row.salt, password: row.password} : undefined);
+            resolve(row ? {user: {id: row.id, username: row.email, name: row.name, surname: row.surname}, salt: row.salt, password: row.password} : undefined);
             });
         });
     }

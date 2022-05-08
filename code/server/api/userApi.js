@@ -97,7 +97,7 @@ router.post('/api/managerSessions', async (req,res) => {
         const info = await db.checkPassword(req.body.username, "manager", req.body.password);
         if (!info)
           return res.status(401).json({error: `Invalid username or password.`});
-        return res.status(200).json({managerInfo: info});
+        return res.status(200).json(info);
     }
     catch(err){
       return res.status(500).json({error: `Something went wrong...`, message: err.message});
@@ -116,7 +116,7 @@ router.post('/api/customerSessions', async (req,res) => {
       const info = await db.checkPassword(req.body.username, "customer", req.body.password);
       if (!info)
         return res.status(401).json({error: `Invalid username or password.`});
-      return res.status(200).json({customerInfo: info});
+        return res.status(200).json(info);
     }
     catch(err){
       return res.status(500).json({error: `Something went wrong...`, message: err.message});
@@ -135,7 +135,7 @@ router.post('/api/supplierSessions', async (req,res) => {
       const info = await db.checkPassword(req.body.username, "supplier", req.body.password);
       if (!info)
         return res.status(401).json({error: `Invalid username or password.`});
-      return res.status(200).json({supplierInfo: info});
+        return res.status(200).json(info);
     }
     catch(err){
       return res.status(500).json({error: `Something went wrong...`, message: err.message});
@@ -154,7 +154,7 @@ router.post('/api/clerkSessions', async (req,res) => {
       const info = await db.checkPassword(req.body.username, "clerk", req.body.password);
       if (!info)
         return res.status(401).json({error: `Invalid username or password.`});
-      return res.status(200).json({clerkInfo: info});
+        return res.status(200).json(info);
     }
     catch(err){
       return res.status(500).json({error: `Something went wrong...`, message: err.message});
@@ -173,7 +173,7 @@ router.post('/api/qualityEmployeeSessions', async (req,res) => {
       const info = await db.checkPassword(req.body.username, "qualityEmployee", req.body.password);
       if (!info)
         return res.status(401).json({error: `Invalid username or password.`});
-      return res.status(200).json({qualityEmployeeInfo: info});
+        return res.status(200).json(info);
     }
     catch(err){
       return res.status(500).json({error: `Something went wrong...`, message: err.message});
