@@ -121,16 +121,9 @@ router.put('/api/skuitems/:rfid', async (req,res) => {
   }
   try{
       const db = new SkuItemDBU('ezwh.db');
-      // get the sku item to be modified
-      const skuItemList = await db.loadSKUitem(rfid);
-      if(skuItemList.length === 0)
-        return res.status(404).json({error: `No SKU with matching id.`});
-      const skuItem = skuItemList.pop();
-      if(req.body.newDateOfStock !== undefined)
-        skuItem.modify(db.db, req.body.newRFID, req.body.newAvailable, req.body.newDateOfStock);
-      else
-        skuItem.modify(db.db, req.body.newRFID, req.body.newAvailable);
-      await db.updateSKUItem(skuItem);
+      const updated = await db.updateSKUitem(rfid, req.body.newRFID, req.body.newAvailable, req.body.newDateOfStock);
+      if (updated === 0)
+        return res.status(404).json({error: `No SKU item with matching rfid.`});
       return res.status(200).end();
   }
   catch(err){
@@ -147,14 +140,9 @@ router.delete('/api/skuitems/:rfid', async (req,res) => {
   }
   try{
       const db = new SkuItemDBU('ezwh.db');
-      // get the sku item to be deleted
-      const skuItemList = await db.loadSKUitem(rfid);
-      if(skuItemList.length > 0){
-        const skuItem = skuItemList.pop();
-        skuItem.delete(db.db);
-        // now, delete the sku item
-        await db.deleteSKUitem(rfid);
-      }
+      const deleted = await db.deleteSKUitem(rfid);
+      if (deleted === 0)
+        return res.status(404).json({error: `No SKU item with matching rfid.`});
       return res.status(204).end();
   }
   catch(err){
@@ -163,3 +151,32 @@ router.delete('/api/skuitems/:rfid', async (req,res) => {
 });
 
 module.exports = router;
+
+/* THE COMPLEX VERSION OF PUT IS NOT NEEDED RIGHT NOW... KEEPING IT FOR THE FUTURE (it may be useful)
+// PUT /api/skuitems/:rfid
+// modify a sku item in the database
+router.put('/api/skuitems/:rfid', async (req,res) => {
+  const rfid = req.params.rfid;
+  if (req.body === undefined || req.body.newRFID === undefined || typeof(req.body.newRFID) !== 'string' ||
+  req.body.newAvailable === undefined || !Number.isInteger(parseInt(req.body.newAvailable)) || parseInt(req.body.newAvailable) < 0 ||
+  (req.body.newDateOfStock !== undefined && !dateIsValid(req.body.newDateOfStock)) ) {
+    return res.status(422).json({error: `Invalid SKU item data.`});
+  }
+  try{
+      const db = new SkuItemDBU('ezwh.db');
+      // get the sku item to be modified
+      const skuItemList = await db.loadSKUitem(rfid);
+      if(skuItemList.length === 0)
+        return res.status(404).json({error: `No SKU item with matching rfid.`});
+      const skuItem = skuItemList.pop();
+      if(req.body.newDateOfStock !== undefined)
+        skuItem.modify(db.db, req.body.newRFID, req.body.newAvailable, req.body.newDateOfStock);
+      else
+        skuItem.modify(db.db, req.body.newRFID, req.body.newAvailable);
+      await db.updateSKUItem(skuItem);
+      return res.status(200).end();
+  }
+  catch(err){
+    return res.status(503).json({error: `Something went wrong...`, message: err.message});
+  }
+}); */

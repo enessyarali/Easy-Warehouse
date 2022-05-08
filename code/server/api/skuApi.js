@@ -131,7 +131,7 @@ router.delete('/api/sku/:id', async (req,res) => {
         sku.delete(db.db);
         // now, delete the sku
         await db.deleteSKU(id);
-      }
+      } else return res.status(404).json({error: `No SKU with matching id.`});
       return res.status(204).end();
   }
   catch(err){
