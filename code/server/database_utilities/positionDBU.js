@@ -68,7 +68,6 @@ class PositionDBU {
         });
     }
 
-    // VERSION 1 - EXPLICIT VALUES
     // this function returns the number of rows which have been modified
     updatePosition(oldPositionId, newPosition, newPositionId=undefined, newAisleId=undefined, newRow=undefined, newCol=undefined, newMaxWeight=undefined, newMaxVolume=undefined, newOccupiedWeight=undefined, newOccupiedVolume=undefined) {
         
