@@ -76,6 +76,56 @@ class TestResultDBU {
         });
     }
 
+    updateTestResult(testResult) {
+        return new Promise((resolve, reject) => {
+            const sqlUpdate = 'UPDATE "TEST-RESULTS" SET SKUitemRFid = ?, descriptorId = ?, date = ?, result = ? WHERE id = ?';
+            this.db.all(sqlUpdate, [testResult.SKUitemRFid, testResult.descriptorId, testResult.date, testResult.result ? 'Pass' : 'Fail', testResult.id], function (err) {
+                if(err) {
+                    reject(err);
+                    return;
+                }
+                else {
+                    resolve(this.changes);
+                }
+            });
+        });
+    }
+
+    deleteTestResult(testId=undefined,SKUitemId=undefined, resultId = undefined) {
+        let sqlInfo = {sql: undefined, values: undefined};
+
+        if(resultId) {
+            const sqlDeleteFromResultId = 'DELETE FROM "TEST-RESULTS" WHERE id = ?';
+            sqlInfo.sql = sqlDeleteFromResultId;
+            sqlInfo.values = [resultId];
+        }
+        else if(SKUitemId) {
+            const sqlDeleteFromSKUitemId = 'DELETE FROM "TEST-RESULTS" WHERE SKUitemId = ?';
+            sqlInfo.sql = sqlDeleteFromSKUitemId;
+            sqlInfo.values = [SKUitemId];
+        }
+        else if(testId) {
+            const sqlDeleteFromTestId = 'DELETE FROM "TEST-RESULTS" WHERE descriptorId = ?';
+            sqlInfo.sql = sqlDeleteFromTestId;
+            sqlInfo.values = [testId];
+        }
+        else {
+            throw( new Error("No Argument Passed", 10));
+        }
+        
+        return new Promise((resolve, reject) => {
+            this.db.all(sqlInfo.sql,sqlInfo.values, function (err) {
+                if(err) {
+                    reject(err);
+                    return;
+                }
+                else {
+                    resolve(this.changes);
+                }
+            });
+        });
+    }
+
 }
 
 module.exports = TestResultDBU;

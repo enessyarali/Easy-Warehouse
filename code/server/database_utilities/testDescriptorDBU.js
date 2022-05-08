@@ -1,6 +1,7 @@
 'use strict';
 const TESTDESCRIPTOR = require('../model/testDescriptor.js');
 const Error = require('../model/error.js');
+const testResultDBU = require('./testResultDBU.js');
 
 const sqlite = require('sqlite3');
 
@@ -38,7 +39,7 @@ class TestDescriptorDBU {
                 sqlInfo.values = [];
             }
 
-            this.db.all(sqlInfo.sql, sqlInfo.values, (err,rowl) => {
+            this.db.all(sqlInfo.sql, sqlInfo.values, (err,rows) => {
                 if(err) {
                     reject(err);
                     return;
@@ -77,8 +78,8 @@ class TestDescriptorDBU {
 
     updateTestDescriptor(testDescriptor) {
         return new Promise((resolve, reject) => {
-            const sqlUpdate = 'UPDATE "TEST-DESCRIPTORS" SET name = ?, procedureDescription = ?, SKUid = ?';
-            this.db.all(sqlUpdate, [testDescriptor.name, testDescriptor.procedureDescription, testDescriptor.SKUid], function (err) {
+            const sqlUpdate = 'UPDATE "TEST-DESCRIPTORS" SET name = ?, procedureDescription = ?, SKUid = ? WHERE id = ?';
+            this.db.all(sqlUpdate, [testDescriptor.name, testDescriptor.procedureDescription, testDescriptor.SKUid, testDescriptor.id], function (err) {
                 if(err) {
                     reject(err);
                     return;
@@ -90,23 +91,28 @@ class TestDescriptorDBU {
         });
     }
 
-    deleteTestDescriptor(testId=undefined,SKUid=undefined) {
+    async deleteTestDescriptor(testId=undefined,SKUid=undefined) {
         let sqlInfo = {sql: undefined, values: undefined};
 
         if(testId) {
             const sqlDeleteFromId = 'DELETE FROM "TEST-DESCRIPTORS" WHERE id = ?';
             sqlInfo.sql = sqlDeleteFromId;
             sqlInfo.values = [testId];
+            await this.db.deleteTestResult(testId);
         }
         else if(SKUid) {
             const sqlDeleteFromSKUid = 'DELETE FROM "TEST-DESCRIPTORS" WHERE SKUid = ?';
             sqlInfo.sql = sqlDeleteFromSKUid;
-            sqlInfo.values = [SKUId];
+            sqlInfo.values = [SKUid];
+            const ids = await this.#getDecscriptorId(SKUid);
+            for (let i of ids) {
+                await this.db.deleteTestResult(i);
+            }
         }
         else {
             throw( new Error("No Argument Passed", 10));
         }
-        
+
         return new Promise((resolve, reject) => {
             this.db.all(sqlInfo.sql,sqlInfo.values, function (err) {
                 if(err) {
@@ -118,6 +124,24 @@ class TestDescriptorDBU {
                 }
             });
         });
+    }
+
+    #getDecscriptorId(SKUid){
+        return new Promise((resolve, reject) => {
+            this.db.all('SELECT * FROM "TEST-DESCRIPTORS" WHERE SKUid = ?', [SKUid], (err, rows) => {
+                if(err) {
+                    reject(err);
+                    return;
+                }
+                else {
+                    const ids = rows.map((td) => {
+                        const id = td.id;
+                        return id;
+                    });
+                    resolve(ids);
+                }
+            });
+        }); 
     }
 }
 module.exports = TestDescriptorDBU;
