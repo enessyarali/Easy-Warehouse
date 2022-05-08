@@ -39,14 +39,14 @@ router.get('/api/skus/:id', async (req,res) => {
 // POST /api/sku
 // add a new sku to the database
 router.post('/api/sku', async (req,res) => {
-  if (req.body === undefined || req.body.description === undefined || req.body.weight === undefined || req.body.weight > 0 || 
-      req.body.volume === undefined || req.body.volume > 0 || req.body.price == undefined || req.body.price > 0 ||
-      req.body.notes === undefined || req.body.availableQuantity === undefined || req.body.availableQuantity > 0 ) {
+  if (req.body === undefined || req.body.description === undefined || req.body.weight === undefined || req.body.weight <= 0 || 
+      req.body.volume === undefined || req.body.volume <= 0 || req.body.price == undefined || req.body.price < 0 ||
+      req.body.notes === undefined || req.body.availableQuantity === undefined || req.body.availableQuantity < 0 ) {
     return res.status(422).json({error: `Invalid SKU data.`});
   }
   try{
       const db = new SkuDBU('ezwh.db');
-      await db.insertSKU(req.body.description, req.body.weight, req.body.volume, req.body.notes, req.body.price, req.body.availableQuantity);
+      const rowID = await db.insertSKU(req.body.description, req.body.weight, req.body.volume, req.body.notes, req.body.price, req.body.availableQuantity);
       return res.status(201).end();
   }
   catch(err){
@@ -59,9 +59,9 @@ router.post('/api/sku', async (req,res) => {
 // modify a sku in the database
 router.put('/api/sku/:id', async (req,res) => {
   const id = parseInt(req.params.id);
-  if (req.body === undefined || req.body.newDescription === undefined || req.body.newWeight === undefined || req.body.newWeight > 0 || 
-    req.body.newVolume === undefined || req.body.newVolume > 0 || req.body.newPrice == undefined || req.body.newPrice > 0 ||
-    req.body.newNotes === undefined || req.body.newAvailableQuantity === undefined || req.body.newAvailableQuantity > 0 || !Number.isInteger(id) || id < 0) {
+  if (req.body === undefined || req.body.newDescription === undefined || req.body.newWeight === undefined || req.body.newWeight <= 0 || 
+    req.body.newVolume === undefined || req.body.newVolume <= 0 || req.body.newPrice == undefined || req.body.newPrice < 0 ||
+    req.body.newNotes === undefined || req.body.newAvailableQuantity === undefined || req.body.newAvailableQuantity < 0 || !Number.isInteger(id) || id < 0) {
     return res.status(422).json({error: `Invalid SKU data.`});
   }
   try{
