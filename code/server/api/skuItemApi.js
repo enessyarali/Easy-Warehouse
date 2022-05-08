@@ -141,8 +141,6 @@ router.delete('/api/skuitems/:rfid', async (req,res) => {
   try{
       const db = new SkuItemDBU('ezwh.db');
       const deleted = await db.deleteSKUitem(rfid);
-      if (deleted === 0)
-        return res.status(404).json({error: `No SKU item with matching rfid.`});
       return res.status(204).end();
   }
   catch(err){

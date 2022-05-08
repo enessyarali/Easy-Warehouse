@@ -4,6 +4,7 @@ const express = require('express');
 const skuRoute = require('./api/skuApi');
 const skuItemRoute = require('./api/skuItemApi');
 const positionRoute = require('./api/positionApi');
+const userRoute = require('./api/userApi');
 
 // init express
 const app = new express();
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use('/', skuRoute);
 app.use('/', skuItemRoute);
 app.use('/', positionRoute);
+app.use('/', userRoute);
 
 //GET /api/test
 app.get('/api/hello', (req,res)=>{

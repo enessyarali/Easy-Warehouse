@@ -103,8 +103,6 @@ router.delete('/api/position/:positionID', async (req,res) => {
       const db = new PositionDBU('ezwh.db');
       // get the position to be deleted
       const deleted = await db.deletePosition(positionID);
-      if(deleted === 0)
-          return res.status(404).json({error: `No position with matching id.`});
       return res.status(204).end();
   }
   catch(err){
