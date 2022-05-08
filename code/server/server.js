@@ -1,8 +1,9 @@
 'use strict';
 const express = require('express');
 
-const skuRoute = require('./api/skuApi.js');
+const skuRoute = require('./api/skuApi');
 const skuItemRoute = require('./api/skuItemApi');
+const positionRoute = require('./api/positionApi');
 
 // init express
 const app = new express();
@@ -11,6 +12,7 @@ const port = 3001;
 app.use(express.json());
 app.use('/', skuRoute);
 app.use('/', skuItemRoute);
+app.use('/', positionRoute);
 
 //GET /api/test
 app.get('/api/hello', (req,res)=>{

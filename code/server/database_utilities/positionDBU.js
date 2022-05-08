@@ -70,17 +70,21 @@ class PositionDBU {
 
     // VERSION 1 - EXPLICIT VALUES
     // this function returns the number of rows which have been modified
-    updatePosition(oldPositionId, newPositionId, newAisleId=undefined, newRow=undefined, newCol=undefined, newMaxWeight=undefined, newMaxVolume=undefined, newOccupiedWeight=undefined, newOccupiedVolume=undefined) {
+    updatePosition(oldPositionId, newPosition, newPositionId=undefined, newAisleId=undefined, newRow=undefined, newCol=undefined, newMaxWeight=undefined, newMaxVolume=undefined, newOccupiedWeight=undefined, newOccupiedVolume=undefined) {
         
         const sqlId = 'UPDATE positions SET positionId=?, aisleId=?, row=?, col=? WHERE positionID=?';
-        const sqlAll = 'UPDATE positions SET positionId=?, aisleId=?, row=?, col=?, maxWeight=?, maxVolume=?, occupiedWeight=?, occupiedVolume=? WHERE positionId=?';
+        const sqlObj = 'UPDATE positions SET positionId=?, aisleId=?, row=?, col=?, maxWeight=?, maxVolume=?, occupiedWeight=?, occupiedVolume=? WHERE positionId=?';
 
         let sqlInfo = {sql: undefined, values: undefined};
 
-        if(!newPositionId) {
+        if(!newPositionId && !newPosition) {
             // update all fields
-            sqlInfo.sql = sqlAll;
+            sqlInfo.sql = sqlObj;
             sqlInfo.values = [getPositionId(newAisleId, newRow, newCol), newAisleId, newRow, newCol, newMaxWeight, newMaxVolume, newOccupiedWeight, newOccupiedVolume, oldPositionId];
+        } else if (newPosition) {
+            // update all fields, taking them from the Position object
+            sqlInfo.sql = sqlObj;
+            sqlInfo.values = [newPosition.positionID, newPosition.aisleID, newPosition.row, newPosition.col, newPosition.maxWeight, newPosition.maxVolume, newPosition.occupiedWeight, newPosition.occupiedVolume, oldPositionId];
         } else {
             // update only positionId
             const coordinates = getPositionCoordinates(newPositionId);
@@ -90,19 +94,6 @@ class PositionDBU {
        
         return new Promise((resolve, reject) => {
             this.db.run(sqlInfo.sql, sqlInfo.values, function (err) {
-                if (err) {
-                    reject(err);
-                    return;
-                } else resolve(this.changes);
-            });
-        });
-    }
-
-    // VERSION 2 - OBJECT
-    updatePosition(oldPositionId, newPosition) {
-        return new Promise((resolve, reject) => {
-            const update = 'UPDATE positions SET positionId=?, aisleId=?, row=?, col=?, maxWeight=?, maxVolume=?, occupiedWeight=?, occupiedVolume=? WHERE positionId=?';
-            this.db.run(update, [newPosition.positionID, newPosition.aisleID, newPosition.row, newPosition.col, newPosition.maxWeight, newPosition.maxVolume, newPosition.occupiedWeight, newPosition.occupiedVolume, oldPositionId], function (err) {
                 if (err) {
                     reject(err);
                     return;
