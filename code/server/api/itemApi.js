@@ -66,7 +66,7 @@ router.put('/api/item/:id', async (req,res) => {
       const item = itemList.pop();
       if(itemList.length === 0)
         return res.status(404).json({error: `No item with matching id.`});
-      item.modify(db.db, req.body.newDescription,req.body.newPrice, req.body.newAvailableQuantity)
+      item.modify(db.db, req.body.newDescription,req.body.newPrice)
       await db.updateItem(item);
       return res.status(200).end();
   }

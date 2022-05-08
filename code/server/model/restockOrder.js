@@ -8,5 +8,20 @@ class restockOrder{
         this.transportNote = transportNote;
         this.skuItems =skuItems;
     }
+    setProducts(products) {
+        this.products = products;
+    }
 }
-module.exports =restockOrder ;
+
+class ProductIO{
+
+    constructor(SKUId, description, price, qty=undefined, rfid=undefined) {
+        this.SKUId = SKUId;
+        this.descripton = description;
+        this.price = price;
+        this.qty = qty;
+        this.rfid = rfid;
+    }
+}
+
+module.exports ={restockOrder : restockOrder , ProductIO : ProductIO}
