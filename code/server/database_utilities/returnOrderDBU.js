@@ -50,22 +50,13 @@ class ReturnOrderDBU {
                     resolve(returns);
                 }
             });
-
         });
     }
 
-    insertReturnOrder(returnOrder) {
+    insertReturnOrder(returnDate, products, restockOrderId) {
         return new Promise((resolve,reject) => {
-            const sqlCreate = 'CREATE TABLE IF NOT EXISTS "RETURN-ORDERS" (id INTEGER NOT NULL, returnDate DATE NOT NULL, products TEXT NOT NULL , restockOrderId INTEGER NOT NULL, PRIMARY KEY(id AUTOINCREMENT))';
-            this.db.all(sqlCreate, [], (err) => {
-                if(err) {
-                    reject(err);
-                    return;
-                }
-                resolve('Done');
-            });
             const sqlInsert = 'INSERT INTO "RETURN-ORDERS"(returnDate, products, restockOrderId) VALUES(?,?,?)';
-            this.db.all(sqlInsert, [returnOrder.returnDate,returnOrder.products, returnOrder.restockOrderId], (err) => {
+            this.db.all(sqlInsert, [returnDate, products, restockOrderId], (err) => {
                 if(err) {
                     reject(err);
                     return;
@@ -78,7 +69,7 @@ class ReturnOrderDBU {
     deleteReturnOrder(orderId) {
         return new Promise((resolve, reject) => {
             const sqlDeleteFromOrderId = 'DELETE FROM "RETURN-ORDERS" WHERE id = ?';
-            this.db.all(sqlDeleteFromOrderId,[orderId], function (err) {
+            this.db.run(sqlDeleteFromOrderId,[orderId], function (err) {
                 if(err) {
                     reject(err);
                     return;

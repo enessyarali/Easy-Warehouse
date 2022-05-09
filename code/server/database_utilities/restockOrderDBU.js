@@ -59,18 +59,10 @@ class restockOrderDBU {
         });
     }
 
-    insertRestockOrder(restockOrder) {
+    insertRestockOrder(issueDate, state, products, supplierId, transportNote, skuItems) {
         return new Promise((resolve,reject) => {
-            const sqlCreate = 'CREATE TABLE IF NOT EXISTS "RESTOCK-ORDERS" ( id INTEGER NOT NULL, issueDate DATE NOT NULL, state VARCHAR(20) NOT NULL, products TEXT NOT NULL, supplierId INTEGER NOT NULL, transportNote TEXT NOT NULL, skuItems TEXT NOT NULL, PRIMARY KEY(id AUTOINCREMENT))';
-            this.db.all(sqlCreate, [], (err) => {
-                if(err) {
-                    reject(err);
-                    return;
-                }
-                resolve('Done');
-            });
             const sqlInsert = 'INSERT INTO "RESTOCK-ORDERS"(issueDate,state,products,supplierId,transportNote,skuItems) VALUES(?,?,?,?,?,?)';
-            this.db.all(sqlInsert, [restockOrder.issueDate, restockOrder.state,restockOrder.products, restockOrder.supplierId, restockOrder.transportNote, restockOrder.skuItems], (err) => {
+            this.db.all(sqlInsert, [issueDate, state, products, supplierId, transportNote, skuItems], (err) => {
                 if(err) {
                     reject(err);
                     return;
@@ -80,10 +72,10 @@ class restockOrderDBU {
         });
     }
 
-    updateRestockOrder(restockOrder) {
+    updateRestockOrder(issueDate, state, products, supplierId, transportNote, skuItems) {
         return new Promise((resolve, reject) => {
             const sqlUpdate = 'UPDATE "RESTOCK-ORDERS" SET issueDate = ?, state = ?, products = ?, supplierId = ?, transportNote = ?, skuItem = ? WHERE id = ?';
-            this.db.all(sqlUpdate, [restockOrder.issueDate, restockOrder.state, restockOrder.products, restockOrder.supplierId, restockOrder.transportNote, restockOrder.skuItems, restockOrder.id], function (err) {
+            this.db.run(sqlUpdate, [issueDate, state, products, supplierId, transportNote, skuItems, id], function (err) {
                 if(err) {
                     reject(err);
                     return;
@@ -103,7 +95,7 @@ class restockOrderDBU {
             }
 
         return new Promise((resolve, reject) => {
-            this.db.all(sqlDelete,[orderId], function (err) {
+            this.db.run(sqlDelete,[orderId], function (err) {
                 if(err) {
                     reject(err);
                     return;
@@ -117,7 +109,7 @@ class restockOrderDBU {
 
     #getReturnId(orderId){
         return new Promise((resolve, reject) => {
-            this.db.all('SELECT * FROM "RETURN-ORDERS" WHERE RestockOrderId = ?', [orderId], (err, rows) => {
+            this.db.run('SELECT * FROM "RETURN-ORDERS" WHERE RestockOrderId = ?', [orderId], (err, rows) => {
                 if(err) {
                     reject(err);
                     return;
