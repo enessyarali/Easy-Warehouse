@@ -6,13 +6,7 @@ class TestDescriptor {
         this.id = id;
         this.name = name;
         this.procedureDescription = procedureDescription;
-        this.SKUid = SKUid;
-    }
-
-    modify(newName, newProcedureDescription, newSKUid) {
-        this.name = newName;
-        this.procedureDescription = newProcedureDescription;
-        this.SKUid = newSKUid;
+        this.idSKU = SKUid;
     }
 }
 

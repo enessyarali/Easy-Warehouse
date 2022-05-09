@@ -1,7 +1,7 @@
 'use strict';
-const TESTDESCRIPTOR = require('../model/testDescriptor.js');
+const TestDescriptor = require('../model/testDescriptor.js');
 const Error = require('../model/error.js');
-const testResultDBU = require('./testResultDBU.js');
+const TestResultDBU = require('./testResultDBU.js');
 
 const sqlite = require('sqlite3');
 
@@ -46,7 +46,7 @@ class TestDescriptorDBU {
                 }
                 else {
                     const descriptors = rows.map((td) => {
-                        const descriptor = new TESTDESCRIPTOR(td.id,td.name,td.procedureDescription, td.SKUid);
+                        const descriptor = new TestDescriptor(td.id, td.name, td.procedureDescription, td.idSKU);
                         return descriptor;
                     });
                     resolve(descriptors);
@@ -55,18 +55,10 @@ class TestDescriptorDBU {
         });
     }
 
-    insertTestDescriptor(testDescriptor) {
+    insertTestDescriptor(name, procedureDescription, SKUid) {
         return new Promise((resolve,reject) => {
-            const sqlCreate = 'CREATE TABLE IF NOT EXISTS "TEST-DESCRIPTORS" ( id INTEGER NOT NULL, name TEXT NOT NULL, procedureDescription TEXT NOT NULL, SKUId INTEGER NOT NULL, PRIMARY KEY(id AUTOINCREMENT))';
-            this.db.all(sqlCreate, [], (err) => {
-                if(err) {
-                    reject(err);
-                    return;
-                }
-                resolve('Done');
-            });
-            const sqlInsert = 'INSERT INTO "TEST-DESCRIPTORS"(name,procedureDescription,SKUid) VALUES(?,?,?)';
-            this.db.all(sqlInsert, [testDescriptor.name, testDescriptor.procedureDescription,testDescriptor.SKUid], (err) => {
+            const sqlInsert = 'INSERT INTO "TEST-DESCRIPTORS"(name, procedureDescription, idSKU) VALUES(?,?,?)';
+            this.db.all(sqlInsert, [name, procedureDescription, SKUid], (err) => {
                 if(err) {
                     reject(err);
                     return;
@@ -76,10 +68,10 @@ class TestDescriptorDBU {
         });
     }
 
-    updateTestDescriptor(testDescriptor) {
+    updateTestDescriptor(id, newName, newProcedure, newIdSKU) {
         return new Promise((resolve, reject) => {
-            const sqlUpdate = 'UPDATE "TEST-DESCRIPTORS" SET name = ?, procedureDescription = ?, SKUid = ? WHERE id = ?';
-            this.db.all(sqlUpdate, [testDescriptor.name, testDescriptor.procedureDescription, testDescriptor.SKUid, testDescriptor.id], function (err) {
+            const sqlUpdate = 'UPDATE "TEST-DESCRIPTORS" SET name = ?, procedureDescription = ?, idSKU = ? WHERE id = ?';
+            this.db.run(sqlUpdate, [newName, newProcedure, newIdSKU, id], function (err) {
                 if(err) {
                     reject(err);
                     return;
@@ -101,7 +93,7 @@ class TestDescriptorDBU {
             await this.db.deleteTestResult(testId);
         }
         else if(SKUid) {
-            const sqlDeleteFromSKUid = 'DELETE FROM "TEST-DESCRIPTORS" WHERE SKUid = ?';
+            const sqlDeleteFromSKUid = 'DELETE FROM "TEST-DESCRIPTORS" WHERE idSKU = ?';
             sqlInfo.sql = sqlDeleteFromSKUid;
             sqlInfo.values = [SKUid];
             const ids = await this.#getDecscriptorId(SKUid);
@@ -114,7 +106,7 @@ class TestDescriptorDBU {
         }
 
         return new Promise((resolve, reject) => {
-            this.db.all(sqlInfo.sql,sqlInfo.values, function (err) {
+            this.db.run(sqlInfo.sql,sqlInfo.values, function (err) {
                 if(err) {
                     reject(err);
                     return;
@@ -128,7 +120,7 @@ class TestDescriptorDBU {
 
     #getDecscriptorId(SKUid){
         return new Promise((resolve, reject) => {
-            this.db.all('SELECT * FROM "TEST-DESCRIPTORS" WHERE SKUid = ?', [SKUid], (err, rows) => {
+            this.db.run('SELECT * FROM "TEST-DESCRIPTORS" WHERE idSKU = ?', [SKUid], (err, rows) => {
                 if(err) {
                     reject(err);
                     return;
