@@ -11,6 +11,9 @@ class RestockOrder{
     setProducts(products) {
         this.products = products;
     }
+    setSkuItems(skuItems) {
+        this.skuItems = skuItems;
+    }
 }
 
 class ProductIO{

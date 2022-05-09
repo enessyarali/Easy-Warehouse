@@ -46,7 +46,7 @@ class ReturnOrderDBU {
                     return;
                 }
                 const orders = rows.map(async (o) => {
-                    const order = new ReturnOrder(o.id, o.returnDate, o.restockOrderId)
+                    const order = new ReturnOrder(o.id, o.returnDate, o.restockOrderId);
                     const products = await this.#getProducts(o.id);
                     order.setProducts(products);
                     return order;

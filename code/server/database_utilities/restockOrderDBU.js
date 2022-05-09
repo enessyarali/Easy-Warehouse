@@ -1,10 +1,14 @@
 'use strict';
-const RESTOCKORDER = require('../model/restockOrder.js');
-const returnOrderDBU = require('./returnOrder.js');
+const RKO = require('../model/restockOrder');
+const SkuItem = require('../model/skuItem');
+const RestockOrder = RKO.RestockOrder;
+const ProductIO = RKO.ProductIO;
+const returnOrderDBU = require('./returnOrderDBU.js');
 
 const sqlite = require('sqlite3');
+const { ReturnOrder } = require('../model/returnOrder');
 
-class restockOrderDBU {
+class RestockOrderDBU {
 
     // attributes
     // - db (Database)
@@ -25,7 +29,6 @@ class restockOrderDBU {
 
 // get RestockOrder(s) from the RESTOCK-ORDERS table and return it/them as a RestockOrder object
     loadRestockOrder(id=undefined, state=undefined) {
-        return new Promise((resolve, reject) => {
             const sqlInfo = {sql: undefined, values: undefined};
 
             if(id) {
@@ -43,25 +46,27 @@ class restockOrderDBU {
                 sqlInfo.sql = sqlNoInfo;
                 sqlInfo.values = [];
             }
-
-            this.db.all(sqlInfo.sql, sqlInfo.values, (err,rows) => {
-                if(err) {
-                    reject(err);
-                    return;
-                }
-                else {
-                    const restocks = rows.map((rk) => {
-                        const restock = new RESTOCKORDER(rk.id, rk.issueDate, rk.state, rk.products, rk.supplierId, rk.transportNote, rk.skuItems);
-                        return restock;
+            return new Promise((resolve, reject) => {
+                this.db.all(sqlInfo.sql, sqlInfo.values, (err, rows) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    const orders = rows.map(async (o) => {
+                        const order = new RestockOrder(o.id, o.issueDate, o.state, o.supplierId, o.transportNote);
+                        const products = await this.#getProducts(o.id);
+                        const skuItems = await this.#getSkuItems(o.id);
+                        order.setProducts(products);
+                        order.setSkuItems(skuItems);
+                        return order;
                     });
-                    resolve(restocks);
-                }
+                    Promise.all(orders).then((orders) => resolve(orders));
+                });
             });
-        });
-    }
+        }
 
 // insert a new RestockOrder inside the RESTOCK-ORDERS table
-    async insertRestockOrder(issueDate, state, products, supplierId, transportNote, skuItems) {
+    async insertRestockOrder(issueDate, products, supplierId, transportNote, skuItems) {
         // check if supplier exist
         const isSupplier = await this.#checkSupplier(supplierId);
         if (!isSupplier)
@@ -72,20 +77,27 @@ class restockOrderDBU {
         if (!isSKUitem)
             throw(new Error("SKUitem does not exist. Operation aborted.", 9));
 
-        return new Promise((resolve,reject) => {
-            const sqlInsert = 'INSERT INTO "RESTOCK-ORDERS"(issueDate,state,products,supplierId,transportNote,skuItems) VALUES(?,?,?,?,?,?)';
-            this.db.all(sqlInsert, [issueDate, state, products, supplierId, transportNote, skuItems], (err) => {
-                if(err) {
+        const promises = [];
+        const orderId = await this.#insertOrder(issueDate, supplierId, transportNote);
+
+        promises.push(products.map((p) => new Promise(async (resolve, reject) => {
+            const insert = 'INSERT INTO "products-sku-io" (orderId, skuId, description, price, qty) VALUES (?,?,?,?,?)';
+            this.db.run(insert, [orderId, p.SKUId, p.description, p.price, p.qty], function (err) {
+                if (err) {
                     reject(err);
                     return;
-                }
-                else resolve('Done');
+                } else resolve('Done');
             });
-        });
+        })));
+
+        promises.push(skuItems.map((s) => new Promise(async (resolve, reject) => {
+            //da fare
+        })));
+        return Promise.all(promises);
     }
 
 // update a selected RestockOrder in the RESTOCK-ORDERS table. Return number of rows modified
-    async updateRestockOrder(issueDate, state, products, supplierId, transportNote, skuItems) {
+    async updateRestockOrder(orderId, issueDate, newState, products, supplierId, transportNote, skuItems) {
         // check if supplier exist
         const isSupplier = await this.#checkSupplier(supplierId);
         if (!isSupplier)
@@ -96,9 +108,27 @@ class restockOrderDBU {
         if (!isSKUitem)
             throw(new Error("SKUitem does not exist. Operation aborted.", 9));
 
+        if(newState=="completed") {
+            const promises = products.map((p) => new Promise(async (resolve, reject) => {
+                // check whether the RFID belongs to the specified skuId AND if the skuId belongs to the order
+                const skuItemId = await this.#checkSkuItemConsistency(orderId, p.SkuID, p.RFID);
+                // if (!skuItemId)
+                //    throw(new Error("Detected inconsistency SKUitem-RFID. Operation aborted.",7));
+                // add the new record for the RFID
+                const addRfid = 'INSERT INTO "products-rfid-io" (orderId, skuId, skuItemId) VALUES (?,?,?)';
+                this.db.run(addRfid, [orderId, p.SkuID, skuItemId], function (err) {
+                    if (err) {
+                        reject(err);
+                        return;
+                    } else resolve('Done');
+                });
+            }));
+            await Promise.all(promises);
+        }
+        
         return new Promise((resolve, reject) => {
-            const sqlUpdate = 'UPDATE "RESTOCK-ORDERS" SET issueDate = ?, state = ?, products = ?, supplierId = ?, transportNote = ?, skuItem = ? WHERE id = ?';
-            this.db.run(sqlUpdate, [issueDate, state, products, supplierId, transportNote, skuItems, id], function (err) {
+            const sqlUpdate = 'UPDATE "RESTOCK-ORDERS" SET issueDate = ?, state = ?, supplierId = ?, transportNote = ?, WHERE id = ?';
+            this.db.run(sqlUpdate, [issueDate, newState, supplierId, transportNote, id], function (err) {
                 if(err) {
                     reject(err);
                     return;
@@ -111,25 +141,89 @@ class restockOrderDBU {
     }
 // delete one or more RestockOrder from the RESTOCK-ORDERS table given different input. Return number of rows modified
     async deleteRestockOrder(orderId) {
-            const sqlDelete = 'DELETE FROM "RESTOCK-ORDERS" WHERE id = ?';
             const ids = await this.#getReturnId(orderId);
+            const rs = new ReturnOrder(); //??
             for (let i of ids) {
-                await this.db.deleteReturnOrder(i);
+                await rs.deleteReturnOrder(i); //??
             }
 
+            const promises = [];
+            // delete from restock orders
+            promises.push(new Promise((resolve, reject) => {
+                const sqlDelete = 'DELETE FROM "restock-orders" WHERE id=?';
+                this.db.run(sqlDelete, [orderId], function (err) {
+                    if (err) {
+                        reject(err);
+                        return;
+                    } else resolve(this.changes);
+                });
+            }));
+            // delete from producs sku
+            promises.push(new Promise((resolve, reject) => {
+                const sqlDelete = 'DELETE FROM "products-sku-io" WHERE orderId=?';
+                this.db.run(sqlDelete, [orderId], function (err) {
+                    if (err) {
+                        reject(err);
+                        return;
+                    } else resolve(this.changes);
+                });
+            }));
+            // delete from products rfid
+            promises.push(new Promise((resolve, reject) => {
+                const sqlDelete = 'DELETE FROM "products-rfid-io" WHERE orderId=?';
+                this.db.run(sqlDelete, [orderId], function (err) {
+                    if (err) {
+                        reject(err);
+                        return;
+                    } else resolve(this.changes);
+                });
+            }));
+            return Promise.all(promises);
+        }
+    
+    // private method to get products for a given orderId 
+    #getProducts(id) {
         return new Promise((resolve, reject) => {
-            this.db.run(sqlDelete,[orderId], function (err) {
-                if(err) {
+            const sqlProd = 'SELECT S.skuId AS skuId, S.description AS description, S.price AS price, S.qty AS qty, SI.RFID AS rfid FROM "products-sku-io" S LEFT JOIN "products-rfid-io" R ON (S.orderId = R.orderId AND S.skuId = R.skuId) LEFT JOIN "sku-items" SI ON R.skuItemId = SI.id WHERE S.orderId=?';
+            this.db.all(sqlProd, [id], (err, rows) => {
+                if (err) {
                     reject(err);
                     return;
                 }
-                else {
-                    resolve(this.changes);
-                }
+                const products = rows.map((p) => new ProductIO(p.skuId, p.description, p.price, p.rfid ? null : p.qty, p.rfid));
+                resolve(products);;
             });
         });
     }
-    
+
+    // private method to get skuitems for a given orderId 
+    #getSkuItems(id) {
+        return new Promise((resolve, reject) => {
+            const sqlProd = '';//da fare 
+            this.db.all(sqlProd, [id], (err, rows) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                const skuitems = rows.map((p) => new SkuItem(p.rfid, p.skuId, p.isAvailable, p.dateOfStock));
+                resolve(skuitems);;
+            });
+        });
+    }
+
+    // private method to insert an order in the relative table. It returns the assigned orderID.
+    #insertOrder(issueDate, supplierId, transportNote) {
+        return new Promise((resolve, reject) => {
+            const sqlInsert = 'INSERT INTO "restock-orders" (issueDate, state, supplierId,transportNote) VALUES(?,"ISSUED",?,?)';
+            this.db.run(sqlInsert, [issueDate, supplierId, transportNote], function (err) {
+                if (err) {
+                    reject(err);
+                    return;
+                } else resolve(this.lastID);
+            });
+        });
+    }
+
     //private method that get ReturnOrder'Id given an orderId
     #getReturnId(orderId){
         return new Promise((resolve, reject) => {
@@ -178,7 +272,7 @@ class restockOrderDBU {
     }
 
 }
-module.exports = restockOrderDBU;
+module.exports = RestockOrderDBU;
 
 /* 
 id
