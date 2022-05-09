@@ -5,6 +5,7 @@ const skuRoute = require('./api/skuApi');
 const skuItemRoute = require('./api/skuItemApi');
 const positionRoute = require('./api/positionApi');
 const userRoute = require('./api/userApi');
+const itemRoute = require('./api/itemApi');
 
 const internalOrderRoute = require('./api/internalOrderApi');
 
@@ -17,6 +18,7 @@ app.use('/', skuRoute);
 app.use('/', skuItemRoute);
 app.use('/', positionRoute);
 app.use('/', userRoute);
+app.use('/', itemRoute);
 app.use('/', internalOrderRoute);
 
 //GET /api/test
