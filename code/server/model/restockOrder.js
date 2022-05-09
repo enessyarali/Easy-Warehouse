@@ -24,4 +24,4 @@ class ProductIO{
     }
 }
 
-module.exports ={restockOrder : RestockOrder , ProductIO : ProductIO}
+module.exports ={RestockOrder : RestockOrder , ProductIO : ProductIO}
