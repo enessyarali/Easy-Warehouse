@@ -1,4 +1,4 @@
-class restockOrder{
+class RestockOrder{
     constructor(id,issueDate,state,products,supplierId,transportNote,skuItems){
         this.id =id;
         this.issueDate =issueDate ;
@@ -24,4 +24,4 @@ class ProductIO{
     }
 }
 
-module.exports ={restockOrder : restockOrder , ProductIO : ProductIO}
+module.exports ={restockOrder : RestockOrder , ProductIO : ProductIO}

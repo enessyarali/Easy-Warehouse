@@ -1,5 +1,7 @@
 'use strict';
-const RETURNORDER = require('../model/returnOrder.js');
+const RTO = require('../model/returnOrder');
+const ReturnOrder = RTO.ReturnOrder;
+const ProductIO = IO.ProductIO;
 
 const sqlite = require('sqlite3');
 
@@ -43,13 +45,13 @@ class ReturnOrderDBU {
                     reject(err);
                     return;
                 }
-                else {
-                    const returns = rows.map((rs) => {
-                        const ret = new RETURNORDER(rs.id, rs.returnDate, rs.products, rs.restockOrderId);
-                        return ret;
-                    });
-                    resolve(returns);
-                }
+                const orders = rows.map(async (o) => {
+                    const order = new ReturnOrder(o.id, o.returnDate, o.restockOrderId)
+                    const products = await this.#getProducts(o.id);
+                    order.setProducts(products);
+                    return order;
+                });
+                Promise.all(orders).then((orders) => resolve(orders));
             });
         });
     }
@@ -61,30 +63,77 @@ class ReturnOrderDBU {
         if (!isRestockOrder)
             throw(new Error("RestockOrder does not exist. Operation aborted.", 12));
 
-        return new Promise((resolve,reject) => {
-            const sqlInsert = 'INSERT INTO "RETURN-ORDERS"(returnDate, products, restockOrderId) VALUES(?,?,?)';
-            this.db.all(sqlInsert, [returnDate, products, restockOrderId], (err) => {
-                if(err) {
+        const promises = []
+        const orderId = await this.#insertOrder(returnDate, restockOrderId);
+        promises.push(products.map((p) => new Promise((resolve, reject) => {
+            const insert = 'INSERT INTO "products-sku-io" (orderId, skuId, description, price, qty) VALUES (?,?,?,?,?)';
+            this.db.run(insert, [orderId, p.SKUId, p.description, p.price, p.qty], function (err) {
+                if (err) {
                     reject(err);
                     return;
-                }
-                else resolve('Done');
+                } else resolve('Done');
             });
-        });
+        })));
+        promises.push(products.map((p) => new Promise((resolve, reject) => {
+            // add the new record for the RFID
+            const addRfid = 'INSERT INTO "products-rfid-io" (orderId, skuId, skuItemId) VALUES (?,?,?)';
+            this.db.run(addRfid, [orderId, p.SkuID, skuItemId], function (err) {
+                if (err) {
+                    reject(err);
+                    return;
+                } else resolve('Done');
+            });
+        })));
+        return Promise.all(promises);
     }
 
 // delete one or more ReturnOrder from the RETURN-ORDERS table given different input. Return number of rows modified
     deleteReturnOrder(orderId) {
+        const promises = [];
+        // delete from internal orders
+        promises.push(new Promise((resolve, reject) => {
+            const sqlDelete = 'DELETE FROM "return-orders" WHERE id=?';
+            this.db.run(sqlDelete, [orderId], function (err) {
+                if (err) {
+                    reject(err);
+                    return;
+                } else resolve(this.changes);
+            });
+        }));
+        // delete from producs sku
+        promises.push(new Promise((resolve, reject) => {
+            const sqlDelete = 'DELETE FROM "products-sku-io" WHERE orderId=?';
+            this.db.run(sqlDelete, [orderId], function (err) {
+                if (err) {
+                    reject(err);
+                    return;
+                } else resolve(this.changes);
+            });
+        }));
+        // delete from products rfid
+        promises.push(new Promise((resolve, reject) => {
+            const sqlDelete = 'DELETE FROM "products-rfid-io" WHERE orderId=?';
+            this.db.run(sqlDelete, [orderId], function (err) {
+                if (err) {
+                    reject(err);
+                    return;
+                } else resolve(this.changes);
+            });
+        }));
+        return Promise.all(promises);
+    }
+
+    // private method to get products for a given orderId 
+    #getProducts(id) {
         return new Promise((resolve, reject) => {
-            const sqlDeleteFromOrderId = 'DELETE FROM "RETURN-ORDERS" WHERE id = ?';
-            this.db.run(sqlDeleteFromOrderId,[orderId], function (err) {
-                if(err) {
+            const sqlProd = 'SELECT S.skuId AS skuId, S.description AS description, S.price AS price, S.qty AS qty, SI.RFID AS rfid FROM "products-sku-io" S LEFT JOIN "products-rfid-io" R ON (S.orderId = R.orderId AND S.skuId = R.skuId) LEFT JOIN "sku-items" SI ON R.skuItemId = SI.id WHERE S.orderId=?';
+            this.db.all(sqlProd, [id], (err, rows) => {
+                if (err) {
                     reject(err);
                     return;
                 }
-                else {
-                    resolve(this.changes);
-                }
+                const products = rows.map((p) => new ProductIO(p.skuId, p.description, p.price, p.rfid ? null : p.qty, p.rfid));
+                resolve(products);;
             });
         });
     }
@@ -100,6 +149,19 @@ class ReturnOrderDBU {
                 }
                 resolve(row ? true : false);
             })
+        });
+    }
+
+    // private method to insert an order in the relative table. It returns the assigned orderID.
+    #insertOrder(returnDate, restockOrderId) {
+        return new Promise((resolve, reject) => {
+            const sqlInsert = 'INSERT INTO "return-orders" (returnDate, customerId) VALUES(?,?)';
+            this.db.run(sqlInsert, [returnDate, restockOrderId], function (err) {
+                if (err) {
+                    reject(err);
+                    return;
+                } else resolve(this.lastID);
+            });
         });
     }
 }
