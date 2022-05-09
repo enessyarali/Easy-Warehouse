@@ -22,6 +22,7 @@ class ReturnOrderDBU {
         this.db.close();
     }
 
+// get ReturnOrder(s) from the RETURN-ORDERS table and return it/them as a ReturnOrder object
     loadReturnOrder(orderId = undefined) {
         return new Promise((resolve, reject) => {
             const sqlInfo = {sql: undefined, values: undefined};
@@ -53,7 +54,13 @@ class ReturnOrderDBU {
         });
     }
 
-    insertReturnOrder(returnDate, products, restockOrderId) {
+// insert a new ReturnOrder inside the RETURN-ORDERS table
+    async insertReturnOrder(returnDate, products, restockOrderId) {
+        // check if restockOrder exist
+        const isRestockOrder = await this.#checkRestockOrder(restockOrderId);
+        if (!isRestockOrder)
+            throw(new Error("RestockOrder does not exist. Operation aborted.", 12));
+
         return new Promise((resolve,reject) => {
             const sqlInsert = 'INSERT INTO "RETURN-ORDERS"(returnDate, products, restockOrderId) VALUES(?,?,?)';
             this.db.all(sqlInsert, [returnDate, products, restockOrderId], (err) => {
@@ -66,6 +73,7 @@ class ReturnOrderDBU {
         });
     }
 
+// delete one or more ReturnOrder from the RETURN-ORDERS table given different input. Return number of rows modified
     deleteReturnOrder(orderId) {
         return new Promise((resolve, reject) => {
             const sqlDeleteFromOrderId = 'DELETE FROM "RETURN-ORDERS" WHERE id = ?';
@@ -81,6 +89,19 @@ class ReturnOrderDBU {
         });
     }
 
+    // private method to check whether RestockOrderId corresponds to an existing RestockOrder
+    #checkRestockOrder(restockOrderId) {
+        const sql = 'SELECT id FROM "RESTOCK-ORDERS" WHERE id=?'
+        return new Promise((resolve, reject) => {
+            this.db.get(sql, [restockOrderId], (err, row) => {
+                if(err) {
+                    reject(err);
+                    return;
+                }
+                resolve(row ? true : false);
+            })
+        });
+    }
 }
 module.exports = ReturnOrderDBU;
 

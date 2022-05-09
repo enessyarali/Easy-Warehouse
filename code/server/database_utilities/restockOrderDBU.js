@@ -23,6 +23,7 @@ class restockOrderDBU {
         this.db.close();
     }
 
+// get RestockOrder(s) from the RESTOCK-ORDERS table and return it/them as a RestockOrder object
     loadRestockOrder(id=undefined, state=undefined) {
         return new Promise((resolve, reject) => {
             const sqlInfo = {sql: undefined, values: undefined};
@@ -59,7 +60,18 @@ class restockOrderDBU {
         });
     }
 
-    insertRestockOrder(issueDate, state, products, supplierId, transportNote, skuItems) {
+// insert a new RestockOrder inside the RESTOCK-ORDERS table
+    async insertRestockOrder(issueDate, state, products, supplierId, transportNote, skuItems) {
+        // check if supplier exist
+        const isSupplier = await this.#checkSupplier(supplierId);
+        if (!isSupplier)
+            throw(new Error("Supplier does not exist. Operation aborted.", 6));
+
+        // check if SKUitem exists
+        const isSKUitem = await this.#checkSKUitem(SKUitemRFid);
+        if (!isSKUitem)
+            throw(new Error("SKUitem does not exist. Operation aborted.", 9));
+
         return new Promise((resolve,reject) => {
             const sqlInsert = 'INSERT INTO "RESTOCK-ORDERS"(issueDate,state,products,supplierId,transportNote,skuItems) VALUES(?,?,?,?,?,?)';
             this.db.all(sqlInsert, [issueDate, state, products, supplierId, transportNote, skuItems], (err) => {
@@ -72,7 +84,18 @@ class restockOrderDBU {
         });
     }
 
-    updateRestockOrder(issueDate, state, products, supplierId, transportNote, skuItems) {
+// update a selected RestockOrder in the RESTOCK-ORDERS table. Return number of rows modified
+    async updateRestockOrder(issueDate, state, products, supplierId, transportNote, skuItems) {
+        // check if supplier exist
+        const isSupplier = await this.#checkSupplier(supplierId);
+        if (!isSupplier)
+            throw(new Error("Supplier does not exist. Operation aborted.", 6));
+
+        // check if SKUitem exists
+        const isSKUitem = await this.#checkSKUitem(SKUitemRFid);
+        if (!isSKUitem)
+            throw(new Error("SKUitem does not exist. Operation aborted.", 9));
+
         return new Promise((resolve, reject) => {
             const sqlUpdate = 'UPDATE "RESTOCK-ORDERS" SET issueDate = ?, state = ?, products = ?, supplierId = ?, transportNote = ?, skuItem = ? WHERE id = ?';
             this.db.run(sqlUpdate, [issueDate, state, products, supplierId, transportNote, skuItems, id], function (err) {
@@ -86,7 +109,7 @@ class restockOrderDBU {
             });
         });
     }
-
+// delete one or more RestockOrder from the RESTOCK-ORDERS table given different input. Return number of rows modified
     async deleteRestockOrder(orderId) {
             const sqlDelete = 'DELETE FROM "RESTOCK-ORDERS" WHERE id = ?';
             const ids = await this.#getReturnId(orderId);
@@ -106,7 +129,8 @@ class restockOrderDBU {
             });
         });
     }
-
+    
+    //private method that get ReturnOrder'Id given an orderId
     #getReturnId(orderId){
         return new Promise((resolve, reject) => {
             this.db.run('SELECT * FROM "RETURN-ORDERS" WHERE RestockOrderId = ?', [orderId], (err, rows) => {
@@ -124,6 +148,35 @@ class restockOrderDBU {
             });
         }); 
     }
+
+    // private method to check whether supplierId corresponds to an existing supplier
+    #checkSupplier(supplierId) {
+        const sql = 'SELECT id FROM users WHERE id=? AND type="supplier"'
+        return new Promise((resolve, reject) => {
+            this.db.get(sql, [supplierId], (err, row) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(row ? true : false);
+            })
+        });
+    }
+
+    // private method to check whether SKUitemId corresponds to an existing SKUitem
+    #checkSKUitem(skuItemRFid) {
+        const sql = 'SELECT id FROM "SKU-ITEMS" WHERE RFID=?'
+        return new Promise((resolve, reject) => {
+            this.db.get(sql, [skuItemRFid], (err, row) => {
+                if(err) {
+                    reject(err);
+                    return;
+                }
+                resolve(row ? true : false);
+            })
+        });
+    }
+
 }
 module.exports = restockOrderDBU;
 

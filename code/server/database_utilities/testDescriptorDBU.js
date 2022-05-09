@@ -24,6 +24,7 @@ class TestDescriptorDBU {
         this.db.close();
     }
 
+// get testDescriptor(s) from the TEST-DESCRIPTORS table and return it/them as a TestDescriptor object
     loadTestDescriptor(id=undefined) {
         return new Promise((resolve, reject) => {
             const sqlInfo = {sql: undefined, values: undefined};
@@ -55,7 +56,13 @@ class TestDescriptorDBU {
         });
     }
 
-    insertTestDescriptor(name, procedureDescription, SKUid) {
+// insert a new TestDescriptor inside the TEST-DESCRIPTORS table
+    async insertTestDescriptor(name, procedureDescription, SKUid) {
+         // check if SKUId exist
+         const isSKU = await this.#checkSKU(SKUid);
+         if (!isSKU)
+             throw(new Error("SKU does not exist. Operation aborted.", 3));
+    
         return new Promise((resolve,reject) => {
             const sqlInsert = 'INSERT INTO "TEST-DESCRIPTORS"(name, procedureDescription, idSKU) VALUES(?,?,?)';
             this.db.all(sqlInsert, [name, procedureDescription, SKUid], (err) => {
@@ -68,6 +75,7 @@ class TestDescriptorDBU {
         });
     }
 
+// update a selected TestDescriptor in the TEST-DESCRIPTORS table. Return number of rows modified
     updateTestDescriptor(id, newName, newProcedure, newIdSKU) {
         return new Promise((resolve, reject) => {
             const sqlUpdate = 'UPDATE "TEST-DESCRIPTORS" SET name = ?, procedureDescription = ?, idSKU = ? WHERE id = ?';
@@ -83,6 +91,7 @@ class TestDescriptorDBU {
         });
     }
 
+// delete one or more TestDescriptor from the TEST-DESCRIPTORS table given different input. Return number of rows modified
     async deleteTestDescriptor(testId=undefined,SKUid=undefined) {
         let sqlInfo = {sql: undefined, values: undefined};
 
@@ -90,14 +99,17 @@ class TestDescriptorDBU {
             const sqlDeleteFromId = 'DELETE FROM "TEST-DESCRIPTORS" WHERE id = ?';
             sqlInfo.sql = sqlDeleteFromId;
             sqlInfo.values = [testId];
+            //propagate deletion of the TestDescription in the TEST-RESULTS table
             await this.db.deleteTestResult(testId);
         }
         else if(SKUid) {
             const sqlDeleteFromSKUid = 'DELETE FROM "TEST-DESCRIPTORS" WHERE idSKU = ?';
             sqlInfo.sql = sqlDeleteFromSKUid;
             sqlInfo.values = [SKUid];
+            //get the Descriptor's Id given an SKUid
             const ids = await this.#getDecscriptorId(SKUid);
             for (let i of ids) {
+                //propagate deletion of the TestDescription in the TEST-RESULTS table
                 await this.db.deleteTestResult(i);
             }
         }
@@ -117,7 +129,7 @@ class TestDescriptorDBU {
             });
         });
     }
-
+    //private method to get the Descriptor's Id given an SKUid
     #getDecscriptorId(SKUid){
         return new Promise((resolve, reject) => {
             this.db.run('SELECT * FROM "TEST-DESCRIPTORS" WHERE idSKU = ?', [SKUid], (err, rows) => {
@@ -134,6 +146,20 @@ class TestDescriptorDBU {
                 }
             });
         }); 
+    }
+
+    // private method to check whether skuId corresponds to an existing sku
+    #checkSKU(skuId) {
+        const sql = 'SELECT id FROM skus WHERE id=?'
+        return new Promise((resolve, reject) => {
+            this.db.get(sql, [skuId], (err, row) => {
+                if(err) {
+                    reject(err);
+                    return;
+                }
+                resolve(row ? true : false);
+            })
+        });
     }
 }
 module.exports = TestDescriptorDBU;
