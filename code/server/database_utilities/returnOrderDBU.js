@@ -1,7 +1,7 @@
 'use strict';
 const RTO = require('../model/returnOrder');
 const ReturnOrder = RTO.ReturnOrder;
-const ProductIO = IO.ProductIO;
+const ProductRTO = RTO.ProductRTO;
 
 const sqlite = require('sqlite3');
 
@@ -63,27 +63,16 @@ class ReturnOrderDBU {
         if (!isRestockOrder)
             throw(new Error("RestockOrder does not exist. Operation aborted.", 12));
 
-        const promises = []
         const orderId = await this.#insertOrder(returnDate, restockOrderId);
-        promises.push(products.map((p) => new Promise((resolve, reject) => {
-            const insert = 'INSERT INTO "products-sku-io" (orderId, skuId, description, price, qty) VALUES (?,?,?,?,?)';
-            this.db.run(insert, [orderId, p.SKUId, p.description, p.price, p.qty], function (err) {
+        const promises = products.map((p) => new Promise(async (resolve, reject) => {
+            const insert = 'INSERT INTO "products-rto" (orderId, skuId, description, price, RFID) VALUES (?,?,?,?,?)';
+            this.db.run(insert, [orderId, p.SKUId, p.description, p.price, p.rfid], function (err) {
                 if (err) {
                     reject(err);
                     return;
                 } else resolve('Done');
             });
-        })));
-        promises.push(products.map((p) => new Promise((resolve, reject) => {
-            // add the new record for the RFID
-            const addRfid = 'INSERT INTO "products-rfid-io" (orderId, skuId, skuItemId) VALUES (?,?,?)';
-            this.db.run(addRfid, [orderId, p.SkuID, skuItemId], function (err) {
-                if (err) {
-                    reject(err);
-                    return;
-                } else resolve('Done');
-            });
-        })));
+        }));
         return Promise.all(promises);
     }
 
@@ -100,19 +89,9 @@ class ReturnOrderDBU {
                 } else resolve(this.changes);
             });
         }));
-        // delete from producs sku
+        // delete from products rto
         promises.push(new Promise((resolve, reject) => {
-            const sqlDelete = 'DELETE FROM "products-sku-io" WHERE orderId=?';
-            this.db.run(sqlDelete, [orderId], function (err) {
-                if (err) {
-                    reject(err);
-                    return;
-                } else resolve(this.changes);
-            });
-        }));
-        // delete from products rfid
-        promises.push(new Promise((resolve, reject) => {
-            const sqlDelete = 'DELETE FROM "products-rfid-io" WHERE orderId=?';
+            const sqlDelete = 'DELETE FROM "products-rto" WHERE orderId=?';
             this.db.run(sqlDelete, [orderId], function (err) {
                 if (err) {
                     reject(err);
@@ -126,13 +105,13 @@ class ReturnOrderDBU {
     // private method to get products for a given orderId 
     #getProducts(id) {
         return new Promise((resolve, reject) => {
-            const sqlProd = 'SELECT S.skuId AS skuId, S.description AS description, S.price AS price, S.qty AS qty, SI.RFID AS rfid FROM "products-sku-io" S LEFT JOIN "products-rfid-io" R ON (S.orderId = R.orderId AND S.skuId = R.skuId) LEFT JOIN "sku-items" SI ON R.skuItemId = SI.id WHERE S.orderId=?';
+            const sqlProd = 'SELECT skuId, description, price, RFID AS rfid FROM "products-rto" orderId=?';
             this.db.all(sqlProd, [id], (err, rows) => {
                 if (err) {
                     reject(err);
                     return;
                 }
-                const products = rows.map((p) => new ProductIO(p.skuId, p.description, p.price, p.rfid ? null : p.qty, p.rfid));
+                const products = rows.map((p) => new ProductRTO(p.skuId, p.description, p.price, p.rfid ? null : p.rfid));
                 resolve(products);;
             });
         });

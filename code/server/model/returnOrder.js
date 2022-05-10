@@ -11,14 +11,13 @@ class ReturnOrder {
     }
 }   
 
-class ProductIO{
+class ProductRTO{
     
-    constructor(SKUId, description, price, qty=undefined, rfid=undefined) {
+    constructor(SKUId, description, price, rfid=undefined) {
         this.SKUId = SKUId;
         this.descripton = description;
         this.price = price;
-        this.qty = qty;
         this.rfid = rfid;
     }
 }
-    module.exports ={ReturnOrder : ReturnOrder , ProductIO : ProductIO}
+    module.exports ={ReturnOrder : ReturnOrder , ProductRTO : ProductRTO}

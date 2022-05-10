@@ -1,7 +1,6 @@
 'use strict';
 const TestDescriptor = require('../model/testDescriptor.js');
 const Error = require('../model/error.js');
-const TestResultDBU = require('./testResultDBU.js');
 
 const sqlite = require('sqlite3');
 
@@ -99,19 +98,21 @@ class TestDescriptorDBU {
             const sqlDeleteFromId = 'DELETE FROM "TEST-DESCRIPTORS" WHERE id = ?';
             sqlInfo.sql = sqlDeleteFromId;
             sqlInfo.values = [testId];
-            //propagate deletion of the TestDescription in the TEST-RESULTS table
-            await this.db.deleteTestResult(testId);
+/*             //propagate deletion of the TestDescription in the TEST-RESULTS table
+            await this.db.deleteTestResult(testId); 
+*/
         }
         else if(SKUid) {
             const sqlDeleteFromSKUid = 'DELETE FROM "TEST-DESCRIPTORS" WHERE idSKU = ?';
             sqlInfo.sql = sqlDeleteFromSKUid;
             sqlInfo.values = [SKUid];
             //get the Descriptor's Id given an SKUid
-            const ids = await this.#getDecscriptorId(SKUid);
+/*             const ids = await this.#getDecscriptorId(SKUid);
             for (let i of ids) {
                 //propagate deletion of the TestDescription in the TEST-RESULTS table
-                await this.db.deleteTestResult(i);
+                await this.db.deleteTestResult(i); 
             }
+*/
         }
         else {
             throw( new Error("No Argument Passed", 10));
