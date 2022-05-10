@@ -15,6 +15,7 @@ class Error {
     // 10 - No Argument Passed
     // 11 - TestDescriptor does not exist
     // 12 - RestockOrder does not exist
+    // 13 - Incorrect order's status
 
     constructor(message, code=undefined) {
         this.message = message;

@@ -16,15 +16,14 @@ class RestockOrder{
     }
 }
 
-class ProductIO{
+class ProductRKO{
 
-    constructor(SKUId, description, price, qty=undefined, rfid=undefined) {
+    constructor(SKUId, description, price, qty=undefined) {
         this.SKUId = SKUId;
         this.descripton = description;
         this.price = price;
         this.qty = qty;
-        this.rfid = rfid;
     }
 }
 
-module.exports ={RestockOrder : RestockOrder , ProductIO : ProductIO}
+module.exports ={RestockOrder : RestockOrder , ProductRKO : ProductRKO}
