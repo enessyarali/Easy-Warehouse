@@ -119,7 +119,7 @@ router.get('/api/restockOrders/:id/returnItems', async (req,res) => {
 // POST /api/restockOrder
 // add a new restockOrder to the database
 router.post('/api/restockOrder', async (req,res) => {
-  if (req.body === undefined || req.body.id === undefined|| req.body.issueDate == undefined || req.body.state === undefined ||
+  if (req.body === undefined || req.body.id === undefined|| dateIsValid(req.body.issueDate) ||req.body.issueDate == undefined || req.body.state === undefined ||
       req.body.products === undefined || req.body.supplierId || req.body.transportnote || req.body.skuitems === undefined) {
     return res.status(422).json({error: `Invalid restockOrder data.`});
   }
