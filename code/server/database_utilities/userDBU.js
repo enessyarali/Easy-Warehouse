@@ -23,7 +23,7 @@ class UserDBU {
         this.db.close();
     }
 
-    // returns true if the password matches, false otherwise
+    // returns user info if the password matches, false otherwise
     // if no user matches the pair username, type, an exception is thrown
     async checkPassword(username, type, password) {
         let info;
@@ -32,10 +32,9 @@ class UserDBU {
         } catch(err) {  // if the database access generates an exception, propagate it
             throw(err);
         }
-        if(!info)
-            throw(new Error('No matching user!', 1));
-
-        return saltHash.verifySaltHash(info.salt, info.password, password);
+        if(info && saltHash.verifySaltHash(info.salt, info.password, password)) {
+            return info.user;
+        } else return false;
     }
 
     loadUser(username=undefined, type=undefined, id=undefined) {
@@ -111,8 +110,18 @@ class UserDBU {
         });
     }
 
-    deleteUser(username, type) {
-        // delete other things to keep consistency - TODO
+    async deleteUser(username, type) {
+        // load the user
+        const userList = await this.loadUser(username, type);
+        if (userList.length !== 0) {
+            return 0;
+        }
+        // check whether there are tables referencing that user
+        const dependency = await this.#checkDependency(userList.pop().id);
+        if (dependency.some(d => d)) {
+            // if there is at least 1 dependency
+            throw(new Error("Dependency detected. Delete aborted.", 14));
+        }
         return new Promise((resolve, reject) => {
             const sqlDelete = 'DELETE FROM USERS WHERE username=? AND type=?';
             this.db.run(sqlDelete, [username, type], function (err) {
@@ -128,15 +137,53 @@ class UserDBU {
     // private method to load password information
     #loadPassword(username, type) {
         return new Promise((resolve, reject) => {
-            const user = 'SELECT salt, password FROM USERS WHERE email=? AND type=?';
+            const user = 'SELECT * FROM USERS WHERE email=? AND type=?';
             this.db.get(user, [username, type], (err, row) => {
             if (err) {
                 reject(err);
                 return;
             }
-            resolve(row ? {salt: row.salt, password: row.password} : undefined);
+            resolve(row ? {user: {id: row.id, username: row.email, name: row.name, surname: row.surname}, 
+                salt: row.salt, password: row.password} : undefined);
             });
         });
+    }
+
+    #checkDependency(id) {
+        // users can be referenced by
+        // - items
+        // - internal-order
+        // - restock-order (it is actually a dependency of items, hence checking it is not necessary)
+        const results = [];
+        // items check
+        results.push(new Promise((resolve, reject) => {
+            const user = 'SELECT supplierId FROM items WHERE supplierId=?';
+            this.db.all(user, [id], (err, rows) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            if (!rows || rows.length == 0)
+                resolve(true);
+            else resolve(false);
+            return;
+            });
+        }));
+        // internal-orders check
+        results.push(new Promise((resolve, reject) => {
+            const user = 'SELECT customerId FROM "internal-orders" WHERE customerId=?';
+            this.db.all(user, [id], (err, rows) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            if (!rows || rows.length == 0)
+                resolve(true);
+            else resolve(false);
+            return;
+            });
+        }));
+        return Promise.all(results);
     }
     
 }

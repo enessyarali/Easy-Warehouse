@@ -20,7 +20,7 @@ class ProductIO{
         this.descripton = description;
         this.price = price;
         this.qty = qty;
-        this.rfid = rfid;
+        this.RFID = rfid;
     }
 }
 

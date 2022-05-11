@@ -10,11 +10,6 @@ class Item {
         this.supplierId = supplierId;
     }
 
-    modify(description, price) {
-        this.description = description;
-        this.price = price;
-    }
-
 } 
 
 module.exports = Item ;
