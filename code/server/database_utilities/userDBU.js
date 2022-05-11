@@ -110,8 +110,18 @@ class UserDBU {
         });
     }
 
-    deleteUser(username, type) {
-        // delete other things to keep consistency - TODO
+    async deleteUser(username, type) {
+        // load the user
+        const userList = await this.loadUser(username, type);
+        if (userList.length !== 0) {
+            return 0;
+        }
+        // check whether there are tables referencing that user
+        const dependency = await this.#checkDependency(userList.pop().id);
+        if (dependency.some(d => d)) {
+            // if there is at least 1 dependency
+            throw(new Error("Dependency detected. Delete aborted.", 14));
+        }
         return new Promise((resolve, reject) => {
             const sqlDelete = 'DELETE FROM USERS WHERE username=? AND type=?';
             this.db.run(sqlDelete, [username, type], function (err) {
@@ -133,9 +143,47 @@ class UserDBU {
                 reject(err);
                 return;
             }
-            resolve(row ? {user: {id: row.id, username: row.email, name: row.name, surname: row.surname}, salt: row.salt, password: row.password} : undefined);
+            resolve(row ? {user: {id: row.id, username: row.email, name: row.name, surname: row.surname}, 
+                salt: row.salt, password: row.password} : undefined);
             });
         });
+    }
+
+    #checkDependency(id) {
+        // users can be referenced by
+        // - items
+        // - internal-order
+        // - restock-order (it is actually a dependency of items, hence checking it is not necessary)
+        const results = [];
+        // items check
+        results.push(new Promise((resolve, reject) => {
+            const user = 'SELECT supplierId FROM items WHERE supplierId=?';
+            this.db.all(user, [id], (err, rows) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            if (!rows || rows.length == 0)
+                resolve(true);
+            else resolve(false);
+            return;
+            });
+        }));
+        // internal-orders check
+        results.push(new Promise((resolve, reject) => {
+            const user = 'SELECT customerId FROM "internal-orders" WHERE customerId=?';
+            this.db.all(user, [id], (err, rows) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            if (!rows || rows.length == 0)
+                resolve(true);
+            else resolve(false);
+            return;
+            });
+        }));
+        return Promise.all(results);
     }
     
 }

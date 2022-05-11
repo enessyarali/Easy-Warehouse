@@ -104,27 +104,21 @@ class SkuItemDBU {
     }
 
     // this function returns the number of rows which has been modified
-    deleteSKUitem(rfid, skuId=undefined) {
-        const sqlId = 'DELETE FROM "SKU-ITEMS" WHERE RFID=?';
-        const sqlSku = 'DELETE FROM "SKU-ITEMS" WHERE SKUId=?';
-
-        let sqlInfo = {sql: undefined, values: undefined};
-
-        if(!rfid && !skuId) {
-            // unexisting behaviour
-            throw(new Error("Cannot call delete without parameters", 10))
-        } else if (rfid) { 
-            // delete sku item by rfid
-            sqlInfo.sql = sqlId;
-            sqlInfo.values = [rfid];
-        } else {
-            // delete sku items belonging to a given sku
-            sqlInfo.sql = sqlSku;
-            sqlInfo.values = [skuId];
+    deleteSKUitem(rfid) {
+        // load the sku item
+        const id = await this.#getSKUitemIncrementalId(rfid);
+        if (!id) {
+            return 0;   // no lines were modified
         }
-        // delete other things to keep consistency - TODO
+        // check whether there are tables referencing that item
+        const dependency = await this.#checkDependency(id);
+        if (dependency.some(d => d)) {
+            // if there is at least 1 dependency
+            throw(new Error("Dependency detected. Delete aborted.", 14));
+        }
         return new Promise((resolve, reject) => {
-            this.db.run(sqlInfo.sql, sqlInfo.values, function (err) {
+            const sqlId = 'DELETE FROM "SKU-ITEMS" WHERE RFID=?';
+            this.db.run(sqlId, [rfid], function (err) {
                 if (err) {
                     reject(err);
                     return;
@@ -144,6 +138,71 @@ class SkuItemDBU {
             resolve(row ? true : undefined);
             });
         });
+    }
+
+    #getSKUitemIncrementalId(rfid) {
+        return new Promise((resolve, reject) => {
+            const skuItem = 'SELECT id FROM "sku-items" WHERE RFID=?';
+            this.db.get(skuItem, [rfid], (err, row) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve(row);
+            });
+        });
+    }
+
+    #checkDependency(id) {
+        // sku items can be referenced by
+        // - test-results
+        // - restock-order (sku-items-rko)
+        // - return-order (it is actually a dependency of restock order, hence checking it is not necessary)
+        // - internal-order (product-rfid-io) 
+        const results = [];
+        // test-result check
+        results.push(new Promise((resolve, reject) => {
+            const skuItem = 'SELECT SKUItemId FROM "test-results" WHERE SKUItemId=?';
+            this.db.all(skuItem, [id], (err, rows) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            if (!rows || rows.length == 0)
+                resolve(true);
+            else resolve(false);
+            return;
+            });
+        }));
+        // restock-order check
+        results.push(new Promise((resolve, reject) => {
+            const skuItem = 'SELECT skuItemId FROM "sku-items-rko" WHERE skuItemId=?';
+            this.db.all(skuItem, [id], (err, rows) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            if (!rows || rows.length == 0)
+                resolve(true);
+            else resolve(false);
+            return;
+            });
+        }));
+        // internal-order check
+        results.push(new Promise((resolve, reject) => {
+            const skuItem = 'SELECT skuItemId FROM "products-rfid-io" WHERE skuItemId=?';
+            this.db.all(skuItem, [id], (err, rows) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            if (!rows || rows.length == 0)
+                resolve(true);
+            else resolve(false);
+            return;
+            });
+        }));
+        return Promise.all(results);
     }
 
 }

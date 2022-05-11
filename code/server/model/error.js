@@ -17,6 +17,8 @@ class Error {
     // 12 - RestockOrder does not exist
     // 13 - Incorrect order's status
 
+    // 14 - Dependency detected - delete aborted
+
     constructor(message, code=undefined) {
         this.message = message;
         this.code = code;
