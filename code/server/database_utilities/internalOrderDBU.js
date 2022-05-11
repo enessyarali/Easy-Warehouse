@@ -8,7 +8,8 @@ const Error = require('../model/error')
 const sqlite = require('sqlite3');
 
 // IMPORTANT!
-// some complex checks are currently NOT working
+// some complex checks cannot be performed due to the non-atomicity of the database operations.
+// we assume that the client structure will take care of them by means of the provided APIs.
 
 class InternalOrderDBU {
 
@@ -122,6 +123,7 @@ class InternalOrderDBU {
     }
 
     deleteInternalOrder(orderId) {
+        // internal orders are not referenced by anything, hence we don't need to check for consistency
         const promises = [];
         // delete from internal orders
         promises.push(new Promise((resolve, reject) => {
@@ -159,7 +161,9 @@ class InternalOrderDBU {
     // private method to get products for a given orderId 
    #getProducts(id) {
         return new Promise((resolve, reject) => {
-            const sqlProd = 'SELECT S.skuId AS skuId, S.description AS description, S.price AS price, S.qty AS qty, SI.RFID AS rfid FROM "products-sku-io" S LEFT JOIN "products-rfid-io" R ON (S.orderId = R.orderId AND S.skuId = R.skuId) LEFT JOIN "sku-items" SI ON R.skuItemId = SI.id WHERE S.orderId=?';
+            const sqlProd = 'SELECT S.skuId AS skuId, S.description AS description, S.price AS price, S.qty AS qty, \
+                SI.RFID AS rfid FROM "products-sku-io" S LEFT JOIN "products-rfid-io" R ON (S.orderId = R.orderId AND S.skuId = R.skuId) \
+                LEFT JOIN "sku-items" SI ON R.skuItemId = SI.id WHERE S.orderId=?';
             this.db.all(sqlProd, [id], (err, rows) => {
             if (err) {
                 reject(err);
@@ -215,7 +219,8 @@ class InternalOrderDBU {
    // private method to check consistency order-skuItem
    #checkSkuItemConsistency(orderId, skuId, rfid) {
         return new Promise((resolve, reject) => {
-            const sqlConst = 'SELECT SI.id AS id FROM "sku-items" SI JOIN "products-sku-io" S ON SI.SKUId = S.skuId WHERE S.orderId = ? AND SI.RFID = ? AND SI.SKUId = ?';
+            const sqlConst = 'SELECT SI.id AS id FROM "sku-items" SI JOIN "products-sku-io" S ON SI.SKUId = S.skuId WHERE S.orderId = ? \
+                AND SI.RFID = ? AND SI.SKUId = ?';
             this.db.get(sqlConst,[orderId, rfid, skuId], (err, row) => {
             if (err) {
                 reject(err);
