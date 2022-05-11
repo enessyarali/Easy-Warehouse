@@ -98,21 +98,26 @@ class TestDescriptorDBU {
             const sqlDeleteFromId = 'DELETE FROM "TEST-DESCRIPTORS" WHERE id = ?';
             sqlInfo.sql = sqlDeleteFromId;
             sqlInfo.values = [testId];
-/*             //propagate deletion of the TestDescription in the TEST-RESULTS table
-            await this.db.deleteTestResult(testId); 
-*/
+            const dependency = await this.#checkDependency(id);
+            if (dependency) {
+                // if there is at least 1 dependency
+                throw (new Error("Dependency detected. Delete aborted.", 14));
+            }
         }
         else if(SKUid) {
             const sqlDeleteFromSKUid = 'DELETE FROM "TEST-DESCRIPTORS" WHERE idSKU = ?';
             sqlInfo.sql = sqlDeleteFromSKUid;
             sqlInfo.values = [SKUid];
             //get the Descriptor's Id given an SKUid
-/*             const ids = await this.#getDecscriptorId(SKUid);
+            const ids = await this.#getDecscriptorId(SKUid);
             for (let i of ids) {
-                //propagate deletion of the TestDescription in the TEST-RESULTS table
-                await this.db.deleteTestResult(i); 
+                const dependency = await this.#checkDependency(i);
+                if (dependency) {
+                    // if there is at least 1 dependency
+                    throw (new Error("Dependency detected. Delete aborted.", 14));
+                } 
             }
-*/
+
         }
         else {
             throw( new Error("No Argument Passed", 10));
@@ -160,6 +165,23 @@ class TestDescriptorDBU {
                 }
                 resolve(row ? true : false);
             })
+        });
+    }
+
+    #checkDependency(id) {
+        // test-results check
+        return new Promise((resolve, reject) => {
+            const testDescriptor = 'SELECT id FROM "test-results" WHERE descriptorId=?';
+            this.db.all(testDescriptor, [id], (err, rows) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                if (!rows || rows.length == 0)
+                    resolve(true);
+                else resolve(false);
+                return;
+            });
         });
     }
 }
