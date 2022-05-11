@@ -77,7 +77,7 @@ router.get('/api/skuitems/:rfid', async (req,res) => {
       const skuItemList = await db.loadSKUitem(rfid);
       if(skuItemList.length === 0)
         return res.status(404).json({error: `No SKU item with matching rfid.`});
-      return res.status(200).json(skuItemList);
+      return res.status(200).json(skuItemList[0]);
     } catch (err) {
         return res.status(500).json({error: `Something went wrong...`, message: err.message});
     }

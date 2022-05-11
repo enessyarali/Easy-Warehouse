@@ -30,7 +30,7 @@ router.get('/api/skus/:id', async (req,res) => {
     const skuList = await db.loadSKU(id);
     if(skuList.length === 0)
       return res.status(404).json({error: `No SKU with matching id.`});
-    return res.status(200).json(skuList);
+    return res.status(200).json(skuList[0]);
   } catch (err) {
       return res.status(500).json({error: `Something went wrong...`, message: err.message});
   }

@@ -209,9 +209,7 @@ router.put('/api/users/:username', async (req,res) => {
         return res.status.apply(404).json({error: `No user with matching username or type.`});
       const user = userList.pop();
       user.setType(req.body.newType);
-      const updated = await db.updateUser(user);
-      if(updated === 0)
-          return res.status(404).json({error: `No user with matching username or type.`});
+      await db.updateUser(user);
       return res.status(200).end();
   }
   catch(err){
