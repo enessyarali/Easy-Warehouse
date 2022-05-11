@@ -52,7 +52,7 @@ function dateIsValid(dateStr) {
   return true;
 }
 
-//GET  and /api/restockOrders/:id/returnItems
+//GET  and /api/restockOrders
 //Needs to be added SUPPORT NEEDED
 router.get('/api/restockOrders', async (req,res) => {
   // create connection with the db  
@@ -81,7 +81,7 @@ router.get('/api/restockOrders/:id', async (req,res) => {
   }
 });
 // /api/restockOrdersIssued 
-router.get('/api/restockOrders/:id', async (req,res) => {
+router.get('/api/restockOrdersIssued', async (req,res) => {
   // create connection with the db  
   try {
     const state = req.params.id;
@@ -99,7 +99,6 @@ router.get('/api/restockOrders/:id', async (req,res) => {
 
 
 ///api/restockOrders/:id/returnItems //ONGOING FIXES   
-{ /*
 router.get('/api/restockOrders/:id/returnItems', async (req,res) => {
   // create connection with the db  
   try {
@@ -114,7 +113,7 @@ router.get('/api/restockOrders/:id/returnItems', async (req,res) => {
   } catch (err) {
       return res.status(500).json({error: `Something went wrong...`, message: err.message});
   }
-}); */}
+}); 
 
 // POST /api/restockOrder
 // add a new restockOrder to the database
