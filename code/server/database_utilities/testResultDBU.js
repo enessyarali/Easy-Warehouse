@@ -1,5 +1,5 @@
 'use strict';
-const TESTRESULT = require('../model/testResult.js');
+const TestResult = require('../model/testResult.js');
 const Error = require('../model/error.js');
 
 const sqlite = require('sqlite3');
@@ -24,40 +24,42 @@ class TestResultDBU {
     }
 
 // get testResult(s) from the TEST-RESULTS table and return it/them as a TestResult object
-    loadTestResult(rfId, resultId = undefined) {
+    async loadTestResult(rfId, resultId = undefined) {
+        const isSKUitem = await this.#checkSKUitem(rfId);
+        if(!isSKUitem){
+            throw( new Error("SKUitem does not exist", 9));
+        }
         return new Promise((resolve, reject) => {
             const sqlInfo = {sql: undefined, values: undefined};
-
-            if(resultId) {
-                const sqlResultId = 'SELECT * FROM "TEST-RESULTS" WHERE id = ? AND SKUitemRFid = ?';
-                sqlInfo.sql = sqlResultId;
-                sqlInfo.values = [resultId, rfId];
-            }
-            else {
-                const sqlNoResultId = 'SELECT * FROM "TEST-RESULTS" WHERE SKUitemRFid = ?';
-                sqlInfo.sql = sqlNoResultId;
-                sqlInfo.values = [rfId];
-            }
-
-            this.db.all(sqlInfo.sql, sqlInfo.values, (err, rows) => {
-                if(err) {
-                    reject(err);
-                    return;
+                if(resultId) {
+                    const sqlResultId = 'SELECT * FROM "TEST-RESULTS" WHERE id = ? AND SKUitemId = ?';
+                    sqlInfo.sql = sqlResultId;
+                    sqlInfo.values = [resultId, isSKUitem];
                 }
                 else {
-                    const results = rows.map((tr) => {
-                        const res = new TESTRESULT(tr.SKUitemRFid, tr.id, tr.descriptorId, tr.date, tr.result =='Pass'? true : false);
-                        return res;
-                    });
-                    resolve(results);
+                    const sqlNoResultId = 'SELECT * FROM "TEST-RESULTS" WHERE SKUitemId = ?';
+                    sqlInfo.sql = sqlNoResultId;
+                    sqlInfo.values = [isSKUitem];
                 }
-            });
-
+    
+                this.db.all(sqlInfo.sql, sqlInfo.values, (err, rows) => {
+                    if(err) {
+                        reject(err);
+                        return;
+                    }
+                    else {
+                        const results = rows.map((tr) => {
+                            const res = new TestResult(tr.SKUitemRFid, tr.id, tr.descriptorId, tr.date, tr.result =='Pass'? true : false);
+                            return res;
+                        });
+                        resolve(results);
+                    }
+                });
         });
     }
 
 // insert a new TestResult inside the TEST-RESULTS table
-    insertTestResult(SKUitemRFid, descriptorId, date, result) {
+    async insertTestResult(SKUitemRFid, descriptorId, date, result) {
         // check if SKUitem exists
         const isSKUitem = await this.#checkSKUitem(SKUitemRFid);
         if (!isSKUitem)
@@ -68,8 +70,8 @@ class TestResultDBU {
             throw(new Error("TestDescriptor does not exist. Operation aborted",11));
 
         return new Promise((resolve,reject) => {
-            const sqlInsert = 'INSERT INTO "TEST-RESULTS"(SKUitemRFid, descriptorId, date, result) VALUES(?,?,?,?)';
-            this.db.all(sqlInsert, [SKUitemRFid, descriptorId, date, result ? 'Pass' : 'Fail'], (err) => {
+            const sqlInsert = 'INSERT INTO "TEST-RESULTS"(SKUitemId, descriptorId, date, result) VALUES(?,?,?,?)';
+            this.db.all(sqlInsert, [isSKUitem, descriptorId, date, result ? 'Pass' : 'Fail'], (err) => {
                 if(err) {
                     reject(err);
                     return;
@@ -80,10 +82,10 @@ class TestResultDBU {
     }
 
 // update a selected TestResult in the TEST-RESULTS table. Return number of rows modified
-    updateTestResult(SKUitemRFid, descriptorId, date, result, id) {
+    updateTestResult(id, descriptorId, date, result) {
         return new Promise((resolve, reject) => {
-            const sqlUpdate = 'UPDATE "TEST-RESULTS" SET SKUitemRFid = ?, descriptorId = ?, date = ?, result = ? WHERE id = ?';
-            this.db.run(sqlUpdate, [SKUitemRFid, descriptorId, date, result ? 'Pass' : 'Fail', id], function (err) {
+            const sqlUpdate = 'UPDATE "TEST-RESULTS" SET descriptorId = ?, date = ?, result = ? WHERE id = ?';
+            this.db.run(sqlUpdate, [descriptorId, date, result ? 'Pass' : 'Fail', id], function (err) {
                 if(err) {
                     reject(err);
                     return;
@@ -96,23 +98,20 @@ class TestResultDBU {
     }
 
 // delete one or more TestResult from the TEST-RESULTS table given different input. Return number of rows modified
-    deleteTestResult(testId=undefined,SKUitemId=undefined, resultId = undefined) {
+    async deleteTestResult(skuItemRFid, resultId) {
         let sqlInfo = {sql: undefined, values: undefined};
 
-        if(resultId) {
-            const sqlDeleteFromResultId = 'DELETE FROM "TEST-RESULTS" WHERE id = ?';
-            sqlInfo.sql = sqlDeleteFromResultId;
-            sqlInfo.values = [resultId];
-        }
-        else if(SKUitemId) {
-            const sqlDeleteFromSKUitemId = 'DELETE FROM "TEST-RESULTS" WHERE SKUitemId = ?';
-            sqlInfo.sql = sqlDeleteFromSKUitemId;
-            sqlInfo.values = [SKUitemId];
-        }
-        else if(testId) {
-            const sqlDeleteFromTestId = 'DELETE FROM "TEST-RESULTS" WHERE descriptorId = ?';
-            sqlInfo.sql = sqlDeleteFromTestId;
-            sqlInfo.values = [testId];
+        if(resultId && skuItemRFid) {
+            const skuItemId = await this.#checkSKUitem(skuItemRFid)
+            if(skuItemId){
+
+                const sqlDeleteFromResultId = 'DELETE FROM "TEST-RESULTS" WHERE id = ?';
+                sqlInfo.sql = sqlDeleteFromResultId;
+                sqlInfo.values = [resultId];
+            }
+            else {
+                throw( new Error("SKUitem does not exist", 9));
+            }
         }
         else {
             throw( new Error("No Argument Passed", 10));
@@ -139,7 +138,7 @@ class TestResultDBU {
                     reject(err);
                     return;
                 }
-                resolve(row ? true : false);
+                resolve(row ? row.id : false);
             })
         });
     }

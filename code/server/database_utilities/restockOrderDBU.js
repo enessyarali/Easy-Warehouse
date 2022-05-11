@@ -26,24 +26,47 @@ class RestockOrderDBU {
     }
 
 // get RestockOrder(s) from the RESTOCK-ORDERS table and return it/them as a RestockOrder object
-    loadRestockOrder(id=undefined, state=undefined, skuItemIds=undefined) {
+    loadRestockOrder(id=undefined, state=undefined, returnItems=undefined) { //returnItems is a flag 
             const sqlInfo = {sql: undefined, values: undefined};
 
             if(id) {
-                const sqlId = 'SELECT * FROM "RESTOCK-ORDERS" WHERE id = ?';
-                sqlInfo.sql = sqlId;
-                sqlInfo.values = [id];
+                if(!returnItems) {
+                    const sqlId = 'SELECT * FROM "restock-orders" WHERE id = ?';
+                    sqlInfo.sql = sqlId;
+                    sqlInfo.values = [id];
+                }
+                else {
+                    // return an array
+                    if(!this.#checkState(orderId, 'COMPLETEDRETURN')) {
+                        throw(new Error("Incorrect order's status. Operation aborted", 13));
+                    }
+                    const sqlReturn = 'SELECT S.SKUid as skuId, S.RFID as rfid FROM "sku-items" S, "sku-items-rko" R, "test-results" Tr WHERE R.orderId=? AND s.id = r.skuItemId AND R.skuItemId=Tr.SKUitemId AND Tr.result= Fail'
+                    sqlInfo.sql = sqlReturn;
+                    sqlInfo.values = [id]
+
+                    return new Promise((resolve, reject) => {
+                        this.db.all(sqlInfo.sql, sqlInfo.values, (err, rows) => {
+                            if (err) {
+                                reject(err);
+                                return;
+                            }
+                            const skuItemArray = rows.map((si) => {
+                                const sia = {SKUid: rows.skuId, rfid: rows.rfid};
+                                return sia;
+                            });
+                            Promise.all(skuItemArray).then((skuItemArray) => resolve(skuItemArray));
+                        });
+                    });
+                    
+                }
             }
             else if(state) {
-                const sqlState = 'SELECT * FROM "RESTOCK-ORDERS" WHERE state = ?';
+                const sqlState = 'SELECT * FROM "restock-orders" WHERE state = ?';
                 sqlInfo.sql = sqlState;
                 sqlInfo.values = [state];
             }
-            else if(skuItemIds) {
-                
-            }
             else{
-                const sqlNoInfo = 'SELECT * FROM "RESTOCK-ORDERS"';
+                const sqlNoInfo = 'SELECT * FROM "restock-orders"';
                 sqlInfo.sql = sqlNoInfo;
                 sqlInfo.values = [];
             }
@@ -273,7 +296,7 @@ class RestockOrderDBU {
                     reject(err);
                     return;
                 }
-                resolve(row ? row : false);
+                resolve(row ? row.id : false);
             });
         });
     }
