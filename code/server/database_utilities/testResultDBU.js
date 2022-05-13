@@ -104,10 +104,9 @@ class TestResultDBU {
         if(resultId && skuItemRFid) {
             const skuItemId = await this.#checkSKUitem(skuItemRFid)
             if(skuItemId){
-
-                const sqlDeleteFromResultId = 'DELETE FROM "TEST-RESULTS" WHERE id = ?';
+                const sqlDeleteFromResultId = 'DELETE FROM "TEST-RESULTS" WHERE id = ? AND SKUitemId = ?';
                 sqlInfo.sql = sqlDeleteFromResultId;
-                sqlInfo.values = [resultId];
+                sqlInfo.values = [resultId, skuItemId];
             }
             else {
                 throw( new Error("SKUitem does not exist", 9));
