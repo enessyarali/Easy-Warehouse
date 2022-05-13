@@ -1,7 +1,7 @@
 'use strict';
 
 const PositionDBU = require('../database_utilities/positionDBU');
-const ErrorCode = require('./error');
+const Error = require('./error');
 
 class SKU {
 

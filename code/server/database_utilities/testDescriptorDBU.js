@@ -61,7 +61,6 @@ class TestDescriptorDBU {
          const isSKU = await this.#checkSKU(SKUid);
          if (!isSKU)
              throw(new Error("SKU does not exist. Operation aborted.", 3));
-    
         return new Promise((resolve,reject) => {
             const sqlInsert = 'INSERT INTO "TEST-DESCRIPTORS"(name, procedureDescription, idSKU) VALUES(?,?,?)';
             this.db.all(sqlInsert, [name, procedureDescription, SKUid], (err) => {
@@ -76,6 +75,11 @@ class TestDescriptorDBU {
 
 // update a selected TestDescriptor in the TEST-DESCRIPTORS table. Return number of rows modified
     updateTestDescriptor(id, newName, newProcedure, newIdSKU) {
+        // check if SKUId exist
+        const isSKU = await this.#checkSKU(newIdSKU);
+        if (!isSKU)
+            throw(new Error("SKU does not exist. Operation aborted.", 3));
+
         return new Promise((resolve, reject) => {
             const sqlUpdate = 'UPDATE "TEST-DESCRIPTORS" SET name = ?, procedureDescription = ?, idSKU = ? WHERE id = ?';
             this.db.run(sqlUpdate, [newName, newProcedure, newIdSKU, id], function (err) {

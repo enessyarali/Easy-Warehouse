@@ -45,14 +45,12 @@ router.post('/api/testDescriptor', async (req,res) => {
   }
   try{
       const db = new TestDescriptorDBU('ezwh.db');
-      const dbSKU = new SkuDBU('ezwh.db');
-      const skuList = await dbSKU.loadSKU(req.body.idSKU);
-      if(skuList.length === 0)
-        return res.status(404).json({error: `No sku with matching idSKU`, message: err.message});
-      await db.insertTestDescriptor(req.body);
+      await db.insertTestDescriptor(req.body.name, req.body.procedureDescription, req.body.idSKU);
       return res.status(201).end();
   }
   catch(err){
+    if (code==3)
+      return res.status(404).json({error: `No SKU with matching id.`});
     return res.status(503).json({error: `Something went wrong...`, message: err.message});
   }
 });
@@ -68,19 +66,14 @@ router.put('/api/testDescriptor/:id', async (req,res) => {
   }
   try{
     const db = new TestDescriptorDBU('ezwh.db');
-    const dbSKU = new SkuDBU('ezwh.db');
-    const skuList = await dbSKU.loadSKU(req.body.newIdSKU);
-    if(skuList.length === 0)
-      return res.status(404).json({error: `No sku with matching newIdSKU`, message: err.message});
-    const descriptorList = await db.loadTestDescriptor(id);
-    if(descriptorList.length === 0)
-      return res.status(404).json({error: `No test descriptor with matching id`, message: err.message});
-    const descriptor = descriptorList.pop();
-    await descriptor.modify(req.body.newName, req.body.newProcedureDescription, req.body.newIdSKU);
-    await db.updateTestDescriptor(descriptor);
+    const isUpdated = await db.updateTestDescriptor(id, req.body.newName, req.body.newProcedureDescription, req.body.newIdSKU);
+    if (!isUpdated)
+      return res.status(404).json({error: `No test descriptor with matching id.`});
     return res.status(200).end();
   }
   catch(err){
+    if (code==3)
+      return res.status(404).json({error: `No SKU with matching id.`});
     return res.status(503).json({error: `Something went wrong...`, message: err.message});
   }
 });
@@ -94,7 +87,6 @@ router.delete('/api/testDescriptor/:id', async (req,res) => {
   }
   try{
       const db = new TestDescriptorDBU('ezwh.db');
-      // get the test descriptor to be deleted
       await db.deleteTestDescriptor(id);
       return res.status(204).end();
   }
