@@ -198,7 +198,8 @@ router.put('/api/restockOrder/:id/transportNote', async (req,res) => {
   const id = parseInt(req.params.id);
   if(!Number.isInteger(id) || id < 0)
     return res.status(422).json({error: `Invalid restockOrder id.`});
-  if (req.body === undefined || req.body.transportNote === undefined || req.body.transportNote.deliveryDate === undefined) {
+  if (req.body === undefined || req.body.transportNote === undefined || req.body.transportNote.deliveryDate === undefined
+      || !dateIsValid(req.body.transportNote.deliveryDate === undefined, false)) {
     return res.status(422).json({error: `Invalid restockOrder data.`});
   }
   try{
