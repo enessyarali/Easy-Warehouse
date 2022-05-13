@@ -8,6 +8,7 @@ const userRoute = require('./api/userApi');
 const itemRoute = require('./api/itemApi');
 
 const internalOrderRoute = require('./api/internalOrderApi');
+const restockOrderRoute = require('./api/restockOrderApi');
 
 // init express
 const app = new express();
@@ -20,6 +21,7 @@ app.use('/', positionRoute);
 app.use('/', userRoute);
 app.use('/', itemRoute);
 app.use('/', internalOrderRoute);
+app.use('/', restockOrderRoute);
 
 //GET /api/test
 app.get('/api/hello', (req,res)=>{

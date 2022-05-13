@@ -1,12 +1,10 @@
 class RestockOrder{
-    constructor(id,issueDate,state,products,supplierId,transportNote,skuItems){
+    constructor(id,issueDate,state,supplierId,transportNote){
         this.id =id;
         this.issueDate =issueDate ;
         this.state =state ;
-        this.products =products ;
         this.supplierId =supplierId ;
-        this.transportNote = transportNote;
-        this.skuItems =skuItems;
+        this.transportNote = JSON.parse(transportNote);
     }
     setProducts(products) {
         this.products = products;
