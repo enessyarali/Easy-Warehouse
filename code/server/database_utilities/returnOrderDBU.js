@@ -163,7 +163,7 @@ class ReturnOrderDBU {
     #retriveRFID(skuItemId) {
         const sql = 'SELECT RFID AS rfid FROM "SKU-ITEMS" WHERE id = ?'
         return new Promise((resolve, reject) => {
-            this.db.get(sql, [skuitemId], (err, row) => {
+            this.db.get(sql, [skuItemId], (err, row) => {
                 if (err) {
                     reject(err);
                     return;
