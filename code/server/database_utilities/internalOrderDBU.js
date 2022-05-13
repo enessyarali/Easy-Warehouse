@@ -93,7 +93,7 @@ class InternalOrderDBU {
 
     // this function returns the number of rows which have been modified
     async updateInternalOrder(orderId, newState, products=undefined) {
-        if(newState=="completed") {
+        if(newState=="COMPLETED") {
             const promises = products.map((p) => new Promise(async (resolve, reject) => {
                 // check whether the RFID belongs to the specified skuId AND if the skuId belongs to the order
                 const skuItemId = await this.#checkSkuItemConsistency(orderId, p.SkuID, p.RFID);

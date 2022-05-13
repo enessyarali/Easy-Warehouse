@@ -66,7 +66,7 @@ router.get('/api/internalOrdersIssued', async (req,res) => {
   // create connection with the db  
   try {
     const db = new internalOrderDBU('ezwh.db');
-    const internalOrderList = await db.loadInternalOrder(null, "issued");
+    const internalOrderList = await db.loadInternalOrder(null, "ISSUED");
     return res.status(200).json(internalOrderList);
   } catch (err) {
       return res.status(500).json({message: `Something went wrong...`, error: err});
@@ -77,7 +77,7 @@ router.get('/api/internalOrdersAccepted', async (req,res) => {
   // create connection with the db  
   try {
     const db = new internalOrderDBU('ezwh.db');
-    const internalOrderList = await db.loadInternalOrder(null, "accepted");
+    const internalOrderList = await db.loadInternalOrder(null, "ACCEPTED");
     return res.status(200).json(internalOrderList);
   } catch (err) {
       return res.status(500).json({message: `Something went wrong...`, error: err});

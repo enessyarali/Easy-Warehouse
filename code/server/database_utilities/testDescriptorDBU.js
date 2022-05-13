@@ -95,40 +95,15 @@ class TestDescriptorDBU {
     }
 
 // delete one or more TestDescriptor from the TEST-DESCRIPTORS table given different input. Return number of rows modified
-    async deleteTestDescriptor(testId=undefined,SKUid=undefined) {
-        let sqlInfo = {sql: undefined, values: undefined};
-
-        if(testId) {
-            const sqlDeleteFromId = 'DELETE FROM "TEST-DESCRIPTORS" WHERE id = ?';
-            sqlInfo.sql = sqlDeleteFromId;
-            sqlInfo.values = [testId];
-            const dependency = await this.#checkDependency(id);
-            if (dependency) {
-                // if there is at least 1 dependency
-                throw (new Error("Dependency detected. Delete aborted.", 14));
-            }
+    async deleteTestDescriptor(testId=undefined) { 
+        const dependency = await this.#checkDependency(id);
+        if (dependency) {
+            // if there is at least 1 dependency
+            throw (new Error("Dependency detected. Delete aborted.", 14));
         }
-        else if(SKUid) {
-            const sqlDeleteFromSKUid = 'DELETE FROM "TEST-DESCRIPTORS" WHERE idSKU = ?';
-            sqlInfo.sql = sqlDeleteFromSKUid;
-            sqlInfo.values = [SKUid];
-            //get the Descriptor's Id given an SKUid
-            const ids = await this.#getDecscriptorId(SKUid);
-            for (let i of ids) {
-                const dependency = await this.#checkDependency(i);
-                if (dependency) {
-                    // if there is at least 1 dependency
-                    throw (new Error("Dependency detected. Delete aborted.", 14));
-                } 
-            }
-
-        }
-        else {
-            throw( new Error("No Argument Passed", 10));
-        }
-
         return new Promise((resolve, reject) => {
-            this.db.run(sqlInfo.sql,sqlInfo.values, function (err) {
+            const sql = 'DELETE FROM "TEST-DESCRIPTORS" WHERE id = ?';
+            this.db.run(sql, [testId], function (err) {
                 if(err) {
                     reject(err);
                     return;
@@ -140,7 +115,7 @@ class TestDescriptorDBU {
         });
     }
     //private method to get the Descriptor's Id given an SKUid
-    #getDecscriptorId(SKUid){
+    #getDescriptorId(SKUid){
         return new Promise((resolve, reject) => {
             this.db.run('SELECT * FROM "TEST-DESCRIPTORS" WHERE idSKU = ?', [SKUid], (err, rows) => {
                 if(err) {
@@ -156,20 +131,6 @@ class TestDescriptorDBU {
                 }
             });
         }); 
-    }
-
-    // private method to check whether skuId corresponds to an existing sku
-    #checkSKU(skuId) {
-        const sql = 'SELECT id FROM skus WHERE id=?'
-        return new Promise((resolve, reject) => {
-            this.db.get(sql, [skuId], (err, row) => {
-                if(err) {
-                    reject(err);
-                    return;
-                }
-                resolve(row ? true : false);
-            })
-        });
     }
 
     #checkDependency(id) {
