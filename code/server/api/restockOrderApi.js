@@ -54,6 +54,16 @@ function dateIsValid(dateStr, compare=true) {
   return true;
 }
 
+async function checkState(db, orderId, stateRequested) {
+  try{
+    const currentState = await db.retriveState(orderId);
+    return currentState == stateRequested;
+  }
+  catch {
+    return false;
+  }
+}
+
 //GET /api/restockOrders
 router.get('/api/restockOrders', async (req,res) => {
   // create connection with the db  
@@ -103,11 +113,15 @@ router.get('/api/restockOrders/:id/returnItems', async (req,res) => {
     if(!Number.isInteger(id) || id < 0)
       return res.status(422).json({error: `Invalid restockOrder id.`});
     const db = new RestockOrderDBU('ezwh.db');
+
+    const isRightState = await checkState(db, id, 'COMPLETEDRETURN');
+    if(!isRightState) {
+      return res.status(422).json({error: 'Order status is not COMPLETEDRETURN.'});
+    }
+
     const returnItems = await db.selectReturnItems(id);
     return res.status(200).json(returnItems);
   } catch (err) {
-      if(err.code==13)
-        return res.status(422).json({error: 'Order status is not COMPLETEDRETURN.'});
       return res.status(500).json({error: `Something went wrong...`, message: err.message});
   }
 }); 
@@ -162,14 +176,18 @@ router.put('/api/restockOrder/:id/skuItems', async (req,res) => {
   }
   try{
       const db = new RestockOrderDBU('ezwh.db');
+
+      const isRightState = await checkState(db, id, 'DELIVERED');
+      if(!isRightState) {
+        return res.status(422).json({error: 'Order status is not DELIVERED.'});
+      }
+
       await db.patchRestockOrderSkuItems(id, req.body.skuItems);
       return res.status(201).end();
   }
   catch(err){
     if (err.code==12)
       return res.status(404).json({error: `No restockOrder with matching id.`});
-    if(err.code==13)
-      return res.status(422).json({error: 'Order status is not DELIVERED.'}); 
     return res.status(503).json({error: `Something went wrong...`, message: err.message});
   }
 });
@@ -191,12 +209,16 @@ router.put('/api/restockOrder/:id/transportNote', async (req,res) => {
         return res.status(404).json({error: `No restockOrder with matching id.`});
       if(restockOrderList.pop().transportNote.deliveryDate < issueDate)
         return res.status(422).json({error: `Delivery Date Before Issue Date.`});
+
+      const isRightState = await checkState(db, id, 'DELIVERY');
+      if(!isRightState) {
+        return res.status(422).json({error: 'Order status is not DELIVERY.'});
+      }
+      
       await db.patchRestockOrderTransportNote(id, req.body.transportNote);
       return res.status(201).end();
   }
   catch(err){
-    if(err.code==13)
-      return res.status(422).json({error: 'Order status is not DELIVERY.'}); 
     return res.status(503).json({error: `Something went wrong...`, message: err.message});
   }
 });

@@ -66,10 +66,6 @@ class RestockOrderDBU {
     // fetches from the database all items which should be returned
     async selectReturnItems(id) {
         // return an array
-        const state = await this.#getState(id);
-        if (state!='COMPLETEDRETURN') {
-            throw (new Error("Incorrect order's status. Operation aborted", 13));
-        }
         return new Promise((resolve, reject) => {
             const sql = 'SELECT S.SKUid AS skuId, S.RFID AS rfid FROM "sku-items-rko" R JOIN "sku-items" S ON S.id = R.skuItemId \
                 WHERE R.orderId=? AND NOT EXISTS ( \
@@ -131,12 +127,6 @@ class RestockOrderDBU {
     // add new sku items a restock order
     async patchRestockOrderSkuItems(orderId, skuItems) {
         // check if the order status is correct
-        const state = await this.#getState(id);
-        if (!state)
-            throw(new Error("Restock order does not exist. Operation aborted.", 12));
-        if (state!='DELIVERED') 
-            throw (new Error("Incorrect order's status. Operation aborted", 13));
-
         const ids = [];
         for (ski of skuItems) {
             // check if SKUitem exists
@@ -161,10 +151,6 @@ class RestockOrderDBU {
 
     // add new transport note to restock order
     async patchRestockOrderTransportNote(orderId, newTransportNote) {
-        const isState = await this.#checkState(id, 'DELIVERY');
-        if (!isState) 
-            throw (new Error("Incorrect order's status. Operation aborted", 13));
-
         const sql = 'UPDATE "restock-orders" SET transportNote = ? WHERE id = ?';
         // update TransportNote
         return new Promise((resolve, reject) => {
@@ -221,6 +207,19 @@ class RestockOrderDBU {
         return Promise.all(promises);
     }
 
+        // method to check whether the state of the Order corresponds to the correct one
+        retriveState(orderId) {
+            const sql = 'SELECT state AS state FROM "restock-orders" WHERE id = ?';
+            return new Promise((resolve, reject) => {
+                this.db.get(sql, [orderId], (err, row) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    resolve(row.state);
+                });
+            });
+        }
 
     // private method to get products for a given orderId 
     #getProducts(orderId) {
@@ -274,20 +273,6 @@ class RestockOrderDBU {
                     return;
                 }
                 resolve(row ? true : false);
-            });
-        });
-    }
-
-    //private method to check whether the state of the Order corresponds to the correct one
-    #getState(orderId, state) {
-        const sql = 'SELECT state FROM "restock-orders" WHERE id = ?';
-        return new Promise((resolve, reject) => {
-            this.db.get(sql, [orderId, state], (err, row) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                resolve(row);
             });
         });
     }
