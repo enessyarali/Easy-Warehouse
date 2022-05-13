@@ -89,7 +89,7 @@ class SkuDBU {
         });
     }
 
-    deleteSKU(id) {
+    async deleteSKU(id) {
         // check whether there are tables referencing that sku
         const dependency = await this.#checkDependency(id);
         if (dependency.some(d => d)) {

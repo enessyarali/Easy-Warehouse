@@ -104,7 +104,7 @@ class SkuItemDBU {
     }
 
     // this function returns the number of rows which has been modified
-    deleteSKUitem(rfid) {
+    async deleteSKUitem(rfid) {
         // load the sku item
         const id = await this.#getSKUitemIncrementalId(rfid);
         if (!id) {
