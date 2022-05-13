@@ -2,6 +2,7 @@
 const RTO = require('../model/returnOrder');
 const ReturnOrder = RTO.ReturnOrder;
 const ProductRTO = RTO.ProductRTO;
+const Error = require('../model/error');
 
 const sqlite = require('sqlite3');
 
