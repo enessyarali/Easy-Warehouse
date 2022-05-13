@@ -2,6 +2,7 @@
 const RTO = require('../model/returnOrder');
 const ReturnOrder = RTO.ReturnOrder;
 const ProductRTO = RTO.ProductRTO;
+const Error = require('../model/error');
 
 const sqlite = require('sqlite3');
 
@@ -65,8 +66,9 @@ class ReturnOrderDBU {
 
         const orderId = await this.#insertOrder(returnDate, restockOrderId);
         const promises = products.map((p) => new Promise(async (resolve, reject) => {
-            const insert = 'INSERT INTO "products-rto" (orderId, skuId, description, price, RFID) VALUES (?,?,?,?,?)';
-            this.db.run(insert, [orderId, p.SKUId, p.description, p.price, p.rfid], function (err) {
+            const skuItemId = await this.#checkSKUitem(p.rfid, p.SKUId);
+            const insert = 'INSERT INTO "products-rto" (orderId, skuId, description, price, skuItemId) VALUES (?,?,?,?,?)';
+            this.db.run(insert, [orderId, p.SKUId, p.description, p.price, skuItemId], function (err) {
                 if (err) {
                     reject(err);
                     return;
@@ -105,13 +107,15 @@ class ReturnOrderDBU {
     // private method to get products for a given orderId 
     #getProducts(id) {
         return new Promise((resolve, reject) => {
-            const sqlProd = 'SELECT skuId, description, price, RFID AS rfid FROM "products-rto" orderId=?';
+            const sqlProd = 'SELECT skuId, description, price, skuItemId FROM "products-rto" orderId=?';
             this.db.all(sqlProd, [id], (err, rows) => {
                 if (err) {
                     reject(err);
                     return;
                 }
-                const products = rows.map((p) => new ProductRTO(p.skuId, p.description, p.price, p.rfid ? null : p.rfid));
+                const products = rows.map(async (p) => {
+                    rfId = await this.#retriveRFID(p.skuItemId);
+                    new ProductRTO(p.skuId, p.description, p.price, rfid ? null : rfid)});
                 resolve(products);;
             });
         });
@@ -140,6 +144,32 @@ class ReturnOrderDBU {
                     reject(err);
                     return;
                 } else resolve(this.lastID);
+            });
+        });
+    }
+
+    #checkSKUitem(RFiD, SKUId) {
+        const sql = 'SELECT id FROM "SKU-ITEMS" WHERE RFID=? AND SKUid = ?'
+        return new Promise((resolve, reject) => {
+            this.db.get(sql, [RFiD, SKUId], (err, row) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(row ? row.id : false);
+            });
+        });
+    }
+    
+    #retriveRFID(skuItemId) {
+        const sql = 'SELECT RFID AS rfid FROM "SKU-ITEMS" WHERE id = ?'
+        return new Promise((resolve, reject) => {
+            this.db.get(sql, [skuItemId], (err, row) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(row ? row.id : false);
             });
         });
     }
