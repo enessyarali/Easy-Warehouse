@@ -16,8 +16,9 @@ class Positon {
     }
 
     updateOccupiedWeightAndVolume(newWeight=0, newVolume=0) {
-        if (newWeight>this.maxWeight || newVolume>this.maxVolume)
+        if (newWeight>this.maxWeight || newVolume>this.maxVolume) {
             throw(new Error("Position cannot store the required SKU. Operation aborted.", 4));
+        }
         this.occupiedWeight = newWeight;
         this.occupiedVolume = newVolume;
     }
