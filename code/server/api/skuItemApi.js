@@ -9,12 +9,12 @@ function dateIsValid(dateStr) {
     const regex = /^\d{4}\/\d{2}\/\d{2}$/;
     const regex2 = /^\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}$/;
   
-    if (!dateStr.match(regex) && !dateStr.match(regex2)) {
+    if (!regex.test(dateStr) && !regex2.test(dateStr)) {
       return false;
     }
 
     const now = new Date();
-    if(dateStr.match(regex2)){
+    if(regex2.test(dateStr)){
         const [date, time] = dateStr.split(' ');
         const [year, month, day] = date.split('/');
         const [hour, minute] = time.split(':');
@@ -36,6 +36,11 @@ function dateIsValid(dateStr) {
     return true;
   }
 
+function rfidIsValid(str){
+  const regex = /^\d{32}$/;
+  return regex.test(str);
+}
+
 // GET /api/skuitems
 // retrieves all sku items from the database
 router.get('/api/skuitems', async (req,res) => {
@@ -51,11 +56,10 @@ router.get('/api/skuitems', async (req,res) => {
 // GET /api/skuitems/sku/:id
 // retrieves all available sku items from the database given the sku id
 router.get('/api/skuitems/sku/:id', async (req,res) => {
-  let id;
+  const id = parseInt(req.params.id);
   try {
-    id = parseInt(req.params.id);
-    if(!id || !Number.isInteger(id) || id <= 0)
-      return res.status(422).json({error: `Invalid SKU id [${id}]`});
+    if(!Number.isInteger(id) || id <= 0)
+      return res.status(422).json({error: `Invalid SKU id`});
     const db = new SkuItemDBU('ezwh.db');
     const skuItemList = await db.loadSKUitem(null, id);
     return res.status(200).json(skuItemList);
@@ -71,7 +75,7 @@ router.get('/api/skuitems/sku/:id', async (req,res) => {
 router.get('/api/skuitems/:rfid', async (req,res) => {
     try {
       const rfid = req.params.rfid;
-      if(typeof rfid !== 'string')
+      if(!rfidIsValid(rfid))
         return res.status(422).json({error: `Invalid SKU item rfid.`});
       const db = new SkuItemDBU('ezwh.db');
       const skuItemList = await db.loadSKUitem(rfid);
@@ -86,7 +90,7 @@ router.get('/api/skuitems/:rfid', async (req,res) => {
 // POST /api/skuitem
 // add a new sku item to the database
 router.post('/api/skuitem', async (req,res) => {
-  if (req.body === undefined || req.body.RFID === undefined || typeof(req.body.RFID) !== 'string' || 
+  if (req.body === undefined || req.body.RFID === undefined || typeof(req.body.RFID) !== 'string' || !rfidIsValid(req.body.rfid) ||
       req.body.SKUId === undefined || !Number.isInteger(parseInt(req.body.SKUId)) || parseInt(req.body.SKUId) <= 0 ||
       (req.body.DateOfStock !== undefined && !dateIsValid(req.body.DateOfStock)) ) {
     return res.status(422).json({error: `Invalid SKU Item data.`});
@@ -114,8 +118,8 @@ router.post('/api/skuitem', async (req,res) => {
 // modify a sku item in the database
 router.put('/api/skuitems/:rfid', async (req,res) => {
   const rfid = req.params.rfid;
-  if (req.body === undefined || req.body.newRFID === undefined || typeof(req.body.newRFID) !== 'string' ||
-  req.body.newAvailable === undefined || !Number.isInteger(parseInt(req.body.newAvailable)) || parseInt(req.body.newAvailable) < 0 ||
+  if (!rfidIsValid(rfid) || req.body === undefined || req.body.newRFID === undefined || !rfidIsValid(req.body.newRFID) ||
+  req.body.newAvailable === undefined || !Number.isInteger(parseInt(req.body.newAvailable)) || parseInt(req.body.newAvailable) < 1 ||
   (req.body.newDateOfStock !== undefined && !dateIsValid(req.body.newDateOfStock)) ) {
     return res.status(422).json({error: `Invalid SKU item data.`});
   }
@@ -135,12 +139,12 @@ router.put('/api/skuitems/:rfid', async (req,res) => {
 // remove a sku item from the database
 router.delete('/api/skuitems/:rfid', async (req,res) => {
   const rfid = req.params.rfid;
-  if (typeof rfid !== 'string') {
+  if (!rfidIsValid(rfid)) {
     return res.status(422).json({error: `Validation of rfid failed`});
   }
   try{
       const db = new SkuItemDBU('ezwh.db');
-      const deleted = await db.deleteSKUitem(rfid);
+      await db.deleteSKUitem(rfid);
       return res.status(204).end();
   }
   catch(err){
