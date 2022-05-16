@@ -87,7 +87,7 @@ class SKU {
             // fetch position
             db = new PositionDBU(null, openDB);
             const posList = await db.loadPosition(position);
-            if(posList.lenght==0) {
+            if(posList.length==0) {
                 throw(new Error("The provided position does not exist.", 5));
             }
             const pos = posList.pop();
@@ -98,8 +98,6 @@ class SKU {
         } catch(err) {
             // if there is some exception, propagate it
             throw(err);
-        } finally {
-            db.close();
         }
     }
 
