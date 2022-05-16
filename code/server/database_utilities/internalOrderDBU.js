@@ -112,7 +112,7 @@ class InternalOrderDBU {
         }
         // finally, update the main table
         return new Promise((resolve, reject) => {
-            const sqlUpdate = 'UPDATE "internal-orders" SET state=?, qty=null WHERE id=?';
+            const sqlUpdate = 'UPDATE "internal-orders" SET state=? WHERE id=?';
             this.db.run(sqlUpdate, [newState, orderId], function (err) {
                 if (err) {
                     reject(err);
