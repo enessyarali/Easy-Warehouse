@@ -55,10 +55,6 @@ router.post('/api/sku', async (req,res) => {
   }
   try{
       const db = new SkuDBU('ezwh.db');
-      console.log(typeof req.body.volume);
-      console.log(typeof req.body.weight);
-      console.log(typeof req.body.price);
-      console.log(typeof req.body.availableQuantity);
       await db.insertSKU(req.body.description, req.body.weight, req.body.volume, req.body.notes, req.body.price, req.body.availableQuantity);
       return res.status(201).end();
   }
