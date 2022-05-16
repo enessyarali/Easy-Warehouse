@@ -113,7 +113,7 @@ class UserDBU {
     async deleteUser(username, type) {
         // load the user
         const userList = await this.loadUser(username, type);
-        if (userList.length !== 0) {
+        if (userList.length === 0) {
             return 0;
         }
         // check whether there are tables referencing that user
@@ -123,7 +123,7 @@ class UserDBU {
             throw(new Error("Dependency detected. Delete aborted.", 14));
         }
         return new Promise((resolve, reject) => {
-            const sqlDelete = 'DELETE FROM USERS WHERE username=? AND type=?';
+            const sqlDelete = 'DELETE FROM USERS WHERE email=? AND type=?';
             this.db.run(sqlDelete, [username, type], function (err) {
                 if (err) {
                     reject(err);
