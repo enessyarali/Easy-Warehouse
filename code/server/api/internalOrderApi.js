@@ -122,7 +122,7 @@ router.post('/api/internalOrder', async (req,res) => {
 router.put('/api/internalOrder/:id', async (req,res) => {
   const id = parseInt(req.params.id);
   if (req.body === undefined || id === undefined || req.body.newState ===undefined|| !getState(req.body.newState) || 
-    req.body.customerId ===undefined ||  (getState(req.body.newState)=="COMPLETED" && req.body.products===undefined)) {
+      (getState(req.body.newState)=="COMPLETED" && req.body.products===undefined)) {
     return res.status(422).json({error: `Invalid item data.`});
   }
   try{
