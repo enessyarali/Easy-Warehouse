@@ -79,7 +79,7 @@ router.post('/api/newUser', async (req,res) => {
   const type = req.body && getType(req.body.type);  
   if (req.body === undefined || req.body.username === undefined || !mailIsValid(req.body.username) ||
       req.body.name === undefined || typeof req.body.name !== 'string' || !nameIsValid(req.body.name) ||
-      req.body.surname === undefined || typeof req.body.surname !== 'string' || !this.surnameIsValid(req.body.surname) ||
+      req.body.surname === undefined || typeof req.body.surname !== 'string' || !surnameIsValid(req.body.surname) ||
       req.body.password === undefined || type === undefined || type === 'manager' || type === 'administrator' ||
       req.body.password.length < 8 ) {
     return res.status(422).json({error: `Invalid user data.`});

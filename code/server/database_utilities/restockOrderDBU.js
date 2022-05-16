@@ -109,10 +109,10 @@ class RestockOrderDBU {
 
     // modify the state for a restock order
     patchRestockOrderState(orderId, newState) {
-        sql = 'UPDATE "restock-orders" SET state = ? WHERE id = ?';
+        const sql = 'UPDATE "restock-orders" SET state = ? WHERE id = ?';
         //update state
         return new Promise((resolve, reject) => {
-            this.db.run(sqlInfo.sql, [newState, orderId], function (err) {
+            this.db.run(sql, [newState, orderId], function (err) {
                 if (err) {
                     reject(err);
                     return;
@@ -128,7 +128,7 @@ class RestockOrderDBU {
     async patchRestockOrderSkuItems(orderId, skuItems) {
         // check if the order status is correct
         const ids = [];
-        for (ski of skuItems) {
+        for (let ski of skuItems) {
             // check if SKUitem exists
             const isSKUitem = await this.#checkSKUitem(ski);
             if (!isSKUitem)
@@ -154,7 +154,7 @@ class RestockOrderDBU {
         const sql = 'UPDATE "restock-orders" SET transportNote = ? WHERE id = ?';
         // update TransportNote
         return new Promise((resolve, reject) => {
-            this.db.run(sql, [newTransportNote, orderId], function (err) {
+            this.db.run(sql, [JSON.stringify(newTransportNote), orderId], function (err) {
                 if (err) {
                     reject(err);
                     return;
@@ -168,7 +168,7 @@ class RestockOrderDBU {
     
     // delete one or more RestockOrder from the RESTOCK-ORDERS table given different input. Return number of rows modified
     async deleteRestockOrder(orderId) {
-        const dependency = await this.#checkDependency(id);
+        const dependency = await this.#checkDependency(orderId);
         if (dependency) {
             // if there is at least 1 dependency
             throw (new Error("Dependency detected. Delete aborted.", 14));
@@ -207,19 +207,19 @@ class RestockOrderDBU {
         return Promise.all(promises);
     }
 
-        // method to check whether the state of the Order corresponds to the correct one
-        retriveState(orderId) {
-            const sql = 'SELECT state AS state FROM "restock-orders" WHERE id = ?';
-            return new Promise((resolve, reject) => {
-                this.db.get(sql, [orderId], (err, row) => {
-                    if (err) {
-                        reject(err);
-                        return;
-                    }
-                    resolve(row.state);
-                });
+    // method to check whether the state of the Order corresponds to the correct one
+    retriveState(orderId) {
+        const sql = 'SELECT state AS state FROM "restock-orders" WHERE id = ?';
+        return new Promise((resolve, reject) => {
+            this.db.get(sql, [orderId], (err, row) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(row ? row.state : undefined);
             });
-        }
+        });
+    }
 
     // private method to get products for a given orderId 
     #getProducts(orderId) {
@@ -281,7 +281,7 @@ class RestockOrderDBU {
     #checkSKUitem(skuItem) {
         const sql = 'SELECT id FROM "SKU-ITEMS" WHERE RFID=? AND SKUid = ?'
         return new Promise((resolve, reject) => {
-            this.db.get(sql, [skuItem.RFID, skuItem.SKUId], (err, row) => {
+            this.db.get(sql, [skuItem.rfid, skuItem.SKUId], (err, row) => {
                 if (err) {
                     reject(err);
                     return;
@@ -294,7 +294,7 @@ class RestockOrderDBU {
     #checkDependency(id) {
         // return-order check
         return new Promise((resolve, reject) => {
-            const returnOrder = 'SELECT id FROM "return-order" WHERE restockOrderId=?';
+            const returnOrder = 'SELECT id FROM "return-orders" WHERE restockOrderId=?';
             this.db.all(returnOrder, [id], (err, rows) => {
                 if (err) {
                     reject(err);

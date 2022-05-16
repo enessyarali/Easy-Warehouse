@@ -11,9 +11,10 @@ function getState(str) {
   const clean = str.trim().toUpperCase();
   switch (clean) {
     case "ISSUED":
-    case "ACCEPTED":
-    case "REFUSED":
-    case "CANCELED":
+    case "DELIVERY":
+    case "DELIVERED":
+    case "TESTED":
+    case "COMPLETEDRETURN":
     case "COMPLETED":
       return clean;
     default:
@@ -57,7 +58,7 @@ function dateIsValid(dateStr, compare=true) {
 async function checkState(db, orderId, stateRequested) {
   try{
     const currentState = await db.retriveState(orderId);
-    return currentState == stateRequested;
+    return currentState ? currentState == stateRequested : undefined;
   }
   catch {
     return false;
@@ -115,7 +116,10 @@ router.get('/api/restockOrders/:id/returnItems', async (req,res) => {
     const db = new RestockOrderDBU('ezwh.db');
 
     const isRightState = await checkState(db, id, 'COMPLETEDRETURN');
-    if(!isRightState) {
+    if (isRightState===undefined) {
+      return res.status(404).json({error: `No restockOrder with matching id.`});
+    }
+    if(isRightState===false) {
       return res.status(422).json({error: 'Order status is not COMPLETEDRETURN.'});
     }
 
@@ -178,7 +182,10 @@ router.put('/api/restockOrder/:id/skuItems', async (req,res) => {
       const db = new RestockOrderDBU('ezwh.db');
 
       const isRightState = await checkState(db, id, 'DELIVERED');
-      if(!isRightState) {
+      if (isRightState===undefined) {
+        return res.status(404).json({error: `No restockOrder with matching id.`});
+      }
+      if(isRightState===false) {
         return res.status(422).json({error: 'Order status is not DELIVERED.'});
       }
 
@@ -198,7 +205,8 @@ router.put('/api/restockOrder/:id/transportNote', async (req,res) => {
   const id = parseInt(req.params.id);
   if(!Number.isInteger(id) || id < 0)
     return res.status(422).json({error: `Invalid restockOrder id.`});
-  if (req.body === undefined || req.body.transportNote === undefined || req.body.transportNote.deliveryDate === undefined) {
+  if (req.body === undefined || req.body.transportNote === undefined || 
+    req.body.transportNote.deliveryDate === undefined || !dateIsValid(req.body.transportNote.deliveryDate)) {
     return res.status(422).json({error: `Invalid restockOrder data.`});
   }
   try{
@@ -207,11 +215,14 @@ router.put('/api/restockOrder/:id/transportNote', async (req,res) => {
       const restockOrderList = await db.loadRestockOrder(id);
       if (restockOrderList.length==0)
         return res.status(404).json({error: `No restockOrder with matching id.`});
-      if(restockOrderList.pop().transportNote.deliveryDate < issueDate)
+      if(restockOrderList.pop().issueDate > req.body.transportNote.deliveryDate)
         return res.status(422).json({error: `Delivery Date Before Issue Date.`});
 
       const isRightState = await checkState(db, id, 'DELIVERY');
-      if(!isRightState) {
+      if (isRightState===undefined) {
+        return res.status(404).json({error: `No restockOrder with matching id.`});
+      }
+      if(isRightState===false) {
         return res.status(422).json({error: 'Order status is not DELIVERY.'});
       }
       
@@ -234,8 +245,8 @@ router.delete('/api/restockOrder/:id', async (req,res) => {
   try{
       const db = new RestockOrderDBU('ezwh.db');
       // delete the restockOrder
-      const deleted = sum(await db.deleterestockOrder(id));
-      if (!deleted)
+      const deleted = await db.deleteRestockOrder(id);
+      if (deleted.every(d => !d))
         return res.status(404).json({error: `No restockOrder with matching id.`});
       return res.status(204).end();
   }
