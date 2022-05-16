@@ -16,7 +16,7 @@ class RestockOrder{
 
 class ProductRKO{
 
-    constructor(SKUId, description, price, qty=undefined) {
+    constructor(SKUId, description, price, qty) {
         this.SKUId = SKUId;
         this.descripton = description;
         this.price = price;
