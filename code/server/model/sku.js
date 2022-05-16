@@ -31,10 +31,10 @@ class SKU {
         this.testDescriptors = testDescriptors;
     }
 
-    modify(openDB, newDescription, newWeight, newVolume, newNotes, newPrice, newAvailableQuantity) {
-        if(this.position && newAvailableQuantity!=this.availableQuantity) {
+    async modify(openDB, newDescription, newWeight, newVolume, newNotes, newPrice, newAvailableQuantity) {
+        if(this.position && (newAvailableQuantity!=this.availableQuantity || newWeight!=this.weight || newVolume!=this.volume)) {
             try{
-                this.#propagatePosition(openDB, newAvailableQuantity*newWeight, newAvailableQuantity*newVolume);
+                await this.#propagatePosition(openDB, this.position, newAvailableQuantity*newWeight, newAvailableQuantity*newVolume);
             } catch(err) {
                 // propagate exception
                 throw(err);
@@ -81,13 +81,13 @@ class SKU {
         this.position = newPositionId;
     }
 
-    async #propagatePosition(openDB, position=this.position, occupiedWeight=0, occupiedVolume=0) {
+    async #propagatePosition(openDB, position, occupiedWeight=0, occupiedVolume=0) {
         let db;
         try {
             // fetch position
             db = new PositionDBU(null, openDB);
             const posList = await db.loadPosition(position);
-            if(posList.lenght==0) {
+            if(posList.length==0) {
                 throw(new Error("The provided position does not exist.", 5));
             }
             const pos = posList.pop();
@@ -98,8 +98,6 @@ class SKU {
         } catch(err) {
             // if there is some exception, propagate it
             throw(err);
-        } finally {
-            db.close();
         }
     }
 

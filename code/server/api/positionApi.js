@@ -7,12 +7,12 @@ let router = express.Router();
 
 function isValid(str) {
     const regex = /^\d{4}$/;
-    return str.match(regex);
+    return regex.test(str);
 }
 
 function idIsValid(str) {
     const regex = /^\d{12}$/;
-    return str.match(regex);
+    return regex.test(str);
 }
 
 // GET /api/positions
@@ -33,8 +33,8 @@ router.post('/api/position', async (req,res) => {
   if (req.body === undefined || req.body.positionID === undefined || req.body.aisleID === undefined ||
       req.body.row === undefined || req.body.col === undefined || !isValid(req.body.aisleID) || !isValid(req.body.row) ||
       !isValid(req.body.col) || req.body.positionID !== req.body.aisleID + req.body.row + req.body.col ||
-      req.body.maxWeight === undefined || !Number.isInteger(parseInt(req.body.maxWeight)) || parseInt(req.body.maxWeight) < 0 ||
-      req.body.maxVolume === undefined || !Number.isInteger(parseInt(req.body.maxVolume)) || parseInt(req.body.maxVolume) < 0 ) {
+      req.body.maxWeight === undefined || !Number.isInteger(parseInt(req.body.maxWeight)) || parseInt(req.body.maxWeight) <= 0 ||
+      req.body.maxVolume === undefined || !Number.isInteger(parseInt(req.body.maxVolume)) || parseInt(req.body.maxVolume) <= 0 ) {
     return res.status(422).json({error: `Invalid position data.`});
   }
   try{
@@ -52,13 +52,13 @@ router.post('/api/position', async (req,res) => {
 // modify a position in the database
 router.put('/api/position/:positionID', async (req,res) => {
   const positionID = req.params.positionID;
-  if (req.body === undefined || req.body.newAisleID === undefined || req.body.newRow === undefined ||
-    req.body.newCol === undefined || !isValid(req.body.newAisleID) || !isValid(req.body.newRow) || !isValid(req.body.newCol) ||
-    req.body.newMaxWeight === undefined || !Number.isInteger(parseInt(req.body.newMaxWeight)) || parseInt(req.body.newMaxWeight) < 0 ||
-    req.body.newMaxVolume === undefined || !Number.isInteger(parseInt(req.body.newMaxVolume)) || parseInt(req.body.newMaxVolume) < 0 ||
-    req.body.newOccupiedWeight === undefined || !Number.isInteger(parseInt(req.body.newOccupiedWeight)) || parseInt(req.body.newOccupiedWeight) < 0 ||
-    req.body.newOccupiedVolume === undefined || !Number.isInteger(parseInt(req.body.newOccupiedVolume)) || parseInt(req.body.newOccupiedVolume) < 0 ||
-    parseInt(req.body.newOccupiedWeight) > parseInt(req.body.newMaxWeight) || parseInt(req.body.newOccupiedVolume) > parseInt(req.body.newMaxVolume)) {
+  if (!idIsValid(positionID) || req.body === undefined || req.body.newAisleID === undefined || req.body.newRow === undefined ||
+      req.body.newCol === undefined || !isValid(req.body.newAisleID) || !isValid(req.body.newRow) || !isValid(req.body.newCol) ||
+      req.body.newMaxWeight === undefined || !Number.isInteger(parseInt(req.body.newMaxWeight)) || parseInt(req.body.newMaxWeight) <= 0 ||
+      req.body.newMaxVolume === undefined || !Number.isInteger(parseInt(req.body.newMaxVolume)) || parseInt(req.body.newMaxVolume) <= 0 ||
+      req.body.newOccupiedWeight === undefined || !Number.isInteger(parseInt(req.body.newOccupiedWeight)) || parseInt(req.body.newOccupiedWeight) < 0 ||
+      req.body.newOccupiedVolume === undefined || !Number.isInteger(parseInt(req.body.newOccupiedVolume)) || parseInt(req.body.newOccupiedVolume) < 0 ||
+      parseInt(req.body.newOccupiedWeight) > parseInt(req.body.newMaxWeight) || parseInt(req.body.newOccupiedVolume) > parseInt(req.body.newMaxVolume)) {
     return res.status(422).json({error: `Invalid position data.`});
   }
   try{
@@ -77,7 +77,7 @@ router.put('/api/position/:positionID', async (req,res) => {
 // modify the id of a position in the database
 router.put('/api/position/:positionID/changeID', async (req,res) => {
     const positionID = req.params.positionID;
-    if (req.body === undefined || req.body.newPositionID === undefined || !idIsValid(req.body.newPositionID) ) {
+    if (!idIsValid(positionID) || req.body === undefined || req.body.newPositionID === undefined || !idIsValid(req.body.newPositionID) ) {
       return res.status(422).json({error: `Invalid position id.`});
     }
     try{
