@@ -32,6 +32,7 @@ function NewEditItem(props) {
             }
             else{
                 const newItem = {
+                    id:id,
                     description:description,
                     price: price,
                     SKUId: SKUId,
@@ -123,6 +124,28 @@ function NewEditItem(props) {
                 <Row className="justify-content-center">
                     <h2 className='text-center'> {props.edit?("Edit"):("New")} Item </h2>
                 </Row>
+                {!props.edit && <>
+                <Row>
+                    <Col xs={2} />
+                    <Col xs={8}>
+                        <Form.Group  >
+                            <Form.Label>Id:</Form.Label>
+                            <Form.Control
+                                 type='number'
+                                 id="id"
+                                 value={id}
+                                 min={1}
+                                 required
+                                 onChange={ev => setId(ev.target.value)} />
+                            <Form.Control.Feedback type="invalid">
+                                Please insert a valid id.
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                    </Col>
+                    <Col xs={2} />
+                </Row>
+                <br />
+          </>}
                 <Row>
                     <Col xs={2} />
                     <Col xs={8}>
