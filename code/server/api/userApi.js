@@ -12,11 +12,21 @@ let router = express.Router();
 
 function mailIsValid(str) {
     const regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    return str.match(regex);
+    return regex.test(str);
+}
+
+function nameIsValid(str) {
+  const regex = /^[A-Z][a-z]+$/;
+  return regex.test(str);
+}
+
+function surnameIsValid(str) {
+  const regex = /^[A-Z][A-Za-z\s']+$/;
+  return regex.test(str);
 }
 
 function getType(str) {
-  const clean = str.trim().toLowerCase();
+  const clean = (str + '').trim().toLowerCase();
   switch (clean) {
     case "customer":
       return "customer";
@@ -66,10 +76,11 @@ router.get('/api/users', async (req,res) => {
 // POST /api/newUser
 // add a new user to the database
 router.post('/api/newUser', async (req,res) => {
-  const type = req.body && req.body.type;  
+  const type = req.body && getType(req.body.type);  
   if (req.body === undefined || req.body.username === undefined || !mailIsValid(req.body.username) ||
-      req.body.name === undefined || req.body.surname === undefined || req.body.password === undefined ||
-      type === undefined || type === 'manager' || type === 'administrator' || !getType(type) ||
+      req.body.name === undefined || typeof req.body.name !== 'string' || !nameIsValid(req.body.name) ||
+      req.body.surname === undefined || typeof req.body.surname !== 'string' || !this.surnameIsValid(req.body.surname) ||
+      req.body.password === undefined || type === undefined || type === 'manager' || type === 'administrator' ||
       req.body.password.length < 8 ) {
     return res.status(422).json({error: `Invalid user data.`});
   }
@@ -93,11 +104,11 @@ router.post('/api/managerSessions', async (req,res) => {
       return res.status(401).json({error: `Invalid username or password.`});
     }
     try{
-        const db = new UserDBU('ezwh.db');
-        const info = await db.checkPassword(req.body.username, "manager", req.body.password);
-        if (!info)
-          return res.status(401).json({error: `Invalid username or password.`});
-        return res.status(200).json(info);
+      const db = new UserDBU('ezwh.db');
+      const info = await db.checkPassword(req.body.username, "manager", req.body.password);
+      if (!info)
+        return res.status(401).json({error: `Invalid username or password.`});
+      return res.status(200).json(info);
     }
     catch(err){
       return res.status(500).json({error: `Something went wrong...`, message: err.message});
@@ -116,7 +127,7 @@ router.post('/api/customerSessions', async (req,res) => {
       const info = await db.checkPassword(req.body.username, "customer", req.body.password);
       if (!info)
         return res.status(401).json({error: `Invalid username or password.`});
-        return res.status(200).json(info);
+      return res.status(200).json(info);
     }
     catch(err){
       return res.status(500).json({error: `Something went wrong...`, message: err.message});
@@ -189,6 +200,7 @@ router.post('/api/logout', async (req,res) => {
         // TO DO
         //
         //
+        return res.status(200).end();
     }
     catch(err){
       return res.status(500).json({error: `Something went wrong...`, message: err.message});
@@ -199,10 +211,10 @@ router.post('/api/logout', async (req,res) => {
 // modify rights of a user in the database
 router.put('/api/users/:username', async (req,res) => {
   const username = req.params.username;
-  if (req.body === undefined || req.body.oldType === undefined || req.body.oldType === 'manager' ||
-    req.body.oldType === 'administrator' || !getType(req.body.oldType) || req.body.newType === undefined || 
-    req.body.newType === 'manager' || req.body.newType === 'administrator' || !getType(req.body.newType) || 
-    username === undefined || !mailIsValid(username) ) {
+  if (req.body === undefined || getType(req.body.oldType) === undefined || req.body.oldType === 'manager' ||
+      req.body.oldType === 'administrator' || getType(req.body.newType) === undefined || 
+      req.body.newType === 'manager' || req.body.newType === 'administrator' || 
+      username === undefined || !mailIsValid(username) ) {
     return res.status(422).json({error: `Invalid user data.`});
   }
   try{
@@ -224,15 +236,14 @@ router.put('/api/users/:username', async (req,res) => {
 // remove a user from the database
 router.delete('/api/users/:username/:type', async (req,res) => {
   const username = req.params.username;
-  const type = req.params.type;
-  if (username === undefined || !mailIsValid(username) || type === 'manager' || 
-  type === 'administrator' || !getType(type) ) {
+  const type = getType(req.params.type);
+  if (username === undefined || !mailIsValid(username) || type === undefined || type === 'manager' || 
+      type === 'administrator' ) {
     return res.status(422).json({error: `Invalid username or type.`});
   }
   try{
       const db = new UserDBU('ezwh.db');
-      // get the user to be deleted
-      const deleted = await db.deleteUser(username, getType(type));
+      await db.deleteUser(username, type);
       return res.status(204).end();
   }
   catch(err){
