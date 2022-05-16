@@ -122,13 +122,13 @@ router.post('/api/internalOrder', async (req,res) => {
 router.put('/api/internalOrder/:id', async (req,res) => {
   const id = parseInt(req.params.id);
   if (req.body === undefined || id === undefined || req.body.newState ===undefined|| !getState(req.body.newState) || 
-    req.body.customerId ===undefined ||  (getState(req.body.newState)=="COMPLETED" && req.body.products===undefined)) {
+     (getState(req.body.newState)=="COMPLETED" && req.body.products===undefined)) {
     return res.status(422).json({error: `Invalid item data.`});
   }
   try{
     const db = new internalOrderDBU('ezwh.db');
-    const updatedList = await db.updateInternalOrder(id, getState(req.body.newState), req.body.products);
-    if (updatedList.every(i => i===0))
+    const updated = await db.updateInternalOrder(id, getState(req.body.newState), req.body.products);
+    if (!updated)
       return res.status(404).json({error: `No internalOrder with matching id.`});
     return res.status(200).end();
   }
