@@ -138,7 +138,7 @@ class ReturnOrderDBU {
     // private method to insert an order in the relative table. It returns the assigned orderID.
     #insertOrder(returnDate, restockOrderId) {
         return new Promise((resolve, reject) => {
-            const sqlInsert = 'INSERT INTO "return-orders" (returnDate) VALUES(?)';
+            const sqlInsert = 'INSERT INTO "return-orders" (returnDate, restockOrderId) VALUES(?,?)';
             this.db.run(sqlInsert, [returnDate, restockOrderId], function (err) {
                 if (err) {
                     reject(err);

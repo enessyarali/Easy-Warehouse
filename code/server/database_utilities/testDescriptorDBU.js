@@ -74,7 +74,7 @@ class TestDescriptorDBU {
     }
 
 // update a selected TestDescriptor in the TEST-DESCRIPTORS table. Return number of rows modified
-    updateTestDescriptor(id, newName, newProcedure, newIdSKU) {
+   async updateTestDescriptor(id, newName, newProcedure, newIdSKU) {
         // check if SKUId exist
         const isSKU = await this.#checkSKU(newIdSKU);
         if (!isSKU)
@@ -131,6 +131,20 @@ class TestDescriptorDBU {
                 }
             });
         }); 
+    }
+
+    // private method to check whether skuId corresponds to an existing SKU
+    #checkSKU(skuId) {
+        const sql = 'SELECT id FROM "SKUS" WHERE id=?'
+        return new Promise((resolve, reject) => {
+            this.db.get(sql, [skuId], (err, row) => {
+                if(err) {
+                    reject(err);
+                    return;
+                }
+                resolve(row ? row.id : false);
+            })
+        });
     }
 
     #checkDependency(id) {
