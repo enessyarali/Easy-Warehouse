@@ -164,8 +164,8 @@ class UserDBU {
                 return;
             }
             if (!rows || rows.length == 0)
-                resolve(true);
-            else resolve(false);
+                resolve(false);
+            else resolve(true);
             return;
             });
         }));
@@ -178,8 +178,8 @@ class UserDBU {
                 return;
             }
             if (!rows || rows.length == 0)
-                resolve(true);
-            else resolve(false);
+                resolve(false);
+            else resolve(true);
             return;
             });
         }));
