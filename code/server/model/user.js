@@ -17,6 +17,14 @@ class User {
         this.type = newType;
     }
 
+    // removes the fields passed in the toBeRemoved array
+    clean(toBeRemoved) {
+        for (let attr of toBeRemoved) {
+            this[attr] = undefined;
+        }
+        return this;
+    }
+
 }
 
 module.exports = User;

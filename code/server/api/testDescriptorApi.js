@@ -2,7 +2,6 @@
 
 const express = require('express');
 const TestDescriptorDBU = require('../database_utilities/testDescriptorDBU.js');
-const SkuDBU = require('../database_utilities/skuDBU.js');
 
 let router = express.Router();
 

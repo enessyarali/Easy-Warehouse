@@ -55,7 +55,7 @@ router.get('/api/suppliers', async (req,res) => {
     try {
       const db = new UserDBU('ezwh.db');
       const supplierList = await db.loadUser(null, 'supplier');
-      return res.status(200).json(supplierList);
+      return res.status(200).json(supplierList.map(sup => sup.clean(['type'])));
     } catch (err) {
         return res.status(500).json({error: `Something went wrong...`, message: err.message});
     }
