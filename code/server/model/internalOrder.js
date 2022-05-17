@@ -17,10 +17,10 @@ class ProductIO{
 
     constructor(SKUId, description, price, qty=undefined, rfid=undefined) {
         this.SKUId = SKUId;
-        this.descripton = description;
+        this.description = description;
         this.price = price;
-        this.qty = qty;
-        this.RFID = rfid;
+        this.qty = qty ? qty : undefined;
+        this.RFID = rfid ? rfid : undefined;
     }
 }
 

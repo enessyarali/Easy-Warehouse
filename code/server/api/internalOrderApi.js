@@ -1,8 +1,7 @@
 'use strict';
 
 const express = require('express')
-const internalOrder = require('../model/internalOrder.js')
-const internalOrderDBU = require('../database_utilities/internalOrderDBU.js')
+const InternalOrderDBU = require('../database_utilities/internalOrderDBU.js')
 
 let router = express.Router()
 
@@ -54,7 +53,7 @@ function dateIsValid(dateStr) {
 router.get('/api/internalOrders', async (req,res) => {
   // create connection with the db  
   try {
-    const db = new internalOrderDBU('ezwh.db');
+    const db = new InternalOrderDBU('ezwh.db');
     const internalOrderList = await db.loadInternalOrder();
     return res.status(200).json(internalOrderList);
   } catch (err) {
@@ -65,7 +64,7 @@ router.get('/api/internalOrders', async (req,res) => {
 router.get('/api/internalOrdersIssued', async (req,res) => {
   // create connection with the db  
   try {
-    const db = new internalOrderDBU('ezwh.db');
+    const db = new InternalOrderDBU('ezwh.db');
     const internalOrderList = await db.loadInternalOrder(null, "ISSUED");
     return res.status(200).json(internalOrderList);
   } catch (err) {
@@ -76,7 +75,7 @@ router.get('/api/internalOrdersIssued', async (req,res) => {
 router.get('/api/internalOrdersAccepted', async (req,res) => {
   // create connection with the db  
   try {
-    const db = new internalOrderDBU('ezwh.db');
+    const db = new InternalOrderDBU('ezwh.db');
     const internalOrderList = await db.loadInternalOrder(null, "ACCEPTED");
     return res.status(200).json(internalOrderList);
   } catch (err) {
@@ -90,7 +89,7 @@ router.get('/api/internalOrders/:id', async (req,res) => {
     const id = parseInt(req.params.id);
     if(!Number.isInteger(id) || id < 0)
       return res.status(422).json({error: `Invalid internalOrder id.`});
-    const db = new internalOrderDBU('ezwh.db');
+    const db = new InternalOrderDBU('ezwh.db');
     const internalOrderList = await db.loadInternalOrder(id);
     if(internalOrderList.length === 0)
       return res.status(404).json({error: `No internalOrder with matching id.`});
@@ -108,7 +107,7 @@ router.post('/api/internalOrders', async (req,res) => {
     return res.status(422).json({error: `Invalid internal order data.`});
   }
   try{
-      const db = new internalOrderDBU('ezwh.db');
+      const db = new InternalOrderDBU('ezwh.db');
       await db.insertInternalOrder(req.body.issueDate, req.body.products, req.body.customerId);
       return res.status(201).end();
   }
@@ -126,7 +125,7 @@ router.put('/api/internalOrders/:id', async (req,res) => {
     return res.status(422).json({error: `Invalid item data.`});
   }
   try{
-    const db = new internalOrderDBU('ezwh.db');
+    const db = new InternalOrderDBU('ezwh.db');
     const updated = await db.updateInternalOrder(id, getState(req.body.newState), req.body.products);
     if (!updated)
       return res.status(404).json({error: `No internalOrder with matching id.`});
@@ -146,7 +145,7 @@ router.delete('/api/internalOrders/:id', async (req,res) => {
     return res.status(422).json({error: `Validation of id failed`});
   }
   try{
-      const db = new internalOrderDBU('ezwh.db');
+      const db = new InternalOrderDBU('ezwh.db');
       await db.deleteInternalOrder(id);
       return res.status(204).end();
   }

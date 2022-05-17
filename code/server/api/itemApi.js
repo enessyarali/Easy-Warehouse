@@ -1,7 +1,6 @@
 'use strict';
 
 const express = require('express')
-const Item = require('../model/item.js')
 const ItemDBU = require('../database_utilities/ItemDBU.js')
 
 let router = express.Router()

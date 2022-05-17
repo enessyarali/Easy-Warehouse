@@ -1,7 +1,6 @@
 'use strict';
 
 const express = require('express')
-const RestockOrder = require('../model/restockOrder.js')
 const RestockOrderDBU = require('../database_utilities/restockOrderDBU.js')
 
 let router = express.Router()
@@ -100,7 +99,7 @@ router.get('/api/restockOrders/:id', async (req,res) => {
     const restockOrderList = await db.loadRestockOrder(id);
     if(restockOrderList.length === 0)
       return res.status(404).json({error: `No restockOrder with matching id.`});
-    return res.status(200).json(restockOrderList.pop());
+    return res.status(200).json(restockOrderList.pop().clean(['id']));
   } catch (err) {
       return res.status(500).json({error: `Something went wrong...`, message: err.message});
   }
