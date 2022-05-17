@@ -1,8 +1,7 @@
 class ReturnOrder {
-    constructor(id,returnDate,products,restockOrderId){
+    constructor(id,returnDate,restockOrderId){
         this.id =id;
         this.returnDate =returnDate;
-        this.products = products;
         this.restockOrderId = restockOrderId;
     }
 
@@ -13,11 +12,11 @@ class ReturnOrder {
 
 class ProductRTO{
     
-    constructor(SKUId, description, price, rfid=undefined) {
+    constructor(SKUId, description, price, rfid) {
         this.SKUId = SKUId;
-        this.descripton = description;
+        this.description = description;
         this.price = price;
-        this.rfid = rfid;
+        this.RFID = rfid;
     }
 }
     module.exports ={ReturnOrder : ReturnOrder , ProductRTO : ProductRTO}
