@@ -64,6 +64,11 @@ async function checkState(db, orderId, stateRequested) {
   }
 }
 
+function rfidIsValid(str){
+  const regex = /^\d{32}$/;
+  return regex.test(str);
+}
+
 //GET /api/restockOrders
 router.get('/api/restockOrders', async (req,res) => {
   // create connection with the db  
@@ -133,7 +138,13 @@ router.get('/api/restockOrders/:id/returnItems', async (req,res) => {
 // add a new restockOrder to the database
 router.post('/api/restockOrder', async (req,res) => {
   if (req.body === undefined || req.body.issueDate == undefined || !dateIsValid(req.body.issueDate) || 
-      req.body.products === undefined || req.body.supplierId === undefined) {
+      req.body.products === undefined || 
+      req.body.products.some(p => (p.SKUId === undefined || typeof p.SKUId !== 'number' ||
+      p.SKUId <= 0 || p.description === undefined || p.price === undefined ||
+      typeof p.price !== 'number' || p.price <= 0 || p.qty === undefined || typeof p.qty !== 'number' ||
+      !Number.isInteger(p.qty) || p.qty < 0)) ||
+      req.body.supplierId === undefined || typeof req.body.supplierId !== 'number' 
+      || !Number.isInteger(req.body.supplierId)) {
     return res.status(422).json({error: `Invalid restockOrder data.`});
   }
   try{
@@ -174,7 +185,9 @@ router.put('/api/restockOrder/:id/skuItems', async (req,res) => {
   const id = parseInt(req.params.id);
   if(!Number.isInteger(id) || id < 0)
     return res.status(422).json({error: `Invalid restockOrder id.`});
-  if (req.body === undefined || req.body.skuItems === undefined || req.body.skuItems.some((i) => (i.SKUId===undefined || i.rfid===undefined))) {
+  if (req.body === undefined || req.body.skuItems === undefined || 
+    req.body.skuItems.some((i) => (i.SKUId===undefined || typeof p.SKUId !== 'number' ||
+    p.SKUId <= 0 || i.rfid===undefined || !rfidIsValid(i.rfid)))) {
     return res.status(422).json({error: `Invalid restockOrder data.`});
   }
   try{

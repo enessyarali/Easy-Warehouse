@@ -36,8 +36,12 @@ router.get('/api/items/:id', async (req,res) => {
 // POST /api/item
 // add a new item to the database
 router.post('/api/item', async (req,res) => {
-  if (req.body === undefined || req.body.description === undefined|| req.body.price == undefined || req.body.price < 0 ||
-      req.body.SKUId === undefined || req.body.id == undefined || req.body.supplierId === undefined) {
+  if (req.body === undefined || req.body.description === undefined|| 
+      req.body.price == undefined || req.body.price <= 0 || typeof req.body.price !== 'number' ||
+      req.body.SKUId === undefined || req.body.SKUId <= 0 || typeof req.body.SKUId !== 'number' ||
+      req.body.id == undefined || req.body.id == undefined || typeof req.body.id !== 'number' ||
+      !Number.isInteger(req.body.id) || req.body.supplierId === undefined ||
+      req.body.supplierId <= 0 || typeof req.body.id !== 'number') {
     return res.status(422).json({error: `Invalid item data.`});
   }
   try{
@@ -61,7 +65,8 @@ router.post('/api/item', async (req,res) => {
 // modify an item in the database
 router.put('/api/item/:id', async (req,res) => {
   const id = parseInt(req.params.id);
-  if (req.body === undefined || req.body.newDescription === undefined || req.body.newPrice == undefined || req.body.newPrice < 0) {
+  if (req.body === undefined || req.body.newDescription === undefined || 
+    req.body.newPrice == undefined || req.body.newPrice < 0 || typeof req.body.newPrice !== 'number') {
     return res.status(422).json({error: `Invalid item data.`});
   }
   try{
