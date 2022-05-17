@@ -1,7 +1,6 @@
 'use strict';
 
 const express = require('express')
-const ReturnOrder = require('../model/returnOrder.js')
 const ReturnOrderDBU = require('../database_utilities/returnOrderDBU.js')
 
 let router = express.Router()
@@ -90,14 +89,14 @@ router.post('/api/returnOrder', async (req,res) => {
 // DELETE /item/returnOrder/:id
 // remove a returnOrder from the database
 router.delete('/api/returnOrder/:id', async (req,res) => {
-  const id = req.params.id;
+  const id = parseInt(req.params.id);
   if (!Number.isInteger(id) || id < 0) {
     return res.status(422).json({error: `Validation of id failed`});
   }
   try{
       const db = new ReturnOrderDBU('ezwh.db');
-      const deleted = sum(await db.deletereturnOrder(id));
-      if (!deleted)
+      const deleted = await db.deleteReturnOrder(id);
+      if (deleted.every(d => !d))
         return res.status(404).json({error: 'No returnOrder with matching id.'});
       return res.status(204).end();
   }

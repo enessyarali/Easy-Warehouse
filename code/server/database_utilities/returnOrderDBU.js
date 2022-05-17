@@ -66,7 +66,7 @@ class ReturnOrderDBU {
 
         const orderId = await this.#insertOrder(returnDate, restockOrderId);
         const promises = products.map((p) => new Promise(async (resolve, reject) => {
-            const skuItemId = await this.#checkSKUitem(p.rfid, p.SKUId);
+            const skuItemId = await this.#checkSKUitem(p.RFID, p.SKUId);
             const insert = 'INSERT INTO "products-rto" (orderId, skuId, description, price, skuItemId) VALUES (?,?,?,?,?)';
             this.db.run(insert, [orderId, p.SKUId, p.description, p.price, skuItemId], function (err) {
                 if (err) {
@@ -107,16 +107,16 @@ class ReturnOrderDBU {
     // private method to get products for a given orderId 
     #getProducts(id) {
         return new Promise((resolve, reject) => {
-            const sqlProd = 'SELECT skuId, description, price, skuItemId FROM "products-rto" orderId=?';
+            const sqlProd = 'SELECT skuId, description, price, skuItemId FROM "products-rto" WHERE orderId=?';
             this.db.all(sqlProd, [id], (err, rows) => {
                 if (err) {
                     reject(err);
                     return;
                 }
                 const products = rows.map(async (p) => {
-                    rfId = await this.#retriveRFID(p.skuItemId);
-                    new ProductRTO(p.skuId, p.description, p.price, rfid ? null : rfid)});
-                resolve(products);;
+                    const rfId = await this.#retriveRFID(p.skuItemId);
+                    return new ProductRTO(p.skuId, p.description, p.price, rfId);});
+                Promise.all(products).then((p) => resolve(p));
             });
         });
     }
@@ -169,7 +169,7 @@ class ReturnOrderDBU {
                     reject(err);
                     return;
                 }
-                resolve(row ? row.id : false);
+                resolve(row ? row.rfid : false);
             });
         });
     }
