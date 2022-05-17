@@ -102,7 +102,7 @@ router.get('/api/internalOrders/:id', async (req,res) => {
 
 // POST /api/internalOrder
 // add a new internalOrder to the database
-router.post('/api/internalOrder', async (req,res) => {
+router.post('/api/internalOrders', async (req,res) => {
   if (req.body === undefined || req.body.issueDate == undefined || !dateIsValid(req.body.issueDate) ||
       req.body.products === undefined || req.body.customerId === undefined) {
     return res.status(422).json({error: `Invalid internal order data.`});
@@ -119,7 +119,7 @@ router.post('/api/internalOrder', async (req,res) => {
 
 // PUT /api/internalOrder/:id
 // Modify the state of an internal order, given its id. If newState is = COMPLETED an array of RFIDs is sent
-router.put('/api/internalOrder/:id', async (req,res) => {
+router.put('/api/internalOrders/:id', async (req,res) => {
   const id = parseInt(req.params.id);
   if (req.body === undefined || id === undefined || req.body.newState ===undefined|| !getState(req.body.newState) || 
      (getState(req.body.newState)=="COMPLETED" && req.body.products===undefined)) {
@@ -140,7 +140,7 @@ router.put('/api/internalOrder/:id', async (req,res) => {
 
 // DELETE /item/internalOrder/:id
 // remove a internalOrder from the database
-router.delete('/api/internalOrder/:id', async (req,res) => {
+router.delete('/api/internalOrders/:id', async (req,res) => {
   const id = parseInt(req.params.id);
   if (!Number.isInteger(id) || id < 0) {
     return res.status(422).json({error: `Validation of id failed`});
