@@ -59,7 +59,7 @@ router.get('/api/returnOrders/:id', async (req,res) => {
     const returnOrderList = await db.loadReturnOrder(id);
     if(returnOrderList.length === 0)
       return res.status(404).json({error: `No returnOrder with matching id.`});
-    return res.status(200).json(returnOrderList.pop());
+    return res.status(200).json(returnOrderList.pop().clean(['id']));
   } catch (err) {
       return res.status(500).json({error: `Something went wrong...`, message: err.message});
   }

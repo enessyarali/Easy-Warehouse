@@ -62,7 +62,7 @@ router.get('/api/skuitems/sku/:id', async (req,res) => {
       return res.status(422).json({error: `Invalid SKU id`});
     const db = new SkuItemDBU('ezwh.db');
     const skuItemList = await db.loadSKUitem(null, id);
-    return res.status(200).json(skuItemList.map(skuItem => skuItem.clean(['id'])));
+    return res.status(200).json(skuItemList.map(skuItem => skuItem.clean(['Available'])));
   } catch (err) {
       if (err.code == 3)
         return res.status(404).json({error: `Provided id [${id}] does not match any SKU`});
