@@ -22,8 +22,8 @@ router.get('/api/testDescriptors', async (req,res) => {
 // retrieves a test descriptor from the database given its id
 router.get('/api/testDescriptors/:id', async (req,res) => {
     const id = parseInt(req.params.id);
-    if(!Number.isInteger(id) || id < 0 ) {
-        res.status(422).json({error: `Invalid test descriptor id.`});
+    if(!Number.isInteger(id) || id < 1 ) {
+        return res.status(422).json({error: `Invalid test descriptor id.`});
     }
     try {
       const db = new TestDescriptorDBU('ezwh.db');
@@ -39,8 +39,8 @@ router.get('/api/testDescriptors/:id', async (req,res) => {
 // POST /api/testDescriptor
 // add a new test descriptor to the database
 router.post('/api/testDescriptor', async (req,res) => {
-  if (req.body === undefined || req.body.name === undefined || req.body.procedureDescription === undefined ||
-      req.body.idSKU === undefined || !Number.isInteger(parseInt(req.body.idSKU)) || parseInt(req.body.idSKU) < 0 ) {
+  if (req.body === undefined || !req.body.name || !req.body.procedureDescription ||
+      req.body.idSKU === undefined || !Number.isInteger(parseInt(req.body.idSKU)) || parseInt(req.body.idSKU) < 1 ) {
     return res.status(422).json({error: `Invalid test descriptor data.`});
   }
   try{
@@ -49,7 +49,7 @@ router.post('/api/testDescriptor', async (req,res) => {
       return res.status(201).end();
   }
   catch(err){
-    if (code==3)
+    if (err.code === 3)
       return res.status(404).json({error: `No SKU with matching id.`});
     return res.status(503).json({error: `Something went wrong...`, message: err.message});
   }
@@ -59,20 +59,29 @@ router.post('/api/testDescriptor', async (req,res) => {
 // modify a test descriptor in the database
 router.put('/api/testDescriptor/:id', async (req,res) => {
   const id = parseInt(req.params.id);
-  if (req.body === undefined || req.body.newName === undefined || req.body.newProcedureDescription === undefined ||
-      req.body.newIdSKU === undefined || !Number.isInteger(parseInt(req.body.newIdSKU)) ||
-      parseInt(req.body.newIdSKU) < 0 || id === undefined || !Number.isInteger(id) || id < 0 ) {
+  if (req.body === undefined || (req.body.newName === undefined && req.body.newProcedureDescription === undefined &&
+      req.body.newIdSKU === undefined) || (req.body.newName !== undefined && !req.body.newName) ||
+      (req.body.newProcedureDescription !== undefined && !req.body.newProcedureDescription) ||
+      (req.body.newIdSKU !== undefined && (!Number.isInteger(parseInt(req.body.newIdSKU)) ||
+      parseInt(req.body.newIdSKU) < 1)) || id === undefined || !Number.isInteger(id) || id < 1 ) {
     return res.status(422).json({error: `Invalid test descriptor data.`});
   }
   try{
     const db = new TestDescriptorDBU('ezwh.db');
-    const isUpdated = await db.updateTestDescriptor(id, req.body.newName, req.body.newProcedureDescription, req.body.newIdSKU);
+    const descriptorList = await db.loadTestDescriptor(id);
+    const descriptor = descriptorList.pop();
+  
+    const name = req.body.newName ? req.body.newName : descriptor.name;
+    const procedure = req.body.newProcedureDescription ? req.body.newProcedureDescription : descriptor.procedureDescription;
+    const idSKU = req.body.newIdSKU ? req.body.newIdSKU : descriptor.idSKU;
+
+    const isUpdated = await db.updateTestDescriptor(id, name, procedure, idSKU);
     if (!isUpdated)
       return res.status(404).json({error: `No test descriptor with matching id.`});
     return res.status(200).end();
   }
   catch(err){
-    if (code==3)
+    if (err.code === 3)
       return res.status(404).json({error: `No SKU with matching id.`});
     return res.status(503).json({error: `Something went wrong...`, message: err.message});
   }
@@ -82,7 +91,7 @@ router.put('/api/testDescriptor/:id', async (req,res) => {
 // remove a test descriptor from the database
 router.delete('/api/testDescriptor/:id', async (req,res) => {
   const id = parseInt(req.params.id);
-  if (id === undefined || !Number.isInteger(id) || id < 0 ) {
+  if (id === undefined || !Number.isInteger(id) || id < 1 ) {
     return res.status(422).json({error: `Invalid id.`});
   }
   try{
