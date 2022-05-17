@@ -7,6 +7,7 @@ const positionRoute = require('./api/positionApi');
 const userRoute = require('./api/userApi');
 const itemRoute = require('./api/itemApi');
 const testDescriptorRoute = require('./api/testDescriptorApi');
+const testResultRoute = require('./api/testResultApi');
 
 const internalOrderRoute = require('./api/internalOrderApi');
 const restockOrderRoute = require('./api/restockOrderApi');
@@ -26,6 +27,7 @@ app.use('/', internalOrderRoute);
 app.use('/', restockOrderRoute);
 app.use('/', returnOrderRoute);
 app.use('/', testDescriptorRoute);
+app.use('/', testResultRoute);
 
 //GET /api/test
 app.get('/api/hello', (req,res)=>{

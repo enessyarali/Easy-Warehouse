@@ -49,7 +49,7 @@ class TestResultDBU {
                     }
                     else {
                         const results = rows.map((tr) => {
-                            const res = new TestResult(tr.SKUitemRFid, tr.id, tr.descriptorId, tr.date, tr.result =='Pass'? true : false);
+                            const res = new TestResult(tr.id, tr.descriptorId, tr.date, tr.result =='Pass'? true : false);
                             return res;
                         });
                         resolve(results);
@@ -82,10 +82,19 @@ class TestResultDBU {
     }
 
 // update a selected TestResult in the TEST-RESULTS table. Return number of rows modified
-    updateTestResult(id, descriptorId, date, result) {
+    async updateTestResult(SKUitemRFid, id, descriptorId, date, result) {
+        // check if SKUitem exists
+        const isSKUitem = await this.#checkSKUitem(SKUitemRFid);
+        if (!isSKUitem)
+            throw(new Error("SKUitem does not exist. Operation aborted.", 9));
+        // check if TestDescriptor exists
+        const isDescriptorId = await this.#checkDescriptorId(descriptorId);
+        if(!isDescriptorId)
+            throw(new Error("TestDescriptor does not exist. Operation aborted",11));
+
         return new Promise((resolve, reject) => {
-            const sqlUpdate = 'UPDATE "TEST-RESULTS" SET descriptorId = ?, date = ?, result = ? WHERE id = ?';
-            this.db.run(sqlUpdate, [descriptorId, date, result ? 'Pass' : 'Fail', id], function (err) {
+            const sqlUpdate = 'UPDATE "TEST-RESULTS" SET descriptorId = ?, date = ?, result = ? WHERE id = ? AND SKUitemId = ?';
+            this.db.run(sqlUpdate, [descriptorId, date, result ? 'Pass' : 'Fail', id, isSKUitem], function (err) {
                 if(err) {
                     reject(err);
                     return;
@@ -99,25 +108,13 @@ class TestResultDBU {
 
 // delete one or more TestResult from the TEST-RESULTS table given different input. Return number of rows modified
     async deleteTestResult(skuItemRFid, resultId) {
-        let sqlInfo = {sql: undefined, values: undefined};
-
-        if(resultId && skuItemRFid) {
-            const skuItemId = await this.#checkSKUitem(skuItemRFid)
-            if(skuItemId){
-                const sqlDeleteFromResultId = 'DELETE FROM "TEST-RESULTS" WHERE id = ? AND SKUitemId = ?';
-                sqlInfo.sql = sqlDeleteFromResultId;
-                sqlInfo.values = [resultId, skuItemId];
-            }
-            else {
-                throw( new Error("SKUitem does not exist", 9));
-            }
+        const skuItemId = await this.#checkSKUitem(skuItemRFid);
+        if (!skuItemId) {
+            throw( new Error("SKUitem does not exist", 9));
         }
-        else {
-            throw( new Error("No Argument Passed", 10));
-        }
-        
         return new Promise((resolve, reject) => {
-            this.db.run(sqlInfo.sql,sqlInfo.values, function (err) {
+            const sql = 'DELETE FROM "TEST-RESULTS" WHERE id = ? AND SKUitemId = ?';
+            this.db.run(sql,[resultId, skuItemId], function (err) {
                 if(err) {
                     reject(err);
                     return;

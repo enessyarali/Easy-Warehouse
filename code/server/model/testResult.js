@@ -2,16 +2,11 @@
 
 class TestResult {
 
-    constructor(SKUitemRFid, id=undefined, descriptorId, date, result) {
-        this.SKUitemRFid = SKUitemRFid;
+    constructor(id=undefined, descriptorId, date, result) {
         this.id = id;
-        this.descriptorId = descriptorId;
-        this.date = date;
-        this.result = result;
-    }
-
-    setSKUitemRFid(newSKUitemRFid) {
-        this.SKUitemRFid = newSKUitemRFid;
+        this.idTestDescriptor = descriptorId;
+        this.Date = date;
+        this.Result = result;
     }
 }
 
