@@ -231,7 +231,7 @@ class RestockOrderDBU {
                     return;
                 }
                 const products = rows.map((p) => new ProductRKO(p.skuId, p.description, p.price, p.quantity));
-                resolve(products);;
+                resolve(products);
             });
         });
     }
