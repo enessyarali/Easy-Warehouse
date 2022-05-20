@@ -53,9 +53,9 @@ class ItemDBU {
         if (!isSKU)
             throw(new Error("SKU does not exist. Operation aborted.", 3));
         // check if supplier already sell object
-        const isAlreadySelling = await this.#checkConsistency(supplierId, SKUId);
+        const isAlreadySelling = await this.#checkConsistency(id, supplierId, SKUId);
         if (isAlreadySelling)
-            throw(new Error("Supplier already sells SKU. Operation aborted.", 8));
+            throw(new Error("Supplier already sells SKU / item. Operation aborted.", 8));
         return new Promise((resolve, reject) => {
             const sqlInsert = 'INSERT INTO ITEMS (id, description, price, SKUId, supplierId) VALUES(?,?,?,?,?);';
             this.db.run(sqlInsert, [id, description, price, SKUId, supplierId], (err) => {
@@ -148,10 +148,10 @@ class ItemDBU {
         });
     }
 
-    #checkConsistency(supplierId, skuId) {
-        const sql = 'SELECT id FROM items WHERE SKUId=? AND supplierId=?'
+    #checkConsistency(id, supplierId, skuId) {
+        const sql = 'SELECT id FROM items WHERE (SKUId=? OR id=?) AND supplierId=?'
         return new Promise((resolve, reject) => {
-            this.db.get(sql, [skuId, supplierId], (err, row) => {
+            this.db.get(sql, [skuId, id, supplierId], (err, row) => {
                 if(err) {
                     reject(err);
                     return;

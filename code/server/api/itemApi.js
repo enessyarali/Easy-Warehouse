@@ -55,7 +55,7 @@ router.post('/api/item', async (req,res) => {
     if (err.code==3)
       return res.status(404).json({error: "SKU not found. Operation aborted."});
     if (err.code==8)
-      return res.status(404).json({error: "Supplier already sells SKU. Operation aborted."});
+      return res.status(422).json({error: "Supplier already sells SKU / Item. Operation aborted."});
     return res.status(503).json({error: `Something went wrong...`, message: err.message});
   }
 });
@@ -87,14 +87,16 @@ router.put('/api/item/:id', async (req,res) => {
 
 // DELETE /api/item/:id
 // remove a item from the database
-router.delete('/api/item/:id', async (req,res) => {
+router.delete('/api/items/:id', async (req,res) => {
   const id = parseInt(req.params.id);
   if (!Number.isInteger(id) || id < 0) {
     return res.status(422).json({error: `Validation of id failed`});
   }
   try{
       const db = new ItemDBU('ezwh.db');
-      await db.deleteItem(id);
+      const deleted = await db.deleteItem(id);
+      if (!deleted)
+        return res.status(404).json({error: `No Item with matching id.`});
       return res.status(204).end();
   }
   catch(err){
