@@ -11,7 +11,7 @@ const agent = chai.request.agent(app);
 /* FUNCTIONAL REQUIREMENTS
  *
  * FR3.1 Manage positions
- *   FR3.1.1 Define a new position, or modify an existing position
+ *   FR3.1.1 Define a new position
  *   FR3.1.2 Delete a position
  *   FR3.1.3 List all positions
  *   FR3.1.4 Modify attributes of a position
@@ -60,37 +60,34 @@ describe('test position apis', () => {
     afterEach( async () => {
         await agent.delete('/api/position/800234543412');
         await agent.delete('/api/position/800234543413');
-    })
+    });
 
-    getPositions(200, [p1, p2]);
+    getPositions('GET /api/positions - retrieve all positions in the system', 200, [p1, p2]);
 
-    addPosition(201, p3);
-    addPosition(422, p1_invalid);
-    addPosition(422, p2_invalid);
-    addPosition(422, p3_invalid);
+    addPosition('POST /api/position - correctly adding a position', 201, p3);
+    addPosition('POST /api/position - passing a negative weight', 422, p1_invalid);
+    addPosition('POST /api/position - passing inconsistent position coordinates', 422, p2_invalid);
+    addPosition('POST /api/position - swapping 2 parameters', 422, p3_invalid);
 
-    modifyPosition(200, p1.positionID, newP1);
-    modifyPosition(422, p2.positionID, newP2_invalid);
-    modifyPosition(404, "800234543414", newP1);
+    modifyPosition('PUT /api/position/:posID - correctly modify a position', 200, p1.positionID, newP1);
+    modifyPosition('PUT /api/position/:posID - passing a field with a typo', 422, p2.positionID, newP2_invalid);
+    modifyPosition('PUT /api/position/:posID - position does not exist', 404, "800234543414", newP1);
 
-    patchPositionID(200, p1.positionID, {newPositionID: "800234543469"});
-    // the new positionID is too short
-    patchPositionID(422, p1.positionID, {newPositionID: "8002345434"});
-    // the old positionID is too short
-    patchPositionID(422, "80023443413", {newPositionID: "800234543469"});
-    patchPositionID(404, "800234543414", {newPositionID: "800234543415"});
+    patchPositionID('PUT /api/position/:posID/changeID - correctly patch id', 200, p1.positionID, {newPositionID: "800234543469"});
+    patchPositionID('PUT /api/position/:posID/changeID - short new positionID', 422, p1.positionID, {newPositionID: "8002345434"});
+    patchPositionID('PUT /api/position/:posID/changeID - short old positionID', 422, "80023443413", {newPositionID: "800234543469"});
+    patchPositionID('PUT /api/position/:posID/changeID - position does not exist', 404, "800234543414", {newPositionID: "800234543415"});
     // we are breaking a database constraint
-    patchPositionID(503, p1.positionID, {newPositionID: "800234543413"});
+    patchPositionID('PUT /api/position/:posID/changeID - new id already exists', 503, p1.positionID, {newPositionID: "800234543413"});
     
-    deletePosition(204, p1.positionID);
-    // the positionID is too short
-    deletePosition(422, "80023443413");
-    deletePosition(404, "800234543414");
+    deletePosition('DELETE /api/position/:posID - correctly delete a position', 204, p1.positionID);
+    deletePosition('DELETE /api/position/:posID - short positionID', 422, "80023443413");
+    deletePosition('DELETE /api/position/:posID - position does not exist', 404, "800234543414");
 });
 
 // FR3.1.3 List all positions
-function getPositions(expectedHTTPStatus, positions) {
-    it('getting position data from the system', async function () {
+function getPositions(description, expectedHTTPStatus, positions) {
+    it(description, async function () {
         try {
             let startTime = performance.now();
             const r = await agent.get('/api/positions');
@@ -113,10 +110,10 @@ function getPositions(expectedHTTPStatus, positions) {
     });       
 }
 
-// FR3.1.1.1 Define a new position
+// FR3.1.1 Define a new position
 // FR3.1.2 Delete a position
-function addPosition(expectedHTTPStatus, p) {
-    it('adding a new position in the system, then removing it', async function () {
+function addPosition(description, expectedHTTPStatus, p) {
+    it(description, async function () {
         try {
             let startTime = performance.now();
             const rInsert = await agent.post('/api/position').send(p);
@@ -135,9 +132,9 @@ function addPosition(expectedHTTPStatus, p) {
     });       
 }
 
-// FR3.1.1.2.1 Modify an existing position
-function modifyPosition(expectedHTTPStatus, oldId, newP) {
-    it('modifying a position in the system', async function () {
+// FR3.1.4.1 Modify an existing position
+function modifyPosition(description, expectedHTTPStatus, oldId, newP) {
+    it(description, async function () {
         try {
             let startTime = performance.now();
             const rUpdate = await agent.put(`/api/position/${oldId}`).send(newP);
@@ -156,9 +153,9 @@ function modifyPosition(expectedHTTPStatus, oldId, newP) {
     });       
 }
 
-// FR3.1.1.2.1 Modify only the ID of an existing position
-function patchPositionID(expectedHTTPStatus, oldId, newId) {
-    it('patching a positionID in the system', async function () {
+// FR3.1.4.1 Modify only the ID of an existing position
+function patchPositionID(description, expectedHTTPStatus, oldId, newId) {
+    it(description, async function () {
         try {
             let startTime = performance.now();
             const rUpdate = await agent.put(`/api/position/${oldId}/changeID`).send(newId);
@@ -178,8 +175,8 @@ function patchPositionID(expectedHTTPStatus, oldId, newId) {
 }
 
 // FR3.1.2 Delete a position
-function deletePosition(expectedHTTPStatus, id) {
-    it('removing a positionID in the system', async function () {
+function deletePosition(description, expectedHTTPStatus, id) {
+    it(description, async function () {
         try {
             let startTime = performance.now();
             const r = await agent.delete(`/api/position/${id}`);
