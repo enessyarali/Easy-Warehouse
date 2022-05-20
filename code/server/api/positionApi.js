@@ -43,7 +43,7 @@ router.post('/api/position', async (req,res) => {
 // modify a position in the database
 router.put('/api/position/:positionID', async (req,res) => {
   const positionID = req.params.positionID;
-  if (!validators.rfidIsValid(positionID) || req.body === undefined || req.body.newAisleID === undefined || req.body.newRow === undefined ||
+  if (!validators.positionIdIsValid(positionID) || req.body === undefined || req.body.newAisleID === undefined || req.body.newRow === undefined ||
       req.body.newCol === undefined || !validators.posFieldIsValid(req.body.newAisleID) || !validators.posFieldIsValid(req.body.newRow) || !validators.posFieldIsValid(req.body.newCol) ||
       req.body.newMaxWeight === undefined || !Number.isInteger(parseInt(req.body.newMaxWeight)) || parseInt(req.body.newMaxWeight) <= 0 ||
       req.body.newMaxVolume === undefined || !Number.isInteger(parseInt(req.body.newMaxVolume)) || parseInt(req.body.newMaxVolume) <= 0 ||
@@ -68,7 +68,7 @@ router.put('/api/position/:positionID', async (req,res) => {
 // modify the id of a position in the database
 router.put('/api/position/:positionID/changeID', async (req,res) => {
     const positionID = req.params.positionID;
-    if (!validators.rfidIsValid(positionID) || req.body === undefined || req.body.newPositionID === undefined || !validators.rfidIsValid(req.body.newPositionID) ) {
+    if (!validators.positionIdIsValid(positionID) || req.body === undefined || req.body.newPositionID === undefined || !validators.positionIdIsValid(req.body.newPositionID) ) {
       return res.status(422).json({error: `Invalid position id.`});
     }
     try{
@@ -87,13 +87,15 @@ router.put('/api/position/:positionID/changeID', async (req,res) => {
 // remove a position from the database
 router.delete('/api/position/:positionID', async (req,res) => {
   const positionID = req.params.positionID;
-  if (!validators.rfidIsValid(positionID)) {
+  if (!validators.positionIdIsValid(positionID)) {
     return res.status(422).json({error: `Invalid position id.`});
   }
   try{
       const db = new PositionDBU('ezwh.db');
       // get the position to be deleted
       const deleted = await db.deletePosition(positionID);
+      if (!deleted)
+        return res.status(404).json({error: 'No position with matching id.'});
       return res.status(204).end();
   }
   catch(err){
