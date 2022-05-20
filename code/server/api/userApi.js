@@ -7,23 +7,9 @@
 
 const express = require('express');
 const UserDBU = require('../database_utilities/userDBU.js');
+const validators = require('./validation');
 
 let router = express.Router();
-
-function mailIsValid(str) {
-    const regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    return regex.test(str);
-}
-
-function nameIsValid(str) {
-  const regex = /^[A-Z][a-z]+$/;
-  return regex.test(str);
-}
-
-function surnameIsValid(str) {
-  const regex = /^[A-Z][A-Za-z\s']+$/;
-  return regex.test(str);
-}
 
 function getType(str) {
   const clean = (str + '').trim().toLowerCase();
@@ -77,9 +63,9 @@ router.get('/api/users', async (req,res) => {
 // add a new user to the database
 router.post('/api/newUser', async (req,res) => {
   const type = req.body && getType(req.body.type);  
-  if (req.body === undefined || req.body.username === undefined || !mailIsValid(req.body.username) ||
-      req.body.name === undefined || typeof req.body.name !== 'string' || !nameIsValid(req.body.name) ||
-      req.body.surname === undefined || typeof req.body.surname !== 'string' || !surnameIsValid(req.body.surname) ||
+  if (req.body === undefined || req.body.username === undefined || !validators.mailIsValid(req.body.username) ||
+      req.body.name === undefined || typeof req.body.name !== 'string' || !validators.nameIsValid(req.body.name) ||
+      req.body.surname === undefined || typeof req.body.surname !== 'string' || !validators.surnameIsValid(req.body.surname) ||
       req.body.password === undefined || type === undefined || type === 'manager' || type === 'administrator' ||
       req.body.password.length < 8 ) {
     return res.status(422).json({error: `Invalid user data.`});
@@ -99,7 +85,7 @@ router.post('/api/newUser', async (req,res) => {
 // POST /api/managerSessions
 // allow manager login
 router.post('/api/managerSessions', async (req,res) => {
-    if (req.body === undefined || req.body.username === undefined || !mailIsValid(req.body.username) ||
+    if (req.body === undefined || req.body.username === undefined || !validators.mailIsValid(req.body.username) ||
         req.body.password === undefined || req.body.password.length < 8 ) {
       return res.status(401).json({error: `Invalid username or password.`});
     }
@@ -118,7 +104,7 @@ router.post('/api/managerSessions', async (req,res) => {
 // POST /api/customerSessions
 // allow customer login
 router.post('/api/customerSessions', async (req,res) => {
-    if (req.body === undefined || req.body.username === undefined || !mailIsValid(req.body.username) ||
+    if (req.body === undefined || req.body.username === undefined || !validators.mailIsValid(req.body.username) ||
         req.body.password === undefined || req.body.password.length < 8 ) {
       return res.status(401).json({error: `Invalid username or password.`});
     }
@@ -137,7 +123,7 @@ router.post('/api/customerSessions', async (req,res) => {
 // POST /api/supplierSessions
 // allow supplier login
 router.post('/api/supplierSessions', async (req,res) => {
-    if (req.body === undefined || req.body.username === undefined || !mailIsValid(req.body.username) ||
+    if (req.body === undefined || req.body.username === undefined || !validators.mailIsValid(req.body.username) ||
         req.body.password === undefined || req.body.password.length < 8 ) {
       return res.status(401).json({error: `Invalid username or password.`});
     }
@@ -156,7 +142,7 @@ router.post('/api/supplierSessions', async (req,res) => {
 // POST /api/clerkSessions
 // allow clerk login
 router.post('/api/clerkSessions', async (req,res) => {
-    if (req.body === undefined || req.body.username === undefined || !mailIsValid(req.body.username) ||
+    if (req.body === undefined || req.body.username === undefined || !validators.mailIsValid(req.body.username) ||
         req.body.password === undefined || req.body.password.length < 8 ) {
       return res.status(401).json({error: `Invalid username or password.`});
     }
@@ -175,7 +161,7 @@ router.post('/api/clerkSessions', async (req,res) => {
 // POST /api/qualityEmployeeSessions
 // allow quality employee login
 router.post('/api/qualityEmployeeSessions', async (req,res) => {
-    if (req.body === undefined || req.body.username === undefined || !mailIsValid(req.body.username) ||
+    if (req.body === undefined || req.body.username === undefined || !validators.mailIsValid(req.body.username) ||
         req.body.password === undefined || req.body.password.length < 8 ) {
       return res.status(401).json({error: `Invalid username or password.`});
     }
@@ -214,7 +200,7 @@ router.put('/api/users/:username', async (req,res) => {
   if (req.body === undefined || getType(req.body.oldType) === undefined || req.body.oldType === 'manager' ||
       req.body.oldType === 'administrator' || getType(req.body.newType) === undefined || 
       req.body.newType === 'manager' || req.body.newType === 'administrator' || 
-      username === undefined || !mailIsValid(username) ) {
+      username === undefined || !validators.mailIsValid(username) ) {
     return res.status(422).json({error: `Invalid user data.`});
   }
   try{
@@ -237,7 +223,7 @@ router.put('/api/users/:username', async (req,res) => {
 router.delete('/api/users/:username/:type', async (req,res) => {
   const username = req.params.username;
   const type = getType(req.params.type);
-  if (username === undefined || !mailIsValid(username) || type === undefined || type === 'manager' || 
+  if (username === undefined || !validators.mailIsValid(username) || type === undefined || type === 'manager' || 
       type === 'administrator' ) {
     return res.status(422).json({error: `Invalid username or type.`});
   }

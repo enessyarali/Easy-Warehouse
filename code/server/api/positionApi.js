@@ -2,18 +2,9 @@
 
 const express = require('express');
 const PositionDBU = require('../database_utilities/positionDBU.js');
+const validators = require('./validation');
 
 let router = express.Router();
-
-function isValid(str) {
-    const regex = /^\d{4}$/;
-    return regex.test(str);
-}
-
-function idIsValid(str) {
-    const regex = /^\d{12}$/;
-    return regex.test(str);
-}
 
 // GET /api/positions
 // retrieves all positions from the database
@@ -31,8 +22,8 @@ router.get('/api/positions', async (req,res) => {
 // add a new position to the database
 router.post('/api/position', async (req,res) => {
   if (req.body === undefined || req.body.positionID === undefined || req.body.aisleID === undefined ||
-      req.body.row === undefined || req.body.col === undefined || !isValid(req.body.aisleID) || !isValid(req.body.row) ||
-      !isValid(req.body.col) || req.body.positionID !== req.body.aisleID + req.body.row + req.body.col ||
+      req.body.row === undefined || req.body.col === undefined || !validators.posFieldIsValid(req.body.aisleID) || !validators.posFieldIsValid(req.body.row) ||
+      !validators.posFieldIsValid(req.body.col) || req.body.positionID !== req.body.aisleID + req.body.row + req.body.col ||
       req.body.maxWeight === undefined || !Number.isInteger(parseInt(req.body.maxWeight)) || parseInt(req.body.maxWeight) <= 0 ||
       req.body.maxVolume === undefined || !Number.isInteger(parseInt(req.body.maxVolume)) || parseInt(req.body.maxVolume) <= 0 ) {
     return res.status(422).json({error: `Invalid position data.`});
@@ -52,8 +43,8 @@ router.post('/api/position', async (req,res) => {
 // modify a position in the database
 router.put('/api/position/:positionID', async (req,res) => {
   const positionID = req.params.positionID;
-  if (!idIsValid(positionID) || req.body === undefined || req.body.newAisleID === undefined || req.body.newRow === undefined ||
-      req.body.newCol === undefined || !isValid(req.body.newAisleID) || !isValid(req.body.newRow) || !isValid(req.body.newCol) ||
+  if (!validators.rfidIsValid(positionID) || req.body === undefined || req.body.newAisleID === undefined || req.body.newRow === undefined ||
+      req.body.newCol === undefined || !validators.posFieldIsValid(req.body.newAisleID) || !validators.posFieldIsValid(req.body.newRow) || !validators.posFieldIsValid(req.body.newCol) ||
       req.body.newMaxWeight === undefined || !Number.isInteger(parseInt(req.body.newMaxWeight)) || parseInt(req.body.newMaxWeight) <= 0 ||
       req.body.newMaxVolume === undefined || !Number.isInteger(parseInt(req.body.newMaxVolume)) || parseInt(req.body.newMaxVolume) <= 0 ||
       req.body.newOccupiedWeight === undefined || !Number.isInteger(parseInt(req.body.newOccupiedWeight)) || parseInt(req.body.newOccupiedWeight) < 0 ||
@@ -77,7 +68,7 @@ router.put('/api/position/:positionID', async (req,res) => {
 // modify the id of a position in the database
 router.put('/api/position/:positionID/changeID', async (req,res) => {
     const positionID = req.params.positionID;
-    if (!idIsValid(positionID) || req.body === undefined || req.body.newPositionID === undefined || !idIsValid(req.body.newPositionID) ) {
+    if (!validators.rfidIsValid(positionID) || req.body === undefined || req.body.newPositionID === undefined || !validators.rfidIsValid(req.body.newPositionID) ) {
       return res.status(422).json({error: `Invalid position id.`});
     }
     try{
@@ -96,7 +87,7 @@ router.put('/api/position/:positionID/changeID', async (req,res) => {
 // remove a position from the database
 router.delete('/api/position/:positionID', async (req,res) => {
   const positionID = req.params.positionID;
-  if (!idIsValid(positionID)) {
+  if (!validators.rfidIsValid(positionID)) {
     return res.status(422).json({error: `Invalid position id.`});
   }
   try{

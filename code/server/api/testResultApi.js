@@ -2,46 +2,9 @@
 
 const express = require('express');
 const TestResultDBU = require('../database_utilities/testResultDBU.js');
+const validators = require('./validation');
 
 let router = express.Router();
-
-function dateIsValid(dateStr, compare=true) {
-  const regex = /^\d{4}\/\d{2}\/\d{2}$/;
-  const regex2 = /^\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}$/;
-
-  if (!dateStr.match(regex) && !dateStr.match(regex2)) {
-    return false;
-  }
-
-  if (compare) {
-    const now = new Date();
-    if(dateStr.match(regex2)){
-        const [date, time] = dateStr.split(' ');
-        const [year, month, day] = date.split('/');
-        const [hour, minute] = time.split(':');
-        const myDate = new Date(year, month - 1, day, hour, minute);
-        if(!(myDate instanceof Date))
-            return false;
-        if(myDate.getTime() > now.getTime())
-            return false;
-    }
-    else{
-        const [year, month, day] = dateStr.split('/');
-        const myDate = new Date(year, month - 1, day);
-        if(!(myDate instanceof Date))
-            return false;
-        if(myDate.getTime() > now.getTime())
-            return false;
-    }
-  }
-
-  return true;
-}
-
-function rfidIsValid(str){
-  const regex = /^\d{32}$/;
-  return regex.test(str);
-}
 
 // GET /api/testresults
 // retrieves all test results from the database
@@ -81,9 +44,9 @@ router.get('/api/skuitems/:rfid/testResults/:id', async (req,res) => {
   // POST /api/testResult
 // add a new test Result to the database
 router.post('/api/skuitems/testResult', async (req,res) => {
-    if (req.body === undefined || req.body.rfid === undefined || !rfidIsValid(req.body.rfid) || 
+    if (req.body === undefined || req.body.rfid === undefined || !validators.rfidIsValid(req.body.rfid) || 
         req.body.idTestDescriptor === undefined || parseInt(req.body.idTestDescriptor) <= 0 ||
-        req.body.Date === undefined || !dateIsValid(req.body.Date) ||
+        req.body.Date === undefined || !validators.dateIsValid(req.body.Date) ||
         req.body.Result === undefined || typeof req.body.Result !== 'boolean') {
       return res.status(422).json({error: `Invalid test Result data.`});
     }
@@ -108,7 +71,7 @@ router.put('/api/skuitems/:rfid/testResult/:id', async (req,res) => {
     const rfId= req.params.rfid
     if (req.body === undefined || req.body.newIdTestDescriptor === undefined || 
       parseInt(req.body.newIdTestDescriptor) <= 0 ||
-      req.body.newDate === undefined || !dateIsValid(req.body.newDate) ||
+      req.body.newDate === undefined || !validators.dateIsValid(req.body.newDate) ||
       req.body.newResult === undefined) {
       return res.status(422).json({error: `Invalid test result data.`});
     }

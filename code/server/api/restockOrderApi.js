@@ -2,6 +2,7 @@
 
 const express = require('express')
 const RestockOrderDBU = require('../database_utilities/restockOrderDBU.js')
+const validators = require('./validation');
 
 let router = express.Router()
 
@@ -21,39 +22,6 @@ function getState(str) {
   }
 }
 
-function dateIsValid(dateStr, compare=true) {
-  const regex = /^\d{4}\/\d{2}\/\d{2}$/;
-  const regex2 = /^\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}$/;
-
-  if (!dateStr.match(regex) && !dateStr.match(regex2)) {
-    return false;
-  }
-
-  if (compare) {
-    const now = new Date();
-    if(dateStr.match(regex2)){
-        const [date, time] = dateStr.split(' ');
-        const [year, month, day] = date.split('/');
-        const [hour, minute] = time.split(':');
-        const myDate = new Date(year, month - 1, day, hour, minute);
-        if(!(myDate instanceof Date))
-            return false;
-        if(myDate.getTime() > now.getTime())
-            return false;
-    }
-    else{
-        const [year, month, day] = dateStr.split('/');
-        const myDate = new Date(year, month - 1, day);
-        if(!(myDate instanceof Date))
-            return false;
-        if(myDate.getTime() > now.getTime())
-            return false;
-    }
-  }
-
-  return true;
-}
-
 async function checkState(db, orderId, stateRequested) {
   try{
     const currentState = await db.retriveState(orderId);
@@ -62,11 +30,6 @@ async function checkState(db, orderId, stateRequested) {
   catch {
     return false;
   }
-}
-
-function rfidIsValid(str){
-  const regex = /^\d{32}$/;
-  return regex.test(str);
 }
 
 //GET /api/restockOrders
@@ -137,7 +100,7 @@ router.get('/api/restockOrders/:id/returnItems', async (req,res) => {
 // POST /api/restockOrder
 // add a new restockOrder to the database
 router.post('/api/restockOrder', async (req,res) => {
-  if (req.body === undefined || req.body.issueDate == undefined || !dateIsValid(req.body.issueDate) || 
+  if (req.body === undefined || req.body.issueDate == undefined || !validators.dateIsValid(req.body.issueDate) || 
       req.body.products === undefined || 
       req.body.products.some(p => (p.SKUId === undefined || typeof p.SKUId !== 'number' ||
       p.SKUId <= 0 || p.description === undefined || p.price === undefined ||
@@ -187,7 +150,7 @@ router.put('/api/restockOrder/:id/skuItems', async (req,res) => {
     return res.status(422).json({error: `Invalid restockOrder id.`});
   if (req.body === undefined || req.body.skuItems === undefined || 
     req.body.skuItems.some((i) => (i.SKUId===undefined || typeof p.SKUId !== 'number' ||
-    p.SKUId <= 0 || i.rfid===undefined || !rfidIsValid(i.rfid)))) {
+    p.SKUId <= 0 || i.rfid===undefined || !validators.rfidIsValid(i.rfid)))) {
     return res.status(422).json({error: `Invalid restockOrder data.`});
   }
   try{
@@ -218,7 +181,7 @@ router.put('/api/restockOrder/:id/transportNote', async (req,res) => {
   if(!Number.isInteger(id) || id < 0)
     return res.status(422).json({error: `Invalid restockOrder id.`});
   if (req.body === undefined || req.body.transportNote === undefined || 
-    req.body.transportNote.deliveryDate === undefined || !dateIsValid(req.body.transportNote.deliveryDate)) {
+    req.body.transportNote.deliveryDate === undefined || !validators.dateIsValid(req.body.transportNote.deliveryDate)) {
     return res.status(422).json({error: `Invalid restockOrder data.`});
   }
   try{

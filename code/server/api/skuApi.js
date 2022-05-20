@@ -2,14 +2,9 @@
 
 const express = require('express');
 const SkuDBU = require('../database_utilities/skuDBU.js');
+const validators = require('./validation');
 
 let router = express.Router();
-
-function positionIdIsValid(str) {
-  const regex = /^\d{12}$/;
-  return str.match(regex);
-}
-
 
 // GET /api/skus
 // retrieves all skus from the database
@@ -98,7 +93,7 @@ router.put('/api/sku/:id', async (req,res) => {
 // assign a position to a sku
 router.put('/api/sku/:id/position', async (req,res) => {
   const id = parseInt(req.params.id);
-  if (req.body === undefined || req.body.position === undefined || !positionIdIsValid(req.body.position) ||
+  if (req.body === undefined || req.body.position === undefined || !validators.positionIdIsValid(req.body.position) ||
       !Number.isInteger(id) || id < 0) {
     return res.status(422).json({error: `Invalid data.`});
   }

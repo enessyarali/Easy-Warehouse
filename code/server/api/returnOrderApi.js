@@ -2,44 +2,9 @@
 
 const express = require('express')
 const ReturnOrderDBU = require('../database_utilities/returnOrderDBU.js')
+const validators = require('./validation');
 
 let router = express.Router()
-
-function dateIsValid(dateStr) {
-  const regex = /^\d{4}\/\d{2}\/\d{2}$/;
-  const regex2 = /^\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}$/;
-
-  if (!dateStr.match(regex) && !dateStr.match(regex2)) {
-    return false;
-  }
-
-  const now = new Date();
-  if(dateStr.match(regex2)){
-      const [date, time] = dateStr.split(' ');
-      const [year, month, day] = date.split('/');
-      const [hour, minute] = time.split(':');
-      const myDate = new Date(year, month - 1, day, hour, minute);
-      if(!(myDate instanceof Date))
-          return false;
-      if(myDate.getTime() > now.getTime())
-          return false;
-  }
-  else{
-      const [year, month, day] = dateStr.split('/');
-      const myDate = new Date(year, month - 1, day);
-      if(!(myDate instanceof Date))
-          return false;
-      if(myDate.getTime() > now.getTime())
-          return false;
-  }
-
-  return true;
-}
-
-function rfidIsValid(str){
-  const regex = /^\d{32}$/;
-  return regex.test(str);
-}
 
 //GET all return orders
 router.get('/api/returnOrders', async (req,res) => {
@@ -74,12 +39,12 @@ router.get('/api/returnOrders/:id', async (req,res) => {
 // POST /api/returnOrder
 // add a new returnOrder to the database
 router.post('/api/returnOrder', async (req,res) => {
-  if (req.body === undefined || req.body.returnDate == undefined || !dateIsValid(req.body.returnDate)
+  if (req.body === undefined || req.body.returnDate == undefined || !validators.dateIsValid(req.body.returnDate)
     || req.body.products === undefined || req.body.restockOrderId === undefined 
     || req.body.products.some(p => (p.SKUId === undefined || typeof p.SKUId !== 'number' ||
     p.SKUId <= 0 || p.description === undefined || p.price === undefined ||
     typeof p.price !== 'number' || p.price <= 0 || p.RFID === undefined ||
-    !rfidIsValid(p.RFID)))
+    !validators.rfidIsValid(p.RFID)))
     || !Number.isInteger(parseInt(req.body.restockOrderId)) || parseInt(req.body.restockOrderId) <= 0) {
     return res.status(422).json({error: `Invalid returnOrder data.`});
   }
