@@ -61,7 +61,7 @@ router.get('/api/restockOrders/:id', async (req,res) => {
   // create connection with the db  
   try {
     const id = parseInt(req.params.id);
-    if(!Number.isInteger(id) || id < 0)
+    if(!Number.isInteger(id) || id <= 0)
       return res.status(422).json({error: `Invalid restockOrder id.`});
     const db = new RestockOrderDBU('ezwh.db');
     const restockOrderList = await db.loadRestockOrder(id);
@@ -78,7 +78,7 @@ router.get('/api/restockOrders/:id/returnItems', async (req,res) => {
   // create connection with the db  
   try {
     const id = parseInt(req.params.id);
-    if(!Number.isInteger(id) || id < 0)
+    if(!Number.isInteger(id) || id <= 0)
       return res.status(422).json({error: `Invalid restockOrder id.`});
     const db = new RestockOrderDBU('ezwh.db');
 
@@ -126,7 +126,7 @@ router.post('/api/restockOrder', async (req,res) => {
 // PUT /api/restockOrder/:id
 router.put('/api/restockOrder/:id', async (req,res) => {
   const id = parseInt(req.params.id);
-  if(!Number.isInteger(id) || id < 0)
+  if(!Number.isInteger(id) || id <= 0)
     return res.status(422).json({error: `Invalid restockOrder id.`});
   if (req.body === undefined || getState(req.body.newState) === undefined) {
     return res.status(422).json({error: `Invalid restockOrder data.`});
@@ -148,11 +148,11 @@ router.put('/api/restockOrder/:id', async (req,res) => {
 // PUT /api/restockOrder/:id/skuItems 
 router.put('/api/restockOrder/:id/skuItems', async (req,res) => {
   const id = parseInt(req.params.id);
-  if(!Number.isInteger(id) || id < 0)
+  if(!Number.isInteger(id) || id <= 0)
     return res.status(422).json({error: `Invalid restockOrder id.`});
   if (req.body === undefined || req.body.skuItems === undefined || 
-    req.body.skuItems.some((i) => (i.SKUId===undefined || typeof p.SKUId !== 'number' ||
-    p.SKUId <= 0 || i.rfid===undefined || !validators.rfidIsValid(i.rfid)))) {
+    req.body.skuItems.some((i) => (i.SKUId===undefined || typeof i.SKUId !== 'number' ||
+    i.SKUId <= 0 || i.rfid===undefined || !validators.rfidIsValid(i.rfid)))) {
     return res.status(422).json({error: `Invalid restockOrder data.`});
   }
   try{
@@ -180,7 +180,7 @@ router.put('/api/restockOrder/:id/skuItems', async (req,res) => {
 // PUT /api/restockOrder/:id/transportnote
 router.put('/api/restockOrder/:id/transportNote', async (req,res) => {
   const id = parseInt(req.params.id);
-  if(!Number.isInteger(id) || id < 0)
+  if(!Number.isInteger(id) || id <= 0)
     return res.status(422).json({error: `Invalid restockOrder id.`});
   if (req.body === undefined || req.body.transportNote === undefined || 
     req.body.transportNote.deliveryDate === undefined || !validators.dateIsValid(req.body.transportNote.deliveryDate, false)) {
@@ -216,7 +216,7 @@ router.put('/api/restockOrder/:id/transportNote', async (req,res) => {
 // remove a restockOrder from the database
 router.delete('/api/restockOrder/:id', async (req,res) => {
   const id = parseInt(req.params.id);
-  if (!Number.isInteger(id) || id < 0) {
+  if (!Number.isInteger(id) || id <= 0) {
     return res.status(422).json({error: `Validation of id failed`});
   }
   try{
