@@ -37,6 +37,9 @@ describe('test restock order apis', () => {
     let sku3 = new SKU(undefined, "Watermelon", 1, 1, "The best fruit. Period.", null, 6.11, 5);
     let sku4 = new SKU(undefined, "Banana", 1, 1, "The second best fruit. Period.", null, 1.03, 42);
 
+    const si2 = new SkuItem("12345678901234567890123456789016", undefined, 0, null); 
+    const si4 = new SkuItem("12345678901234567890123456789017", undefined, 0, null);
+
     const ro1 = new RestockOrder(undefined, "2022/05/19 08:53", "ISSUED", 5, undefined);
     ro1.setProducts([{"SKUId":undefined,"description":"Eurovision 2022 CD","price":10.99,"qty":2},
                     {"SKUId":undefined,"description":"Watermelon","price":7.99,"qty":1}]);
@@ -48,6 +51,11 @@ describe('test restock order apis', () => {
     const ro3 = new RestockOrder(undefined, "2022/05/21 08:53", "ISSUED", 5, undefined);
     ro3.setProducts([{"SKUId":undefined,"description":"Eurovision 2022 CD","price":10.99,"qty":2},
                     {"SKUId":undefined,"description":"Watermelon","price":7.99,"qty":1}]);
+
+    const ro4 = new RestockOrder(undefined, "2022/05/18 08:53", "DELIVERED", 5, undefined);
+    ro4.setProducts([{"SKUId":undefined,"description":"Chiara Ferragni's brand water","price":1000.99,"qty":1},
+                    {"SKUId":undefined,"description":"Banana","price":0.99,"qty":1}]);
+    ro4.setSkuItems([{"SKUId": undefined, "rfid": "12345678901234567890123456789016"}]);
 
     // date has a wrong format
     const ro1_invalid = new RestockOrder(undefined, "2022-05-19", "ISSUED", 5, undefined);
@@ -88,12 +96,17 @@ describe('test restock order apis', () => {
                 sku4 = s;
             }
         }
+        si2.SKUId = sku2.id;
+        si4.SKUId = sku4.id;
         ro1.products[0].SKUId = sku1.id;
         ro1.products[1].SKUId = sku3.id;
         ro2.products[0].SKUId = sku2.id;
         ro2.products[1].SKUId = sku4.id;
         ro3.products[0].SKUId = sku1.id;
         ro3.products[1].SKUId = sku3.id;
+        ro4.products[0].SKUId = sku2.id;
+        ro4.products[1].SKUId = sku4.id;
+        ro4.skuItems[0].SKUId = sku2.id;
         ro1_invalid.products[0].SKUId = sku1.id;
         ro1_invalid.products[1].SKUId = sku3.id;
         ro2_invalid.products[0].SKUId = sku1.id;
@@ -104,30 +117,40 @@ describe('test restock order apis', () => {
         ro4_invalid.products[1].SKUId = sku3.id;
         ro5_invalid.products[0].SKUId = sku1.id;
         ro5_invalid.products[1].SKUId = sku3.id;
+        await agent.post('/api/skuitem').send(si2);
+        await agent.post('/api/skuitem').send(si4);
         await agent.post('/api/restockOrder').send(ro1);
         await agent.post('/api/restockOrder').send(ro2);
+        await agent.post('/api/restockOrder').send(ro4);
         const orders = await agent.get('/api/restockOrders');
         for (let o of orders.body) {
             if (o.issueDate=="2022/05/19 08:53") {
                 ro1.id = o.id;
             } else if (o.issueDate=="2022/05/20 08:53") {
                 ro2.id = o.id;
+            } else if (o.issueDate=="2022/05/18 08:53") {
+                ro4.id = o.id;
             }
         }
         await agent.put(`/api/restockOrder/${ro2.id}`).send({"newState":"DELIVERY"});
         await agent.put(`/api/restockOrder/${ro2.id}/transportNote`).send({"transportNote":{"deliveryDate":"2022/05/29"}});
+        await agent.put(`/api/restockOrder/${ro4.id}`).send({"newState":"DELIVERED"});
+        await agent.put(`/api/restockOrder/${ro4.id}/skuItems`).send({"skuItems":[{"SKUId": si2.SKUId, "rfid": "12345678901234567890123456789016"}]});
     });
     // de-populate the DB
     afterEach( async () => {
         await agent.delete(`/api/restockOrder/${ro1.id}`);
         await agent.delete(`/api/restockOrder/${ro2.id}`);
+        await agent.delete(`/api/restockOrder/${ro4.id}`);
+        await agent.delete('/api/skuitems/12345678901234567890123456789016');
+        await agent.delete('/api/skuitems/12345678901234567890123456789017');
         await agent.delete(`/api/skus/${sku1.id}`);
         await agent.delete(`/api/skus/${sku2.id}`);
         await agent.delete(`/api/skus/${sku3.id}`);
         await agent.delete(`/api/skus/${sku4.id}`);
     });
 
-    getAllRestockOrders('GET /api/restockOrders - retrieve all restock orders in the system', 200, [ro1, ro2]);
+    getAllRestockOrders('GET /api/restockOrders - retrieve all restock orders in the system', 200, [ro1, ro2, ro4]);
     getAllRestockOrders('GET /api/restockOrdersIssued - retrieve all ISSUED restock orders in the system', 200, [ro1], true);
 
     // the actual id is not known when the function is called: we must retrieve it later
@@ -151,9 +174,15 @@ describe('test restock order apis', () => {
     patchTransportNote('PUT /api/restockOrder/:id/transportNote - delivery date is before issue date', 422, {"transportNote":{"deliveryDate":"2021/12/29"}}, null, ro2);
     patchTransportNote('PUT /api/restockOrder/:id/transportNote - order does not exist', 404, {"transportNote":{"deliveryDate":"2022/12/29"}}, 100000000);
 
+    patchSkuItems('PUT /api/restockOrder/:id/skuItems - correctly add a list of sku items to an order', 200, {"skuItems":[{"SKUId": si4, "rfid": "12345678901234567890123456789017"}]}, null, ro4);
+    patchSkuItems('PUT /api/restockOrder/:id/skuItems - order state is not DELIVERED', 422, {"skuItems":[{"SKUId": si4, "rfid": "12345678901234567890123456789017"}]}, null, ro1);
+    patchSkuItems('PUT /api/restockOrder/:id/skuItems - order id is 0', 422, {"skuItems":[{"SKUId": si4, "rfid": "12345678901234567890123456789017"}]}, 0);
+    patchSkuItems('PUT /api/restockOrder/:id/skuItems - typo in a sku item field', 422, {"skuItems":[{"SKUid": 4, "rfid": "12345678901234567890123456789017"}]}, null, ro4);
+    patchSkuItems('PUT /api/restockOrder/:id/skuItems - order does not exist', 404, {"skuItems":[{"SKUId": si4, "rfid": "12345678901234567890123456789017"}]}, 100000000);
+
     deleteRestockOrder('DELETE /api/restockOrder/:id - correctly delete an order', 204, null, ro1);
     deleteRestockOrder('DELETE /api/restockOrder/:id - passing a negative id', 422, -2);
-    deleteRestockOrder('DELETE /api/restockOrder/:id - order does not exist', 404, 100000000); 
+    deleteRestockOrder('DELETE /api/restockOrder/:id - order does not exist', 404, 100000000);
 });
 
 // FR5.0.1 List all restock orders
@@ -223,7 +252,7 @@ function getRestockOrder(description, expectedHTTPStatus, id=undefined, order=un
     it(description, async function () {
         try {
             let startTime = performance.now();
-            const r = await agent.get(`/api/restockOrders/${id ? id : order.id}`);
+            const r = await agent.get(`/api/restockOrders/${order ? order.id : id}`);
             let endTime = performance.now();
             (endTime-startTime).should.lessThanOrEqual(500);
             r.should.have.status(expectedHTTPStatus);
@@ -286,7 +315,7 @@ function patchState(description, expectedHTTPStatus, newState, id=undefined, ord
     it(description, async function () {
         try {
             let startTime = performance.now();
-            const rUpdate = await agent.put(`/api/restockOrder/${id ? id : order.id}`).send(newState);
+            const rUpdate = await agent.put(`/api/restockOrder/${order ? order.id : id}`).send(newState);
             rUpdate.should.have.status(expectedHTTPStatus);
             let endTime = performance.now();
             (endTime-startTime).should.lessThanOrEqual(500);
@@ -299,7 +328,7 @@ function patchTransportNote(description, expectedHTTPStatus, transportNote, id=u
     it(description, async function () {
         try {
             let startTime = performance.now();
-            const rUpdate = await agent.put(`/api/restockOrder/${id ? id : order.id}/transportNote`).send(transportNote);
+            const rUpdate = await agent.put(`/api/restockOrder/${order ? order.id : id}/transportNote`).send(transportNote);
             rUpdate.should.have.status(expectedHTTPStatus);
             let endTime = performance.now();
             (endTime-startTime).should.lessThanOrEqual(500);
@@ -307,16 +336,31 @@ function patchTransportNote(description, expectedHTTPStatus, transportNote, id=u
     });       
 }
 
-  ///////////////// TODO /////////////////////
- //          PATCH SKU ITEMS               //
-////////////////////////////////////////////
+// FR5.8.1 Create and tag a SKU item with an RFID
+function patchSkuItems(description, expectedHTTPStatus, skuItems, id=undefined, order=undefined) {
+    it(description, async function () {
+        try {
+            // set up SKUIds
+            for (let si of skuItems.skuItems) {
+                if (si.SKUId && si.SKUId.SKUId)
+                    si.SKUId = si.SKUId.SKUId;
+            }
+            let startTime = performance.now();
+            const rUpdate = await agent.put(`/api/restockOrder/${order ? order.id : id}/skuItems`).send(skuItems);
+            rUpdate.should.have.status(expectedHTTPStatus);
+            let endTime = performance.now();
+            (endTime-startTime).should.lessThanOrEqual(500);
+        } catch(err) {console.log(err);}
+    });       
+}
+
 
 // FR5.11 Delete a restock order
 function deleteRestockOrder(description, expectedHTTPStatus, id=undefined, order=undefined) {
     it(description, async function () {
         try {
             let startTime = performance.now();
-            const r = await agent.delete(`/api/restockOrder/${id ? id : order.id}`);
+            const r = await agent.delete(`/api/restockOrder/${order ? order.id : id}`);
             r.should.have.status(expectedHTTPStatus);
             let endTime = performance.now();
             (endTime-startTime).should.lessThanOrEqual(500);
