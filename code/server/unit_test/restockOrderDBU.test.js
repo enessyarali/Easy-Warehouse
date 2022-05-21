@@ -17,10 +17,10 @@ describe('Load Restock Order', () => {
         await dbSet.prepareTable();
     });
     //at the end of all tests in this file
-    afterAll(async () => {
+     afterAll(async () => {
         //clear DB at the end
         await dbSet.resetTable();
-    });
+    }); 
 
     const db = new RestockOrderDBU('ezwh.db');
 
@@ -59,12 +59,12 @@ function testGetRestockOrder(db) {
         expect(res[0].skuItems[0].rfid).to.equal('123');
     });
 
-    test('retrive item to return', async () => {
+     test('retrive item to return', async () => {
         var res = await db.selectReturnItems(1);
 
-        expect(res[0].SKUid).to.equal(1);
+        expect(res[0].SKUId).to.equal(1);
         expect(res[0].rfid).to.equal('123');
-    })
+    }); 
 }
 
 describe('Insert and modify Restock Order', () => {
