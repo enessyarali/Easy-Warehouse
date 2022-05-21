@@ -25,7 +25,7 @@ router.get('/api/skuitems/:rfid/testResults', async (req,res) => {
 router.get('/api/skuitems/:rfid/testResults/:id', async (req,res) => {
     const id = parseInt(req.params.id);
     const rfid = req.params.rfid
-    if(!Number.isInteger(id) || id < 0 ) {
+    if(!Number.isInteger(id) || id <= 0 ) {
         res.status(422).json({error: `Invalid  Test Result id.`});
     }
     try {
@@ -96,7 +96,7 @@ router.put('/api/skuitems/:rfid/testResult/:id', async (req,res) => {
 router.delete('/api/skuitems/:rfid/testResult/:id', async (req,res) => {
     const id = parseInt(req.params.id);
     const rfid = req.params.rfid;
-    if (id === undefined || !Number.isInteger(id) || id < 0 || rfid === undefined) {
+    if (id === undefined || !Number.isInteger(id) || id <= 0 || rfid === undefined) {
       return res.status(422).json({error: `Invalid id.`});
     }
     try{
