@@ -55,7 +55,7 @@ router.post('/api/returnOrder', async (req,res) => {
   }
   catch(err){
     if (err.code==12)
-      return res.status(404).json({error: 'No returnOrder with matching id.'});
+      return res.status(404).json({error: 'No restock order with matching id.'});
     return res.status(503).json({error: `Something went wrong...`, message: err.message});
   }
 });
