@@ -94,7 +94,7 @@ router.put('/api/sku/:id', async (req,res) => {
 router.put('/api/sku/:id/position', async (req,res) => {
   const id = parseInt(req.params.id);
   if (req.body === undefined || req.body.position === undefined || !validators.positionIdIsValid(req.body.position) ||
-      !Number.isInteger(id) || id < 0) {
+      !Number.isInteger(id) || id <= 0) {
     return res.status(422).json({error: `Invalid data.`});
   }
   try{

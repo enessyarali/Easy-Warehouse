@@ -23,7 +23,7 @@ router.get('/api/returnOrders/:id', async (req,res) => {
   // create connection with the db  
   try {
     const id = parseInt(req.params.id);
-    if(!Number.isInteger(id) || id < 0)
+    if(!Number.isInteger(id) || id <= 0)
       return res.status(422).json({error: `Invalid returnOrder id.`});
     const db = new ReturnOrderDBU('ezwh.db');
     const returnOrderList = await db.loadReturnOrder(id);
@@ -55,7 +55,7 @@ router.post('/api/returnOrder', async (req,res) => {
   }
   catch(err){
     if (err.code==12)
-      return res.status(404).json({error: 'No returnOrder with matching id.'});
+      return res.status(404).json({error: 'No restock order with matching id.'});
     return res.status(503).json({error: `Something went wrong...`, message: err.message});
   }
 });
@@ -64,7 +64,7 @@ router.post('/api/returnOrder', async (req,res) => {
 // remove a returnOrder from the database
 router.delete('/api/returnOrder/:id', async (req,res) => {
   const id = parseInt(req.params.id);
-  if (!Number.isInteger(id) || id < 0) {
+  if (!Number.isInteger(id) || id <= 0) {
     return res.status(422).json({error: `Validation of id failed`});
   }
   try{
