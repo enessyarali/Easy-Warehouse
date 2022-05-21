@@ -92,6 +92,7 @@ function getPositions(description, expectedHTTPStatus, positions) {
             let startTime = performance.now();
             const r = await agent.get('/api/positions');
             r.should.have.status(expectedHTTPStatus);
+            r.body.length.should.equal(positions.length);
             let i = 0;
             for (let p of r.body) {
                 p.positionID.should.equal(positions[i].positionID);
