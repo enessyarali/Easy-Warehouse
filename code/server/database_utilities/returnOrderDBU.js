@@ -64,8 +64,9 @@ class ReturnOrderDBU {
         if (!isRestockOrder)
             throw(new Error("RestockOrder does not exist. Operation aborted.", 12));
 
+        const prod = [].concat(products);
         const orderId = await this.#insertOrder(returnDate, restockOrderId);
-        const promises = products.map((p) => new Promise(async (resolve, reject) => {
+        const promises = prod.map((p) => new Promise(async (resolve, reject) => {
             const skuItemId = await this.#checkSKUitem(p.RFID, p.SKUId);
             const insert = 'INSERT INTO "products-rto" (orderId, skuId, description, price, skuItemId) VALUES (?,?,?,?,?)';
             this.db.run(insert, [orderId, p.SKUId, p.description, p.price, skuItemId], function (err) {
