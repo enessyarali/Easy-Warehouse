@@ -94,8 +94,9 @@ class RestockOrderDBU {
         if (!isSupplier)
             throw (new Error("Supplier does not exist. Operation aborted.", 6));
 
+        const prod = [].concat(products); //to make sure it is an array
         const orderId = await this.#insertOrder(issueDate, supplierId);
-        const promises = products.map((p) => new Promise(async (resolve, reject) => {
+        const promises = prod.map((p) => new Promise(async (resolve, reject) => {
             const insert = 'INSERT INTO "products-rko" (orderId, skuId, description, price, quantity) VALUES (?,?,?,?,?)';
             this.db.run(insert, [orderId, p.SKUId, p.description, p.price, p.qty], function (err) {
                 if (err) {
@@ -127,8 +128,9 @@ class RestockOrderDBU {
     // add new sku items a restock order
     async patchRestockOrderSkuItems(orderId, skuItems) {
         // check if the order status is correct
+        const sI = [].concat(skuItems);
         const ids = [];
-        for (let ski of skuItems) {
+        for (let ski of sI) {
             // check if SKUitem exists
             const isSKUitem = await this.#checkSKUitem(ski);
             if (!isSKUitem)
