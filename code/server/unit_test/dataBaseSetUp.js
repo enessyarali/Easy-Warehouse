@@ -19,10 +19,12 @@ exports.voidRestockOrder = async () =>{
     await cleanRestockOrder();
     await cleanProductRko();
     await cleanSkuItemRko();
+    await cleanReturnOrder();
 
     await resetRestockOrder();
     await resetProcuctRko();
     await resetSkuItemRko();
+    await resetReturnOrder();
 }
 //empty db
 async function cleanTable() {
@@ -34,6 +36,8 @@ async function cleanTable() {
     await cleanSkuItemRko();
     await cleanTestDescriptor();
     await cleanTestResult();
+    await cleanReturnOrder();
+    await cleanProductRto();
 
     //reset the autoincrement
     await resetSku();
@@ -43,6 +47,8 @@ async function cleanTable() {
     await resetSkuItemRko();
     await resetTestDescriptor()
     await resetTestResult();
+    await resetReturnOrder();
+    await resetProcuctRto();
 }
 
 //popolate db
@@ -65,6 +71,9 @@ async function fillTable() {
     await insertTestDescriptor('td1','test',1);
     await insertTestResult(1,1,'2022/04/04','Fail');
     await insertTestResult(2,1,'2022/04/04','Pass');
+
+    await insertReturnOrder('2022/04/04',1);
+    await insertProductRto(1,1,'test',1,1);
 
     /*      const id3 = await insertOrder('2022/04/04','DELIVERY', 1, ,"transportNote");
       await insertProduct(id3, 1, "descrizione3", 1, 1);
@@ -155,15 +164,39 @@ function insertTestDescriptor(testName, procedureDescription, SKUid){
     });
 }
 
-function insertTestResult(isSKUitem, descriptorId, date, result){
+function insertTestResult(skuItemId, descriptorId, date, result){
     return new Promise((resolve,reject) => {
         const sqlInsert = 'INSERT INTO "TEST-RESULTS"(SKUitemId, descriptorId, date, result) VALUES(?,?,?,?)';
-        db.all(sqlInsert, [isSKUitem, descriptorId, date, result], (err) => {
+        db.all(sqlInsert, [skuItemId, descriptorId, date, result], (err) => {
             if(err) {
                 reject(err);
                 return;
             }
             else resolve('Done');
+        });
+    });
+}
+
+function insertReturnOrder(returnDate, restockOrderId){
+    return new Promise((resolve, reject) => {
+        const sqlInsert = 'INSERT INTO "return-orders" (returnDate, restockOrderId) VALUES(?,?)';
+        db.run(sqlInsert, [returnDate, restockOrderId], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve(this.lastID);
+        });
+    });
+}
+
+function insertProductRto(orderId, SKUId, description, price, skuItemId) {
+    return new Promise((resolve, reject) => {
+        const insert = 'INSERT INTO "products-rto" (orderId, skuId, description, price, skuItemId) VALUES (?,?,?,?,?)';
+        db.run(insert, [orderId, SKUId, description, price, skuItemId], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
         });
     });
 }
@@ -255,6 +288,31 @@ function cleanTestResult() {
         });
     });
 }
+
+function cleanReturnOrder() {
+    return new Promise((resolve, reject) => {
+        const sqlDelete = 'DELETE FROM "return-orders"';
+        db.run(sqlDelete, [], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
+
+function cleanProductRto() {
+    return new Promise((resolve, reject) => {
+        const sqlDelete = 'DELETE FROM "products-rto"';
+        db.run(sqlDelete, [], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
+
 /*
 RESET
 */
@@ -332,6 +390,28 @@ function resetTestDescriptor() {
 function resetTestResult() {
     return new Promise((resolve, reject) => {
         const sqlDelete = 'DELETE FROM SQLITE_SEQUENCE WHERE name="test-results"';
+        db.run(sqlDelete, [], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
+function resetReturnOrder() {
+    return new Promise((resolve, reject) => {
+        const sqlDelete = 'DELETE FROM SQLITE_SEQUENCE WHERE name="return-orders"';
+        db.run(sqlDelete, [], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
+function resetProcuctRto() {
+    return new Promise((resolve, reject) => {
+        const sqlDelete = 'DELETE FROM SQLITE_SEQUENCE WHERE name="products-rto"';
         db.run(sqlDelete, [], function (err) {
             if (err) {
                 reject(err);

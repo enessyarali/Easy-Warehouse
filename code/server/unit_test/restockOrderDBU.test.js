@@ -9,19 +9,20 @@ const dbSet = require('./dataBaseSetUp');
 
 describe('Load Restock Order', () => {
     beforeAll(async () => {
+        await dbSet.resetTable();
         await dbSet.prepareTable();
-    }); 
+    });
 
-    afterAll(async ()=> {
-       await dbSet.resetTable();
-    }); 
+    afterAll(async () => {
+        await dbSet.resetTable();
+    });
 
     const db = new RestockOrderDBU('ezwh.db');
 
     testGetRestockOrder(db);
 });
 
-function testGetRestockOrder(db){
+function testGetRestockOrder(db) {
     test('retrive all RestockOrder', async () => {
         var res = await db.loadRestockOrder();
         expect(res.length).to.equal(2);
@@ -41,7 +42,7 @@ function testGetRestockOrder(db){
     });
 
     test('retrive order by State', async () => {
-        var res = await db.loadRestockOrder(undefined,'ISSUED');
+        var res = await db.loadRestockOrder(undefined, 'ISSUED');
 
         expect(res[0].issueDate).to.equal('2022/04/04');
         expect(res[0].state).to.equal('ISSUED');
@@ -58,10 +59,10 @@ function testGetRestockOrder(db){
 
         expect(res[0].SKUid).to.equal(1);
         expect(res[0].rfid).to.equal('123');
-    }) 
+    })
 }
 
- describe('Insert and modify Restock Order',() => {
+describe('Insert and modify Restock Order', () => {
     beforeAll(async () => {
         await dbSet.resetTable();
         await dbSet.prepareTable();
@@ -79,10 +80,10 @@ function testGetRestockOrder(db){
     testDeleteRestockOrder(db);
 });
 
-function testInsertRestockOrder(db){
+function testInsertRestockOrder(db) {
     test('Insert a new Order', async () => {
         var p = new ProductRKO(1, "descrizione1", 1, 1);
-        await db.insertRestockOrder('2022/04/04',p,5);
+        await db.insertRestockOrder('2022/04/04', p, 5);
 
         var res = await db.loadRestockOrder();
 
@@ -94,7 +95,7 @@ function testInsertRestockOrder(db){
     });
 }
 
-function testUpdateRestockOrderd(db){
+function testUpdateRestockOrderd(db) {
     var orderId = 1;
     test('Update state of an existing Order', async () => {
         await db.patchRestockOrderState(orderId, 'ISSUED');
@@ -104,8 +105,8 @@ function testUpdateRestockOrderd(db){
     });
 
     test('Update skuItem of an existing Order', async () => {
-        var si = {rfid: 123, SKUId: 1};
-        await db.patchRestockOrderSkuItems(orderId,si);
+        var si = { rfid: 123, SKUId: 1 };
+        await db.patchRestockOrderSkuItems(orderId, si);
 
         var res = await db.loadRestockOrder(orderId);
 
@@ -114,19 +115,72 @@ function testUpdateRestockOrderd(db){
     });
 
     test('Update transportNote of an existing Order', async () => {
-        var tn = {deliveryDate:"2021/12/29"};
-        await db.patchRestockOrderTransportNote(orderId,tn);
+        var tn = { deliveryDate: "2021/12/29" };
+        await db.patchRestockOrderTransportNote(orderId, tn);
 
         var res = await db.loadRestockOrder(orderId);
         expect(JSON.stringify(res[0].transportNote)).to.equal(JSON.stringify(tn));
     });
 }
 
-function testDeleteRestockOrder(db){
+function testDeleteRestockOrder(db) {
     var orderId = 1;
     test('Delete an existing Order', async () => {
         await db.deleteRestockOrder(orderId);
         var res = await db.loadRestockOrder(orderId);
         expect(res.length).to.equal(0);
+    });
+}
+
+describe('Test Error of Restock Order', () => {
+    beforeAll(async () => {
+        await dbSet.resetTable();
+        await dbSet.prepareTable();
+    });
+
+    afterAll(async () => {
+        await dbSet.resetTable();
+    });
+
+    const db = new RestockOrderDBU('ezwh.db');
+
+    testInsertWrongRestockOrder(db);
+    testUpdateWrongRestockOrderd(db);
+    testDeleteRestockOrderWithDependencies(db);
+});
+
+function testInsertWrongRestockOrder(db) {
+    test('Insert a new wrong Order', async () => {
+        var p = new ProductRKO(1, "descrizione1", 1, 1);
+
+        try{
+            await db.insertRestockOrder('2022/04/04', p, 4);
+        }
+        catch (err){
+            expect(err.message).to.equal("Supplier does not exist. Operation aborted.");
+        }
+    });
+}
+
+function testUpdateWrongRestockOrderd(db){
+    test('Update skuItem of an existing Order with wrong SKUId', async () => {
+        var si = { rfid: 123, SKUId: 5 };
+        try{
+            await db.patchRestockOrderSkuItems(1, si);
+        }
+        catch(err){
+            expect(err.message).to.equal("SKUitem does not exist. Operation aborted.");
+        }
+    });
+}
+
+function testDeleteRestockOrderWithDependencies(db){
+    test('Delete a Restock Order who has dependencies', async () => {
+        try{
+            await db.deleteRestockOrder(1);
+        }
+        catch(err){
+            expect(err.message).to.equal("Dependency detected. Delete aborted.");
+        }
     });
 }
