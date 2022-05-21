@@ -57,7 +57,7 @@ router.get('/api/internalOrders/:id', async (req,res) => {
   // create connection with the db  
   try {
     const id = parseInt(req.params.id);
-    if(!Number.isInteger(id) || id < 0)
+    if(!Number.isInteger(id) || id <= 0)
       return res.status(422).json({error: `Invalid internalOrder id.`});
     const db = new InternalOrderDBU('ezwh.db');
     const internalOrderList = await db.loadInternalOrder(id);
@@ -119,7 +119,7 @@ router.put('/api/internalOrders/:id', async (req,res) => {
 // remove a internalOrder from the database
 router.delete('/api/internalOrders/:id', async (req,res) => {
   const id = parseInt(req.params.id);
-  if (!Number.isInteger(id) || id < 0) {
+  if (!Number.isInteger(id) || id <= 0) {
     return res.status(422).json({error: `Validation of id failed`});
   }
   try{

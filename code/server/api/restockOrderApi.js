@@ -56,7 +56,7 @@ router.get('/api/restockOrdersIssued', async (req,res) => {
   }
 });
 
-//GET /api/restockOrdersIssued/:id
+//GET /api/restockOrders/:id
 router.get('/api/restockOrders/:id', async (req,res) => {
   // create connection with the db  
   try {
@@ -116,6 +116,8 @@ router.post('/api/restockOrder', async (req,res) => {
       return res.status(201).end();
   }
   catch(err){
+    if (err.code==6)
+      return res.status(404).json({error: "Supplier not found. Operation aborted."});
     return res.status(503).json({error: `Something went wrong...`, message: err.message});
   }
 });
@@ -135,7 +137,7 @@ router.put('/api/restockOrder/:id', async (req,res) => {
       const updated = await db.patchRestockOrderState(id, getState(req.body.newState));
       if(!updated)
         return res.status(404).json({error: `No restockOrder with matching id.`});
-      return res.status(201).end();
+      return res.status(200).end();
   }
   catch(err){
     return res.status(503).json({error: `Something went wrong...`, message: err.message});
@@ -165,7 +167,7 @@ router.put('/api/restockOrder/:id/skuItems', async (req,res) => {
       }
 
       await db.patchRestockOrderSkuItems(id, req.body.skuItems);
-      return res.status(201).end();
+      return res.status(200).end();
   }
   catch(err){
     if (err.code==12)
@@ -181,7 +183,7 @@ router.put('/api/restockOrder/:id/transportNote', async (req,res) => {
   if(!Number.isInteger(id) || id < 0)
     return res.status(422).json({error: `Invalid restockOrder id.`});
   if (req.body === undefined || req.body.transportNote === undefined || 
-    req.body.transportNote.deliveryDate === undefined || !validators.dateIsValid(req.body.transportNote.deliveryDate)) {
+    req.body.transportNote.deliveryDate === undefined || !validators.dateIsValid(req.body.transportNote.deliveryDate, false)) {
     return res.status(422).json({error: `Invalid restockOrder data.`});
   }
   try{
@@ -202,7 +204,7 @@ router.put('/api/restockOrder/:id/transportNote', async (req,res) => {
       }
       
       await db.patchRestockOrderTransportNote(id, req.body.transportNote);
-      return res.status(201).end();
+      return res.status(200).end();
   }
   catch(err){
     return res.status(503).json({error: `Something went wrong...`, message: err.message});

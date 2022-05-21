@@ -117,6 +117,7 @@ function getAllItems(description, expectedHTTPStatus, items) {
             let startTime = performance.now();
             const r = await agent.get('/api/items');
             r.should.have.status(expectedHTTPStatus);
+            r.body.length.should.equal(items.length);
             let i = 0;
             for (let itm of r.body) {
                 itm.id.should.equal(items[i].id);

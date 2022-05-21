@@ -5,6 +5,7 @@ class RestockOrder{
         this.state =state ;
         this.supplierId =supplierId ;
         this.transportNote = transportNote ? JSON.parse(transportNote) : undefined;
+        this.skuItems = [];
     }
     setProducts(products) {
         this.products = products;
