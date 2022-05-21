@@ -57,18 +57,12 @@ router.get('/api/skuitems/:rfid', async (req,res) => {
 router.post('/api/skuitem', async (req,res) => {
   if (req.body === undefined || req.body.RFID === undefined || typeof(req.body.RFID) !== 'string' || !validators.rfidIsValid(req.body.RFID) ||
       req.body.SKUId === undefined || !Number.isInteger(parseInt(req.body.SKUId)) || parseInt(req.body.SKUId) <= 0 ||
-      (req.body.DateOfStock !== undefined && !validators.dateIsValid(req.body.DateOfStock)) ) {
+      (req.body.DateOfStock && !validators.dateIsValid(req.body.DateOfStock))) {
     return res.status(422).json({error: `Invalid SKU Item data.`});
   }
   try{
       const db = new SkuItemDBU('ezwh.db');
-      const skuItemList = await db.loadSKUitem(req.body.RFID);
-      if(skuItemList.length > 0)
-        return res.status(422).json({error: `SKU item already in database.`});
-      if(req.body.DateOfStock !== undefined)
-        await db.insertSKUitem(req.body.RFID, req.body.SKUId, req.body.DateOfStock);
-      else
-        await db.insertSKUitem(req.body.RFID, req.body.SKUId);
+      await db.insertSKUitem(req.body.RFID, req.body.SKUId, req.body.DateOfStock);
       return res.status(201).end();
   }
   catch(err){
@@ -85,7 +79,7 @@ router.put('/api/skuitems/:rfid', async (req,res) => {
   const rfid = req.params.rfid;
   if (!validators.rfidIsValid(rfid) || req.body === undefined || req.body.newRFID === undefined || !validators.rfidIsValid(req.body.newRFID) ||
   req.body.newAvailable === undefined || !Number.isInteger(parseInt(req.body.newAvailable)) || parseInt(req.body.newAvailable) < 1 ||
-  (req.body.newDateOfStock !== undefined && !validators.dateIsValid(req.body.newDateOfStock)) ) {
+  (req.body.newDateOfStock && !validators.dateIsValid(req.body.newDateOfStock)) ) {
     return res.status(422).json({error: `Invalid SKU item data.`});
   }
   try{
