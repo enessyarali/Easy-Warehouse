@@ -1,6 +1,5 @@
 const RKO = require('../model/restockOrder');
 const RestockOrder = RKO.RestockOrder;
-const ProductRKO = RKO.ProductRKO;
 const SKU = require('../model/sku');
 const SkuItem = require('../model/skuItem');
 const TestDescriptor = require('../model/testDescriptor');
@@ -13,10 +12,6 @@ chai.should();
 
 const app = require('../server');
 const agent = chai.request.agent(app);
-
-  ///////////////// TODO /////////////////////
- //        GET THE RETURN ITEMS            //
-////////////////////////////////////////////
 
 /* FUNCTIONAL REQUIREMENTS
  *

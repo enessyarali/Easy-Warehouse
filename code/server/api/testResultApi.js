@@ -10,6 +10,8 @@ let router = express.Router();
 // retrieves all test results from the database
 router.get('/api/skuitems/:rfid/testResults', async (req,res) => {
     const rfid = req.params.rfid;
+    if(!validators.rfidIsValid(rfid))
+        return res.status(422).json({error: `Invalid SKU item rfid.`});
     try {
       const db = new TestResultDBU('ezwh.db');
       const resultList = await db.loadTestResult(rfid);
@@ -28,6 +30,8 @@ router.get('/api/skuitems/:rfid/testResults/:id', async (req,res) => {
     if(!Number.isInteger(id) || id <= 0 ) {
         res.status(422).json({error: `Invalid  Test Result id.`});
     }
+    if(!validators.rfidIsValid(rfid))
+        return res.status(422).json({error: `Invalid SKU item rfid.`});
     try {
       const db = new TestResultDBU('ezwh.db');
       const ResultList = await db.loadTestResult(rfid,id);
@@ -68,7 +72,12 @@ router.post('/api/skuitems/testResult', async (req,res) => {
 // modify a test result in the database
 router.put('/api/skuitems/:rfid/testResult/:id', async (req,res) => {
     const id = parseInt(req.params.id);
-    const rfId= req.params.rfid
+    const rfId= req.params.rfid;
+    if(!Number.isInteger(id) || id <= 0 ) {
+      res.status(422).json({error: `Invalid  Test Result id.`});
+    }
+    if(!validators.rfidIsValid(rfId))
+        return res.status(422).json({error: `Invalid SKU item rfid.`});
     if (req.body === undefined || req.body.newIdTestDescriptor === undefined || 
       parseInt(req.body.newIdTestDescriptor) <= 0 ||
       req.body.newDate === undefined || !validators.dateIsValid(req.body.newDate) ||
@@ -96,15 +105,21 @@ router.put('/api/skuitems/:rfid/testResult/:id', async (req,res) => {
 router.delete('/api/skuitems/:rfid/testResult/:id', async (req,res) => {
     const id = parseInt(req.params.id);
     const rfid = req.params.rfid;
-    if (id === undefined || !Number.isInteger(id) || id <= 0 || rfid === undefined) {
+    if(!validators.rfidIsValid(rfid))
+        return res.status(422).json({error: `Invalid SKU item rfid.`});
+    if (id === undefined || !Number.isInteger(id) || id <= 0) {
       return res.status(422).json({error: `Invalid id.`});
     }
     try{
         const db = new TestResultDBU('ezwh.db');
-        await db.deleteTestResult(rfid,id);
+        const deleted = await db.deleteTestResult(rfid,id);
+        if (!deleted)
+          return res.status(404).json({error: `No test result with matching id.`});
         return res.status(204).end();
     }
     catch(err){
+      if (err.code==9)
+        return res.status(404).json({error: `No SKU item with matching RFID.`});
       return res.status(503).json({error: `Something went wrong...`, message: err.message});
     }
   });
