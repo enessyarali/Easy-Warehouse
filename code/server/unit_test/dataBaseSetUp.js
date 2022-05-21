@@ -7,12 +7,12 @@ const db = new sqlite.Database('ezwh.db', (err) => {
     if (err) throw err;
 });
 
-exports.prepareTable = () => {
-    fillTable();
+exports.prepareTable = async () => {
+    await fillTable();
 }
 
-exports.resetTable = () => {
-    cleanTable();
+exports.resetTable = async () => {
+    await cleanTable();
 }
 
 exports.voidRestockOrder = async () =>{
@@ -50,14 +50,18 @@ async function fillTable() {
 
     await insertSKU('test1',100,100,'test1',1,100);
     await insertSKU('test2',100,100,'test2',1,100);
+
     await insertSkuItem("123", 1, '2022/04/04');
     await insertSkuItem("456", 2, '2022/04/04');
-    await insertRestockOrder('2022/04/04', 'ISSUED', 1);
+
+    await insertRestockOrder('2022/04/04', 'ISSUED', 5);
     await insertProductRko(1, 1, "descrizione1", 1, 1);
     await insertSkuItemRko(1, 1, 1);
-    await insertRestockOrder('2022/04/04', 'COMPLETEDRETURN', 1);
+
+    await insertRestockOrder('2022/04/04', 'COMPLETEDRETURN', 5);
     await insertProductRko(2, 1, "descrizione2", 1, 1);
     await insertSkuItemRko(2, 1, 2);
+
     await insertTestDescriptor('td1','test',1);
     await insertTestResult(1,1,'2022/04/04','Fail');
     await insertTestResult(2,1,'2022/04/04','Pass');
@@ -141,7 +145,7 @@ function insertSkuItemRko(orderId, SKUId, SKUItemId) {
 function insertTestDescriptor(testName, procedureDescription, SKUid){
     return new Promise((resolve,reject) => {
         const sqlInsert = 'INSERT INTO "TEST-DESCRIPTORS"(name, procedureDescription, idSKU) VALUES(?,?,?)';
-        this.db.all(sqlInsert, [testName, procedureDescription, SKUid], (err) => {
+        db.all(sqlInsert, [testName, procedureDescription, SKUid], (err) => {
             if(err) {
                 reject(err);
                 return;
@@ -154,7 +158,7 @@ function insertTestDescriptor(testName, procedureDescription, SKUid){
 function insertTestResult(isSKUitem, descriptorId, date, result){
     return new Promise((resolve,reject) => {
         const sqlInsert = 'INSERT INTO "TEST-RESULTS"(SKUitemId, descriptorId, date, result) VALUES(?,?,?,?)';
-        this.db.all(sqlInsert, [isSKUitem, descriptorId, date, result], (err) => {
+        db.all(sqlInsert, [isSKUitem, descriptorId, date, result], (err) => {
             if(err) {
                 reject(err);
                 return;
