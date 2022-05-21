@@ -79,7 +79,7 @@ class RestockOrderDBU {
                     return;
                 }
                 const skuItemArray = rows.map((si) => {
-                    const sia = { SKUid: si.skuId, rfid: si.rfid };
+                    const sia = { SKUId: si.skuId, rfid: si.rfid };
                     return sia;
                 });
                 Promise.all(skuItemArray).then((skuItemArray) => resolve(skuItemArray));
