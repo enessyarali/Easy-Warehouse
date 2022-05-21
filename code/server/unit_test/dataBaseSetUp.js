@@ -15,7 +15,7 @@ exports.resetTable = async () => {
     await cleanTable();
 }
 
-exports.voidRestockOrder = async () =>{
+exports.voidRestockOrder = async () => {
     await cleanRestockOrder();
     await cleanProductRko();
     await cleanSkuItemRko();
@@ -25,6 +25,14 @@ exports.voidRestockOrder = async () =>{
     await resetProcuctRko();
     await resetSkuItemRko();
     await resetReturnOrder();
+}
+
+exports.voidReturnOrder = async () => {
+    await cleanReturnOrder();
+    await cleanProductRto();
+
+    await resetReturnOrder();
+    await resetProcuctRto();
 }
 //empty db
 async function cleanTable() {
@@ -59,6 +67,7 @@ async function fillTable() {
 
     await insertSkuItem("123", 1, '2022/04/04');
     await insertSkuItem("456", 2, '2022/04/04');
+    await insertSkuItem("789", 2, '2022/04/04');
 
     await insertRestockOrder('2022/04/04', 'ISSUED', 5);
     await insertProductRko(1, 1, "descrizione1", 1, 1);
@@ -67,21 +76,21 @@ async function fillTable() {
     await insertRestockOrder('2022/04/04', 'COMPLETEDRETURN', 5);
     await insertProductRko(2, 1, "descrizione2", 1, 1);
     await insertSkuItemRko(2, 1, 2);
+    await insertSkuItemRko(2, 2, 3);
 
-    await insertTestDescriptor('td1','test',1);
+    await insertTestDescriptor('td1','test1',1);
     await insertTestResult(1,1,'2022/04/04','Fail');
     await insertTestResult(2,1,'2022/04/04','Pass');
 
-    await insertReturnOrder('2022/04/04',1);
-    await insertProductRto(1,1,'test',1,1);
+    await insertTestDescriptor('td2','test2',1);
+    await insertTestResult(1,2,'2022/04/04','Fail');
+    await insertTestResult(3,2,'2022/04/04','Pass');
 
-    /*      const id3 = await insertOrder('2022/04/04','DELIVERY', 1, ,"transportNote");
-      await insertProduct(id3, 1, "descrizione3", 1, 1);
-      await insertSkuItem(id3, 1,3);
-  
-      const id4 = await insertOrder('2022/04/04','DELIVERED', 1, );
-      await insertProduct(id4, 1, "descrizione4", 1, 1);
-      await insertSkuItem(id4, 1,4); */
+    await insertReturnOrder('2022/04/04',1);
+    await insertProductRto(1,1,'desc1',1,1);
+
+    await insertReturnOrder('2022/04/04',2);
+    await insertProductRto(2,2,'desc2',1,3);
 }
 
 /* 
