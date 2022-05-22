@@ -22,7 +22,7 @@ exports.voidRestockOrder = async () => {
     await cleanReturnOrder();
 
     await resetRestockOrder();
-    await resetProcuctRko();
+    await resetProductRko();
     await resetSkuItemRko();
     await resetReturnOrder();
 }
@@ -32,7 +32,17 @@ exports.voidReturnOrder = async () => {
     await cleanProductRto();
 
     await resetReturnOrder();
-    await resetProcuctRto();
+    await resetProductRto();
+}
+
+exports.voidInternalOrder = async () => {
+    await cleanInternalOrder();
+    await cleanProductSkuIO();
+    await cleanProductRfidIO();
+
+    await resetInternalOrder();
+    await resetProductSkuIO();
+    await resetProductRfidIO();
 }
 //empty db
 async function cleanTable() {
@@ -46,17 +56,23 @@ async function cleanTable() {
     await cleanTestResult();
     await cleanReturnOrder();
     await cleanProductRto();
+    await cleanInternalOrder();
+    await cleanProductSkuIO();
+    await cleanProductRfidIO();
 
     //reset the autoincrement
     await resetSku();
     await resetSkuItem();
     await resetRestockOrder();
-    await resetProcuctRko();
+    await resetProductRko();
     await resetSkuItemRko();
     await resetTestDescriptor()
     await resetTestResult();
     await resetReturnOrder();
-    await resetProcuctRto();
+    await resetProductRto();
+    await resetInternalOrder();
+    await resetProductSkuIO();
+    await resetProductRfidIO();
 }
 
 //popolate db
@@ -68,6 +84,7 @@ async function fillTable() {
     await insertSkuItem("123", 1, '2022/04/04');
     await insertSkuItem("456", 2, '2022/04/04');
     await insertSkuItem("789", 2, '2022/04/04');
+    await insertSkuItem("000", 1 ,'2022/04/04');
 
     await insertRestockOrder('2022/04/04', 'ISSUED', 5);
     await insertProductRko(1, 1, "descrizione1", 1, 1);
@@ -91,11 +108,23 @@ async function fillTable() {
 
     await insertReturnOrder('2022/04/04',2);
     await insertProductRto(2,2,'desc2',1,3);
+
+    await insertInternalOrder('2022/04/04','COMPLETED',1);
+    await insertProductSkuIO(1,1,'d1',1,1);
+    await insertProductRfidIO(1,1,4);
+
+    await insertInternalOrder('2022/04/04','ISSUED',1);
+    await insertProductSkuIO(2,2,'d2',1,1);
+    await insertProductRfidIO(2,2,2);
 }
 
-/* 
-INSERT
-*/
+
+/*******************************
+ *                             *
+ *           INSERT            *
+ *                             *
+ *******************************/
+
 
 function insertSKU(description, weight, volume, notes, price, availableQuantity) {
     return new Promise((resolve, reject) => {
@@ -210,9 +239,49 @@ function insertProductRto(orderId, SKUId, description, price, skuItemId) {
     });
 }
 
-/*
-CLEAN
-*/
+function insertInternalOrder(issueDate, state, customerId){
+    return new Promise((resolve, reject) => {
+        const sqlInsert = 'INSERT INTO "internal-orders" (issueDate, state, customerId) VALUES(?,?,?)';
+        db.run(sqlInsert, [issueDate, state, customerId], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve(this.lastID);
+        });
+    });
+}
+
+function insertProductSkuIO(orderId, SKUId, description, price, qty){
+    return new Promise((resolve, reject) => {
+        const insert = 'INSERT INTO "products-sku-io" (orderId, skuId, description, price, qty) VALUES (?,?,?,?,?)';
+        db.run(insert, [orderId, SKUId, description, price, qty], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
+
+function insertProductRfidIO(orderId, SkuID, skuItemId){
+    return new Promise((resolve, reject) => {
+        const addRfid = 'INSERT INTO "products-rfid-io" (orderId, skuId, skuItemId) VALUES (?,?,?)';
+        db.run(addRfid, [orderId, SkuID, skuItemId], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
+
+
+/*******************************
+ *                             *
+ *           CLEAN             *
+ *                             *
+ *******************************/
+
 
 function cleanRestockOrder() {
     return new Promise((resolve, reject) => {
@@ -322,9 +391,49 @@ function cleanProductRto() {
     });
 }
 
-/*
-RESET
-*/
+function cleanInternalOrder() {
+    return new Promise((resolve, reject) => {
+        const sqlDelete = 'DELETE FROM "internal-orders"';
+        db.run(sqlDelete, [], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
+
+function cleanProductSkuIO() {
+    return new Promise((resolve, reject) => {
+        const sqlDelete = 'DELETE FROM "products-sku-io"';
+        db.run(sqlDelete, [], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
+
+function cleanProductRfidIO() {
+    return new Promise((resolve, reject) => {
+        const sqlDelete = 'DELETE FROM "products-rfid-io"';
+        db.run(sqlDelete, [], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
+
+
+/*******************************
+ *                             *
+ *           RESET             *
+ *                             *
+ *******************************/
+
 
 function resetRestockOrder() {
     return new Promise((resolve, reject) => {
@@ -337,7 +446,7 @@ function resetRestockOrder() {
         });
     });
 }
-function resetProcuctRko() {
+function resetProductRko() {
     return new Promise((resolve, reject) => {
         const sqlDelete = 'DELETE FROM SQLITE_SEQUENCE WHERE name="products-rko"';
         db.run(sqlDelete, [], function (err) {
@@ -418,9 +527,42 @@ function resetReturnOrder() {
         });
     });
 }
-function resetProcuctRto() {
+function resetProductRto() {
     return new Promise((resolve, reject) => {
         const sqlDelete = 'DELETE FROM SQLITE_SEQUENCE WHERE name="products-rto"';
+        db.run(sqlDelete, [], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
+function resetInternalOrder() {
+    return new Promise((resolve, reject) => {
+        const sqlDelete = 'DELETE FROM SQLITE_SEQUENCE WHERE name="internal-orders"';
+        db.run(sqlDelete, [], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
+function resetProductSkuIO() {
+    return new Promise((resolve, reject) => {
+        const sqlDelete = 'DELETE FROM SQLITE_SEQUENCE WHERE name="products-sku-io"';
+        db.run(sqlDelete, [], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
+function resetProductRfidIO() {
+    return new Promise((resolve, reject) => {
+        const sqlDelete = 'DELETE FROM SQLITE_SEQUENCE WHERE name="products-rfid-io"';
         db.run(sqlDelete, [], function (err) {
             if (err) {
                 reject(err);

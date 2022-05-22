@@ -75,7 +75,8 @@ class InternalOrderDBU {
         }
         // then, insert the order record in internal-orders table
         const orderId = await this.#insertOrder(issueDate, customerId);
-        const promises = products.map((p) => new Promise(async (resolve, reject) => {
+        const prod = [].concat(products);
+        const promises = prod.map((p) => new Promise(async (resolve, reject) => {
             // check if the sku is valid
             // const isValid = await this.#checkSKU(p.SKUId);
             // if (!isValid)
@@ -94,7 +95,8 @@ class InternalOrderDBU {
     // this function returns the number of rows which have been modified
     async updateInternalOrder(orderId, newState, products=undefined) {
         if(newState=="COMPLETED") {
-            const promises = products.map((p) => new Promise(async (resolve, reject) => {
+            const prod = [].concat(products);
+            const promises = prod.map((p) => new Promise(async (resolve, reject) => {
                 // check whether the RFID belongs to the specified skuId AND if the skuId belongs to the order
                 const skuItemId = await this.#checkSkuItemConsistency(orderId, p.SkuID, p.RFID);
                 // if (!skuItemId)
@@ -169,7 +171,7 @@ class InternalOrderDBU {
                 reject(err);
                 return;
             }
-            const products = rows.map((p) => new ProductIO(p.skuId, p.description, p.price, p.rfid ? null : p.qty, p.rfid));
+            const products = rows.map((p) => new ProductIO(p.skuId, p.description, p.price, p.qty, p.rfid));
             resolve(products);;
             });
         });
