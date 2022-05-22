@@ -114,16 +114,14 @@ describe('Insert and Modify SKU', () =>{
     beforeAll(async () => {
         //clear DB
         await dbSet.resetTable();
-        //popolate DB 
+        //popolate DB
         await dbSet.prepareTable();
-        //removing InternalOrder dependencies to test the insertion
     });
-
-    afterAll(async () => {
+    //at the end of all tests in this file
+     afterAll(async () => {
         //clear DB at the end
         await dbSet.resetTable();
-    });
-
+    }); 
     const db = new skuDBU('ezwh.db');
 
     testsearchAssignedPosition(db);
