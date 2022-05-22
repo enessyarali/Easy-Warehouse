@@ -101,7 +101,7 @@ class ItemDBU {
         else if(skuId) {
             const sqlDeleteFromSKU = 'DELETE FROM ITEMS WHERE SKUId = ?';
             sqlInfo.sql = sqlDeleteFromSKU;
-            sql.values = [skuId];
+            sqlInfo.values = [skuId];
         }
         else {
             throw( new Error("No Argument Passed", 10));

@@ -109,14 +109,14 @@ describe('Test Error of Test Result', () => {
 
     const db = new TestResultDBU('ezwh.db');
 
-    testWrongLoad(db);
-    testWrongInsert(db);
-    testWrongUpdate(db);
-    testWrongDelete(db);
+    testWrongTestResultLoad(db);
+    testWrongTestResultInsert(db);
+    testWrongTestResultUpdate(db);
+    testWrongTestResultDelete(db);
 
 });
 
-function testWrongLoad(db) {
+function testWrongTestResultLoad(db) {
     test('Test loadTestResult with wrong parameters ', async () => {
 
         try{
@@ -128,7 +128,7 @@ function testWrongLoad(db) {
     });
 }
 
-function testWrongInsert(db){
+function testWrongTestResultInsert(db){
     test('Test insertTestResult with wrong rfid ', async () => {
 
         try{
@@ -149,7 +149,7 @@ function testWrongInsert(db){
     });
 }
 
-function testWrongUpdate(db){
+function testWrongTestResultUpdate(db){
     test('Test updateTestResult with wrong rfid ', async () => {
 
         try{
@@ -170,7 +170,7 @@ function testWrongUpdate(db){
     });
 }
 
-function testWrongDelete(db) {
+function testWrongTestResultDelete(db) {
     test('Test deleteTestResult with wrong rfid ', async () => {
 
         try{
