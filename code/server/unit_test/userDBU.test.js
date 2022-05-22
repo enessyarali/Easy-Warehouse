@@ -7,19 +7,19 @@ const userDBU = require('../database_utilities/userDBU');
 
 const USER = require('../model/user');
 
-describe('Test User' , async() =>{
+describe('Test User' , () =>{
      //at the start
      beforeAll(async () => {
         //clear DB
         await dbSet.resetTable();
-
+        //popolate DB
+        await dbSet.prepareTable();
     });
     //at the end of all tests in this file
      afterAll(async () => {
         //clear DB at the end
         await dbSet.resetTable();
     }); 
-
     const db = new userDBU('ezwh.db');
 
     testInsertUser(db);
