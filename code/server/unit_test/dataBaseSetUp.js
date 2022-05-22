@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 'use strict';
 
 const sqlite = require('sqlite3');
@@ -57,6 +59,12 @@ exports.voidItem = async () => {
     await resetItem();
 }
 
+exports.voidUser = async () => {
+    await cleanUser();
+
+    await resetUser();
+}
+
 //empty db
 async function cleanTable() {
     //delete all the elements of the table
@@ -73,6 +81,8 @@ async function cleanTable() {
     await cleanProductSkuIO();
     await cleanProductRfidIO();
     await cleanItem();
+    await cleanUser();
+    await cleanPosition();
 
     //reset the autoincrement
     await resetSku();
@@ -88,13 +98,15 @@ async function cleanTable() {
     await resetProductSkuIO();
     await resetProductRfidIO();
     await resetItem();
+    await resetUser();
+    await resetPosition();
 }
 
 //popolate db
 async function fillTable() {
 
-    await insertSKU('test1',100,100,'test1',1,100);
-    await insertSKU('test2',100,100,'test2',1,100);
+    await insertSKU('test1',100,100,'test1',1,100,1);
+    await insertSKU('test2',100,100,'test2',1,100,2);
 
     await insertSkuItem("123", 1, '2022/04/04');
     await insertSkuItem("456", 2, '2022/04/04');
@@ -134,7 +146,18 @@ async function fillTable() {
 
     await insertItem(1,'dI1',1,1,5);
     await insertItem(2,'dI2',1,2,5);
-    await insertItem(3,'dI3',1,2,5);
+    //await insertItem(3,'dI3',1,2,5);      the insertion of this item causes problems
+
+    await insertUser('testName','surname1','mail1','customer','psw1','salt1');
+    /*await insertUser('testName','surname2','mail2','qualityemployee','psw2','salt2');
+    await insertUser('testName','surname3','mail3','clerk','psw3','salt3');
+    await insertUser('testName','surname4','mail4','deliveryEmployee','psw4','salt4');
+    await insertUser('testName','surname5','mail5','supplier','psw5','salt5');
+    await insertUser('testName','surname6','mail6','manager','psw6','salt6');*/
+
+    await insertPosition('1','1','1','1',50,50,10,10);
+    await insertPosition('2','2','1','1',50,50,0,0);
+    
 }
 
 
@@ -145,10 +168,10 @@ async function fillTable() {
  *******************************/
 
 
-function insertSKU(description, weight, volume, notes, price, availableQuantity) {
+function insertSKU(description, weight, volume, notes, price, availableQuantity,position) {
     return new Promise((resolve, reject) => {
-        const sqlInsert = 'INSERT INTO SKUS (description, weight, volume, notes, price, availableQuantity) VALUES(?,?,?,?,?,?)';
-        db.run(sqlInsert, [description, weight, volume, notes, price, availableQuantity], (err) => {
+        const sqlInsert = 'INSERT INTO SKUS (description, weight, volume, notes, price, availableQuantity, position) VALUES(?,?,?,?,?,?,?)';
+        db.run(sqlInsert, [description, weight, volume, notes, price, availableQuantity, position], (err) => {
             if (err) {
                 reject(err);
                 return;
@@ -307,6 +330,30 @@ function insertItem(id, description, price, SKUId, supplierId){
     });
 }
 
+function insertUser(name, surname, username, type, password, salt){
+    return new Promise((resolve, reject) => {
+        const sqlInsert = 'INSERT INTO USERS (name, surname, email, type, password, salt) VALUES(?,?,?,?,?,?)';
+        db.run(sqlInsert, [name, surname, username, type, password, salt], (err) => {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
+
+function insertPosition(positionId, aisleId, row, col, maxWeight, maxVolume, occupiedWeight, occupiedVolume){
+    return new Promise((resolve, reject) => {
+        const sqlInsert = 'INSERT INTO positions (positionId, aisleId, row, col, maxWeight, maxVolume, \
+            occupiedWeight, occupiedVolume) VALUES(?,?,?,?,?,?,?,?)';
+        db.run(sqlInsert, [positionId, aisleId, row, col, maxWeight, maxVolume, occupiedWeight, occupiedVolume], (err) => {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
 
 /*******************************
  *                             *
@@ -471,6 +518,29 @@ function cleanItem(){
     });
 }
 
+function cleanUser(){
+    return new Promise((resolve, reject) => {
+        const sqlDelete = 'DELETE FROM USERS WHERE name="testName"';
+        db.run(sqlDelete, [], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
+
+function cleanPosition(){
+    return new Promise((resolve, reject) => {
+        const sqlDelete = 'DELETE FROM positions';
+        db.run(sqlDelete, [], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
 
 /*******************************
  *                             *
@@ -618,6 +688,28 @@ function resetProductRfidIO() {
 function resetItem(){
     return new Promise((resolve, reject) => {
         const sqlDelete = 'DELETE FROM SQLITE_SEQUENCE WHERE name="items"';
+        db.run(sqlDelete, [], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
+function resetUser(){
+    return new Promise((resolve, reject) => {
+        const sqlDelete = 'DELETE FROM SQLITE_SEQUENCE WHERE name="users"';
+        db.run(sqlDelete, [], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
+function resetPosition(){
+    return new Promise((resolve, reject) => {
+        const sqlDelete = 'DELETE FROM SQLITE_SEQUENCE WHERE name="positions"';
         db.run(sqlDelete, [], function (err) {
             if (err) {
                 reject(err);

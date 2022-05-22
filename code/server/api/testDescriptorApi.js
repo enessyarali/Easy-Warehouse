@@ -95,7 +95,9 @@ router.delete('/api/testDescriptor/:id', async (req,res) => {
   }
   try{
       const db = new TestDescriptorDBU('ezwh.db');
-      await db.deleteTestDescriptor(id);
+      const deleted = await db.deleteTestDescriptor(id);
+      if (!deleted)
+        return res.status(404).json({error: `No test descriptor with matching id.`});
       return res.status(204).end();
   }
   catch(err){
