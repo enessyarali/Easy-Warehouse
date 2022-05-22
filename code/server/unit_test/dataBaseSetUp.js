@@ -155,8 +155,8 @@ async function fillTable() {
     await insertUser('testName','surname5','mail5','supplier','psw5','salt5');
     await insertUser('testName','surname6','mail6','manager','psw6','salt6');
 
-    await insertPosition(1,1,1,1,50,50,10,10);
-    await insertPosition(2,2,1,1,50,50,0,0);
+    await insertPosition('1','1','1','1',50,50,10,10);
+    await insertPosition('2','2','1','1',50,50,0,0);
     
 }
 
@@ -345,7 +345,7 @@ function insertUser(name, surname, username, type, password, salt){
 function insertPosition(positionId, aisleId, row, col, maxWeight, maxVolume, occupiedWeight, occupiedVolume){
     return new Promise((resolve, reject) => {
         const sqlInsert = 'INSERT INTO positions (positionId, aisleId, row, col, maxWeight, maxVolume, \
-            occupiedWeight, occupiedVolume) VALUES(?,?,?,?,?,?,0,0)';
+            occupiedWeight, occupiedVolume) VALUES(?,?,?,?,?,?,?,?)';
         db.run(sqlInsert, [positionId, aisleId, row, col, maxWeight, maxVolume, occupiedWeight, occupiedVolume], (err) => {
             if (err) {
                 reject(err);
