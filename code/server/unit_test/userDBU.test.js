@@ -12,14 +12,14 @@ describe('Load Users' , () =>{
      beforeAll(async () => {
         //clear DB
         await dbSet.resetTable();
-        //popolate DB
-        await dbSet.prepareTable();
+
     });
     //at the end of all tests in this file
      afterAll(async () => {
         //clear DB at the end
         await dbSet.resetTable();
     }); 
+
     const db = new userDBU('ezwh.db');
 
     testGetUsers(db);
