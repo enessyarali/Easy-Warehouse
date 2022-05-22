@@ -50,6 +50,13 @@ exports.voidTestResult = async () => {
 
     await resetTestResult();
 }
+
+exports.voidItem = async () => {
+    await cleanItem();
+
+    await resetItem();
+}
+
 //empty db
 async function cleanTable() {
     //delete all the elements of the table
@@ -65,6 +72,7 @@ async function cleanTable() {
     await cleanInternalOrder();
     await cleanProductSkuIO();
     await cleanProductRfidIO();
+    await cleanItem();
 
     //reset the autoincrement
     await resetSku();
@@ -79,6 +87,7 @@ async function cleanTable() {
     await resetInternalOrder();
     await resetProductSkuIO();
     await resetProductRfidIO();
+    await resetItem();
 }
 
 //popolate db
@@ -122,6 +131,10 @@ async function fillTable() {
     await insertInternalOrder('2022/04/04','COMPLETED',1);
     await insertProductSkuIO(2,2,'d2',1,1);
     await insertProductRfidIO(2,2,2);
+
+    await insertItem(1,'dI1',1,1,5);
+    await insertItem(2,'dI2',1,2,5);
+    await insertItem(3,'dI3',1,2,5);
 }
 
 
@@ -281,6 +294,19 @@ function insertProductRfidIO(orderId, SkuID, skuItemId){
     });
 }
 
+function insertItem(id, description, price, SKUId, supplierId){
+    return new Promise((resolve, reject) => {
+        const sqlInsert = 'INSERT INTO ITEMS (id, description, price, SKUId, supplierId) VALUES(?,?,?,?,?);';
+        db.run(sqlInsert, [id, description, price, SKUId, supplierId], (err) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve('Done');
+        });
+    });
+}
+
 
 /*******************************
  *                             *
@@ -433,6 +459,18 @@ function cleanProductRfidIO() {
     });
 }
 
+function cleanItem(){
+    return new Promise((resolve, reject) => {
+        const sqlDelete = 'DELETE FROM "items"';
+        db.run(sqlDelete, [], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
+
 
 /*******************************
  *                             *
@@ -569,6 +607,17 @@ function resetProductSkuIO() {
 function resetProductRfidIO() {
     return new Promise((resolve, reject) => {
         const sqlDelete = 'DELETE FROM SQLITE_SEQUENCE WHERE name="products-rfid-io"';
+        db.run(sqlDelete, [], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
+function resetItem(){
+    return new Promise((resolve, reject) => {
+        const sqlDelete = 'DELETE FROM SQLITE_SEQUENCE WHERE name="items"';
         db.run(sqlDelete, [], function (err) {
             if (err) {
                 reject(err);
