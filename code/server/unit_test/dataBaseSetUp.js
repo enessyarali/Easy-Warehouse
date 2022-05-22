@@ -499,7 +499,7 @@ function cleanItem(){
     });
 }
 
-fucntion cleanUser(){
+function cleanUser(){
     return new Promise((resolve, reject) => {
         const sqlDelete = 'DELETE FROM USERS WHERE name=testName';
         db.run(sqlDelete, [username, type], function (err) {
