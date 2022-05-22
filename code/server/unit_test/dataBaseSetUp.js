@@ -82,6 +82,7 @@ async function cleanTable() {
     await cleanProductRfidIO();
     await cleanItem();
     await cleanUser();
+    await cleanPosition();
 
     //reset the autoincrement
     await resetSku();
@@ -98,13 +99,14 @@ async function cleanTable() {
     await resetProductRfidIO();
     await resetItem();
     await resetUser();
+    await resetPosition();
 }
 
 //popolate db
 async function fillTable() {
 
-    await insertSKU('test1',100,100,'test1',1,100);
-    await insertSKU('test2',100,100,'test2',1,100);
+    await insertSKU('test1',100,100,'test1',1,100,1);
+    await insertSKU('test2',100,100,'test2',1,100,2);
 
     await insertSkuItem("123", 1, '2022/04/04');
     await insertSkuItem("456", 2, '2022/04/04');
@@ -152,6 +154,9 @@ async function fillTable() {
     await insertUser('testName','surname4','mail4','deliveryEmployee','psw4','salt4');
     await insertUser('testName','surname5','mail5','supplier','psw5','salt5');
     await insertUser('testName','surname6','mail6','manager','psw6','salt6');
+
+    await insertPosition(1,1,1,1,50,50,10,10);
+    await insertPosition(2,2,1,1,50,50,0,0);
     
 }
 
@@ -163,10 +168,10 @@ async function fillTable() {
  *******************************/
 
 
-function insertSKU(description, weight, volume, notes, price, availableQuantity) {
+function insertSKU(description, weight, volume, notes, price, availableQuantity,position) {
     return new Promise((resolve, reject) => {
-        const sqlInsert = 'INSERT INTO SKUS (description, weight, volume, notes, price, availableQuantity) VALUES(?,?,?,?,?,?)';
-        db.run(sqlInsert, [description, weight, volume, notes, price, availableQuantity], (err) => {
+        const sqlInsert = 'INSERT INTO SKUS (description, weight, volume, notes, price, availableQuantity, position) VALUES(?,?,?,?,?,?,?)';
+        db.run(sqlInsert, [description, weight, volume, notes, price, availableQuantity, position], (err) => {
             if (err) {
                 reject(err);
                 return;
@@ -337,6 +342,18 @@ function insertUser(name, surname, username, type, password, salt){
     });
 }
 
+function insertPosition(positionId, aisleId, row, col, maxWeight, maxVolume, occupiedWeight, occupiedVolume){
+    return new Promise((resolve, reject) => {
+        const sqlInsert = 'INSERT INTO positions (positionId, aisleId, row, col, maxWeight, maxVolume, \
+            occupiedWeight, occupiedVolume) VALUES(?,?,?,?,?,?,0,0)';
+        db.run(sqlInsert, [positionId, aisleId, row, col, maxWeight, maxVolume, occupiedWeight, occupiedVolume], (err) => {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
 
 /*******************************
  *                             *
@@ -513,6 +530,17 @@ function cleanUser(){
     });
 }
 
+function cleanPosition(){
+    return new Promise((resolve, reject) => {
+        const sqlDelete = 'DELETE FROM positions';
+        db.run(sqlDelete, [], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
 
 /*******************************
  *                             *
@@ -671,6 +699,17 @@ function resetItem(){
 function resetUser(){
     return new Promise((resolve, reject) => {
         const sqlDelete = 'DELETE FROM SQLITE_SEQUENCE WHERE name="users"';
+        db.run(sqlDelete, [], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
+function resetPosition(){
+    return new Promise((resolve, reject) => {
+        const sqlDelete = 'DELETE FROM SQLITE_SEQUENCE WHERE name="positions"';
         db.run(sqlDelete, [], function (err) {
             if (err) {
                 reject(err);
