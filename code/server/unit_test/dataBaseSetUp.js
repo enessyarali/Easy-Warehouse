@@ -84,7 +84,7 @@ async function fillTable() {
     await insertSkuItem("123", 1, '2022/04/04');
     await insertSkuItem("456", 2, '2022/04/04');
     await insertSkuItem("789", 2, '2022/04/04');
-    await insertSkuItem("000", 1 ,'2022/04/04');
+    await insertSkuItem("999", 1 ,'2022/04/04');
 
     await insertRestockOrder('2022/04/04', 'ISSUED', 5);
     await insertProductRko(1, 1, "descrizione1", 1, 1);
@@ -109,11 +109,11 @@ async function fillTable() {
     await insertReturnOrder('2022/04/04',2);
     await insertProductRto(2,2,'desc2',1,3);
 
-    await insertInternalOrder('2022/04/04','COMPLETED',1);
+    await insertInternalOrder('2022/04/04','ISSUED',1);
     await insertProductSkuIO(1,1,'d1',1,1);
     await insertProductRfidIO(1,1,4);
 
-    await insertInternalOrder('2022/04/04','ISSUED',1);
+    await insertInternalOrder('2022/04/04','COMPLETED',1);
     await insertProductSkuIO(2,2,'d2',1,1);
     await insertProductRfidIO(2,2,2);
 }

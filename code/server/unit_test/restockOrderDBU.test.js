@@ -91,7 +91,7 @@ describe('Insert and modify Restock Order', () => {
 });
 
 function testInsertRestockOrder(db) {
-    test('Insert a new Restockb Order', async () => {
+    test('Insert a new Restock Order', async () => {
         //create new product to insert
         var p = new ProductRKO(1, "descrizione1", 1, 1);
         await db.insertRestockOrder('2022/04/04', p, 5);

@@ -77,10 +77,6 @@ class InternalOrderDBU {
         const orderId = await this.#insertOrder(issueDate, customerId);
         const prod = [].concat(products);
         const promises = prod.map((p) => new Promise(async (resolve, reject) => {
-            // check if the sku is valid
-            // const isValid = await this.#checkSKU(p.SKUId);
-            // if (!isValid)
-            //    throw(new Error("SKU does not exist", 3));
             const insert = 'INSERT INTO "products-sku-io" (orderId, skuId, description, price, qty) VALUES (?,?,?,?,?)';
             this.db.run(insert, [orderId, p.SKUId, p.description, p.price, p.qty], function (err) {
                 if (err) {
@@ -99,9 +95,6 @@ class InternalOrderDBU {
             const promises = prod.map((p) => new Promise(async (resolve, reject) => {
                 // check whether the RFID belongs to the specified skuId AND if the skuId belongs to the order
                 const skuItemId = await this.#checkSkuItemConsistency(orderId, p.SkuID, p.RFID);
-                // if (!skuItemId)
-                //    throw(new Error("Detected inconsistency SKUitem-RFID. Operation aborted.",7));
-                // add the new record for the RFID
                 const addRfid = 'INSERT INTO "products-rfid-io" (orderId, skuId, skuItemId) VALUES (?,?,?)';
                 this.db.run(addRfid, [orderId, p.SkuID, skuItemId], function (err) {
                     if (err) {
