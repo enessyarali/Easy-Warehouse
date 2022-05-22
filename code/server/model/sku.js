@@ -52,7 +52,8 @@ class SKU {
     async delete(openDB) {
         if (this.position) {
             try {
-                this.#propagatePosition(openDB);
+                await this.#propagatePosition(openDB);
+                this.position=undefined;
             } catch(err) {
                 // if there is some exception, propagate it
                 throw(err);
