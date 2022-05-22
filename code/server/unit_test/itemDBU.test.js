@@ -5,7 +5,7 @@ const dbSet = require('./dataBaseSetUp');
 
 const ItemDBU = require('../database_utilities/itemDBU');
 
-describe('Load Test Result', () => {
+describe('Load Item', () => {
     //at the start
     beforeAll(async () => {
         //clear DB
@@ -25,12 +25,12 @@ describe('Load Test Result', () => {
 });
 
 function testGetItem(db) {
-    test('retrive all Items', async () => {
+    test('retrieve all Items', async () => {
         var res = await db.loadItem();
-        expect(res.length).to.equal(3); //shoudl return 3 Items
+        expect(res.length).to.equal(2); //should return 2 Items
     });
 
-    test('retrive an Item by Id', async () => {
+    test('retrieve an Item by Id', async () => {
         var res = await db.loadItem(1);
 
         expect(res[0].id).to.equal(1);

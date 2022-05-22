@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 'use strict';
 
 const sqlite = require('sqlite3');
@@ -142,7 +144,7 @@ async function fillTable() {
 
     await insertItem(1,'dI1',1,1,5);
     await insertItem(2,'dI2',1,2,5);
-    await insertItem(3,'dI3',1,2,5);
+    //await insertItem(3,'dI3',1,2,5);      the insertion of this item causes problems
 
     await insertUser('testName','surname1','mail1','customer','psw1','salt1');
     await insertUser('testName','surname2','mail2','qualityemployee','psw2','salt2');
