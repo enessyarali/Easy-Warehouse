@@ -57,6 +57,12 @@ exports.voidItem = async () => {
     await resetItem();
 }
 
+exports.voidUser = async () => {
+    await cleanUser();
+
+    await resetUser();
+}
+
 //empty db
 async function cleanTable() {
     //delete all the elements of the table
@@ -73,6 +79,7 @@ async function cleanTable() {
     await cleanProductSkuIO();
     await cleanProductRfidIO();
     await cleanItem();
+    await cleanUser();
 
     //reset the autoincrement
     await resetSku();
@@ -88,6 +95,7 @@ async function cleanTable() {
     await resetProductSkuIO();
     await resetProductRfidIO();
     await resetItem();
+    await resetUser();
 }
 
 //popolate db
@@ -135,6 +143,14 @@ async function fillTable() {
     await insertItem(1,'dI1',1,1,5);
     await insertItem(2,'dI2',1,2,5);
     await insertItem(3,'dI3',1,2,5);
+
+    await insertUser('testName','surname1','mail1','customer','psw1','salt1');
+    await insertUser('testName','surname2','mail2','qualityemployee','psw2','salt2');
+    await insertUser('testName','surname3','mail3','clerk','psw3','salt3');
+    await insertUser('testName','surname4','mail4','deliveryEmployee','psw4','salt4');
+    await insertUser('testName','surname5','mail5','supplier','psw5','salt5');
+    await insertUser('testName','surname6','mail6','manager','psw6','salt6');
+    
 }
 
 
@@ -307,6 +323,18 @@ function insertItem(id, description, price, SKUId, supplierId){
     });
 }
 
+function insertUser(name, surname, username, type, password, salt){
+    return new Promise((resolve, reject) => {
+        const sqlInsert = 'INSERT INTO USERS (name, surname, email, type, password, salt) VALUES(?,?,?,?,?,?)';
+        db.run(sqlInsert, [name, surname, username, type, password, salt], (err) => {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
+
 
 /*******************************
  *                             *
@@ -471,6 +499,18 @@ function cleanItem(){
     });
 }
 
+fucntion cleanUser(){
+    return new Promise((resolve, reject) => {
+        const sqlDelete = 'DELETE FROM USERS WHERE name=testName';
+        db.run(sqlDelete, [username, type], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve(this.changes);
+        });
+    });
+}
+
 
 /*******************************
  *                             *
@@ -618,6 +658,17 @@ function resetProductRfidIO() {
 function resetItem(){
     return new Promise((resolve, reject) => {
         const sqlDelete = 'DELETE FROM SQLITE_SEQUENCE WHERE name="items"';
+        db.run(sqlDelete, [], function (err) {
+            if (err) {
+                reject(err);
+                return;
+            } else resolve('Done');
+        });
+    });
+}
+function resetUser(){
+    return new Promise((resolve, reject) => {
+        const sqlDelete = 'DELETE FROM SQLITE_SEQUENCE WHERE name="users"';
         db.run(sqlDelete, [], function (err) {
             if (err) {
                 reject(err);
