@@ -501,12 +501,12 @@ function cleanItem(){
 
 function cleanUser(){
     return new Promise((resolve, reject) => {
-        const sqlDelete = 'DELETE FROM USERS WHERE name=testName';
-        db.run(sqlDelete, [username, type], function (err) {
+        const sqlDelete = 'DELETE FROM USERS WHERE name="testName"';
+        db.run(sqlDelete, [], function (err) {
             if (err) {
                 reject(err);
                 return;
-            } else resolve(this.changes);
+            } else resolve('Done');
         });
     });
 }
