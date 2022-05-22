@@ -114,24 +114,6 @@ class TestDescriptorDBU {
             });
         });
     }
-    //private method to get the Descriptor's Id given an SKUid
-    #getDescriptorId(SKUid){
-        return new Promise((resolve, reject) => {
-            this.db.run('SELECT * FROM "TEST-DESCRIPTORS" WHERE idSKU = ?', [SKUid], (err, rows) => {
-                if(err) {
-                    reject(err);
-                    return;
-                }
-                else {
-                    const ids = rows.map((td) => {
-                        const id = td.id;
-                        return id;
-                    });
-                    resolve(ids);
-                }
-            });
-        }); 
-    }
 
     // private method to check whether skuId corresponds to an existing SKU
     #checkSKU(skuId) {
