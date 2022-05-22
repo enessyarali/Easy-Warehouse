@@ -27,7 +27,7 @@ describe('Test User' , async() =>{
     testDeleteUser(db);
 } )
 
-function testinsertUser(db){
+function testInsertUser(db){
     test('insert user', async() =>{
         var newuser = new USER(1,'enes','yarali','manager')
         db.insertUser('enesyarali','enes','yarali','Polito','manager') 
