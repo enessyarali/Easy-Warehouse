@@ -77,7 +77,7 @@ function testInsertPosition(db){
     })
 }
 
-escribe('Update Position', () => {
+describe('Update Position', () => {
     //at the start
     beforeAll(async () => {
         //clear DB
