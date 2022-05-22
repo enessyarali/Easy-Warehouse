@@ -149,11 +149,11 @@ async function fillTable() {
     //await insertItem(3,'dI3',1,2,5);      the insertion of this item causes problems
 
     await insertUser('testName','surname1','mail1','customer','psw1','salt1');
-    await insertUser('testName','surname2','mail2','qualityemployee','psw2','salt2');
+    /*await insertUser('testName','surname2','mail2','qualityemployee','psw2','salt2');
     await insertUser('testName','surname3','mail3','clerk','psw3','salt3');
     await insertUser('testName','surname4','mail4','deliveryEmployee','psw4','salt4');
     await insertUser('testName','surname5','mail5','supplier','psw5','salt5');
-    await insertUser('testName','surname6','mail6','manager','psw6','salt6');
+    await insertUser('testName','surname6','mail6','manager','psw6','salt6');*/
 
     await insertPosition('1','1','1','1',50,50,10,10);
     await insertPosition('2','2','1','1',50,50,0,0);
