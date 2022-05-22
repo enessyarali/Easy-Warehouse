@@ -105,8 +105,8 @@ async function cleanTable() {
 //popolate db
 async function fillTable() {
 
-    await insertSKU('test1',100,100,'test1',1,100,1);
-    await insertSKU('test2',100,100,'test2',1,100,2);
+    await insertSKU('test1',1,1,'test1',1,100,1);
+    await insertSKU('test2',100,100,'test2',1,100,null);
 
     await insertSkuItem("123", 1, '2022/04/04');
     await insertSkuItem("456", 2, '2022/04/04');
@@ -155,8 +155,8 @@ async function fillTable() {
     await insertUser('testName','surname5','mail5','supplier','psw5','salt5');
     await insertUser('testName','surname6','mail6','manager','psw6','salt6');*/
 
-    await insertPosition('1','1','1','1',50,50,10,10);
-    await insertPosition('2','2','1','1',50,50,0,0);
+    await insertPosition('111','1','1','1',500,500,100,100);
+    await insertPosition('222','2','1','1',50,50,0,0);
     
 }
 
