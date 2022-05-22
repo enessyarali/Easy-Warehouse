@@ -66,9 +66,9 @@ router.put('/api/sku/:id', async (req,res) => {
   if (req.body === undefined || req.body.newDescription === undefined || req.body.newWeight === undefined || req.body.newWeight <= 0 || 
     req.body.newVolume === undefined || req.body.newVolume <= 0 || req.body.newPrice == undefined || req.body.newPrice <= 0 ||
     req.body.newNotes === undefined || req.body.newAvailableQuantity === undefined || req.body.newAvailableQuantity < 0 ||
-    typeof req.body.weight !== 'number' || typeof req.body.volume !== 'number' || typeof req.body.price !== 'number' ||
-    typeof req.body.availableQuantity !== 'number' || !Number.isInteger(req.body.weight) || !Number.isInteger(req.body.volume) ||
-    !Number.isInteger(req.body.availableQuantity) || !Number.isInteger(id) || id < 1) {
+    typeof req.body.newWeight !== 'number' || typeof req.body.newVolume !== 'number' || typeof req.body.newPrice !== 'number' ||
+    typeof req.body.newAvailableQuantity !== 'number' || !Number.isInteger(req.body.newWeight) || !Number.isInteger(req.body.newVolume) ||
+    !Number.isInteger(req.body.newAvailableQuantity) || !Number.isInteger(id) || id < 1) {
     return res.status(422).json({error: `Invalid SKU data.`});
   }
   try{

@@ -25,6 +25,7 @@ class SKU {
         this.price = price;
         this.position = position;
         this.availableQuantity = availableQuantity;
+        this.testDescriptors = [];
     }
 
     setTestDescriptors(testDescriptors) {
