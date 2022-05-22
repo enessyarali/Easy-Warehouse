@@ -7,11 +7,7 @@ const userDBU = require('../database_utilities/userDBU');
 
 const User = require('../model/user');
 
-<<<<<<< HEAD
-describe('Test User' , () =>{
-=======
 describe('Load Users' , () =>{
->>>>>>> c0ca02872eab33dd7678c8fa8395bbcbdb8803ff
      //at the start
      beforeAll(async () => {
         //clear DB
