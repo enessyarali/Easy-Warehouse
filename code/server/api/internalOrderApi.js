@@ -73,7 +73,7 @@ router.get('/api/internalOrders/:id', async (req,res) => {
 // add a new internalOrder to the database
 router.post('/api/internalOrders', async (req,res) => {
   if (req.body === undefined || req.body.issueDate == undefined || !validators.dateIsValid(req.body.issueDate) ||
-      req.body.products === undefined || 
+      req.body.products === undefined || !Array.isArray(req.body.products) ||
       req.body.products.some(p => (p.SKUId === undefined || typeof p.SKUId !== 'number' ||
       p.SKUId <= 0 || p.description === undefined || p.price === undefined ||
       typeof p.price !== 'number' || p.price <= 0 || p.qty === undefined || typeof p.qty !== 'number' ||
@@ -97,7 +97,7 @@ router.post('/api/internalOrders', async (req,res) => {
 router.put('/api/internalOrders/:id', async (req,res) => {
   const id = parseInt(req.params.id);
   if (req.body === undefined || id === undefined || req.body.newState ===undefined|| !getState(req.body.newState) || 
-     (getState(req.body.newState)=="COMPLETED" && (req.body.products===undefined || 
+     (getState(req.body.newState)=="COMPLETED" && (req.body.products===undefined || !Array.isArray(req.body.products) ||
       req.body.products.some((i) => (i.SkuID===undefined || typeof p.SkuID !== 'number' ||
     p.SkuID <= 0 || i.RFID===undefined || !validators.rfidIsValid(i.RFID)))))) {
     return res.status(422).json({error: `Invalid item data.`});

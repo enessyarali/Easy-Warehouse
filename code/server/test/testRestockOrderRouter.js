@@ -240,6 +240,7 @@ describe('test restock order apis', () => {
     patchTransportNote('PUT /api/restockOrder/:id/transportNote - order does not exist', 404, {"transportNote":{"deliveryDate":"2022/12/29"}}, 100000000);
 
     patchSkuItems('PUT /api/restockOrder/:id/skuItems - correctly add a list of sku items to an order', 200, {"skuItems":[{"SKUId": si4, "rfid": "12345678901234567890123456789017"}]}, null, ro5);
+    patchSkuItems('PUT /api/restockOrder/:id/skuItems - item is not inside an array', 422, {"skuItems": {"SKUId": si4, "rfid": "12345678901234567890123456789017"}}, null, ro5);
     patchSkuItems('PUT /api/restockOrder/:id/skuItems - order state is not DELIVERED', 422, {"skuItems":[{"SKUId": si4, "rfid": "12345678901234567890123456789017"}]}, null, ro1);
     patchSkuItems('PUT /api/restockOrder/:id/skuItems - order id is 0', 422, {"skuItems":[{"SKUId": si4, "rfid": "12345678901234567890123456789017"}]}, 0);
     patchSkuItems('PUT /api/restockOrder/:id/skuItems - typo in a sku item field', 422, {"skuItems":[{"SKUid": 4, "rfid": "12345678901234567890123456789017"}]}, null, ro5);
@@ -423,9 +424,14 @@ function patchSkuItems(description, expectedHTTPStatus, skuItems, id=undefined, 
     it(description, async function () {
         try {
             // set up SKUIds
-            for (let si of skuItems.skuItems) {
-                if (si.SKUId && si.SKUId.SKUId)
-                    si.SKUId = si.SKUId.SKUId;
+            try {
+                for (let si of skuItems.skuItems) {
+                    if (si.SKUId && si.SKUId.SKUId)
+                        si.SKUId = si.SKUId.SKUId;
+                }
+            } catch {
+                if (skuItems.skuItems.SKUId && skuItems.skuItems.SKUId.SKUId)
+                    skuItems.skuItems.SKUId = skuItems.skuItems.SKUId.SKUId;
             }
             let startTime = performance.now();
             const rUpdate = await agent.put(`/api/restockOrder/${order ? order.id : id}/skuItems`).send(skuItems);
