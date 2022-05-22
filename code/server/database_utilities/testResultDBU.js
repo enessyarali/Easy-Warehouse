@@ -49,7 +49,7 @@ class TestResultDBU {
                     }
                     else {
                         const results = rows.map((tr) => {
-                            const res = new TestResult(tr.id, tr.descriptorId, tr.date, tr.result =='Pass'? true : false);
+                            const res = new TestResult(tr.id, tr.descriptorId, tr.date, (tr.result ==='Pass')? true : false);
                             return res;
                         });
                         resolve(results);
@@ -156,11 +156,3 @@ class TestResultDBU {
 }
 
 module.exports = TestResultDBU;
-
-/* 
-SKUitemRFid
-id
-descriptorId
-date
-result
-*/

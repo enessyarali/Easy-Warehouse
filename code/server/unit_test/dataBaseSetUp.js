@@ -44,6 +44,12 @@ exports.voidInternalOrder = async () => {
     await resetProductSkuIO();
     await resetProductRfidIO();
 }
+
+exports.voidTestResult = async () => {
+    await cleanTestResult();
+
+    await resetTestResult();
+}
 //empty db
 async function cleanTable() {
     //delete all the elements of the table
@@ -100,7 +106,7 @@ async function fillTable() {
     await insertTestResult(2,1,'2022/04/04','Pass');
 
     await insertTestDescriptor('td2','test2',1);
-    await insertTestResult(1,2,'2022/04/04','Fail');
+    await insertTestResult(2,2,'2022/04/04','Fail');
     await insertTestResult(3,2,'2022/04/04','Pass');
 
     await insertReturnOrder('2022/04/04',1);

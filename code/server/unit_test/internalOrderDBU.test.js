@@ -118,7 +118,7 @@ function testUpdateInternalOrder(db) {
 
         expect(res[0].state).to.equal('COMPLETED');
         expect(res[0].products[0].SKUId).to.equal(1);
-        //expect(res[0].products[0].rfid).to.equal('999'); //-> strange sync behaviour
+        expect(res[0].products[0].RFID).to.equal('999');
     });
 }
 
