@@ -81,24 +81,25 @@ describe('test test descriptor apis', () => {
         await agent.delete(`/api/skus/${sku2.id}`);
     });
 
-    getAllTestDescriptors('GET /api/testDescriptors - retrive all test descriptors', 200, [td1, td2]);
+    getAllTestDescriptors('GET /api/testDescriptors - retrieve all test descriptors', 200, [td1, td2]);
 
-    getTestDescriptor('GET /api/testDescriptors/:id - retrive a test descriptor given its id', 200, null, td1);
-    getTestDescriptor('GET /api/testDescriptors/:id - retrive a test descriptor given its id', 404, 789);
-    getTestDescriptor('GET /api/testDescriptors/:id - retrive a test descriptor given its id', 422, "");
+    getTestDescriptor('GET /api/testDescriptors/:id - retrieve a test descriptor given its id', 200, null, td1);
+    getTestDescriptor('GET /api/testDescriptors/:id - test descriptor does not exist', 404, 789);
+    getTestDescriptor('GET /api/testDescriptors/:id - id is equal to 0', 422, 0);
 
     addTestDescriptor('POST /api/testDescriptor - correctly adding a test descriptor', 201, new_td);
     addTestDescriptor('POST /api/testDescriptor - idSKU not found', 404, new_td_invalid1);
     addTestDescriptor('POST /api/testDescriptor - invalid idSKU', 422, new_td_invalid2);
 
-    modifyTestDescriptor('PUT /api/testDescriptor/:id - correctly modify a test descriptor', 200, null, updated_td1);
-    modifyTestDescriptor('PUT /api/testDescriptor/:id - no test descriptor associated to given id', 404, 888, updated_td1);
-    modifyTestDescriptor('PUT /api/testDescriptor/:id - no sku associated to given idSKU', 404, null, updated_td_invalid1);
-    modifyTestDescriptor('PUT /api/testDescriptor/:id - invalid test descriptor id', 422, -12, updated_td1);
-    modifyTestDescriptor('PUT /api/testDescriptor/:id - invalid body', 422, null, updated_td_invalid2);
+    modifyTestDescriptor('PUT /api/testDescriptor/:id - correctly modify a test descriptor', 200, updated_td1, null, td1);
+    modifyTestDescriptor('PUT /api/testDescriptor/:id - test descriptor does not exist', 404, updated_td1, 1000000);
+    modifyTestDescriptor('PUT /api/testDescriptor/:id - no sku associated to given idSKU', 404, updated_td_invalid1, null, td1);
+    modifyTestDescriptor('PUT /api/testDescriptor/:id - negative test descriptor id', 422, updated_td1, -2);
+    modifyTestDescriptor('PUT /api/testDescriptor/:id - sku id is not a number', 422, null, updated_td_invalid2);
 
-    deleteTestDescriptor('DELETE /api/testDescriptor/:id - correctly delete a test descriptor', 204, td1.id);
+    deleteTestDescriptor('DELETE /api/testDescriptor/:id - correctly delete a test descriptor', 204, null, td1);
     deleteTestDescriptor('DELETE /api/testDescriptor/:id - invalid test descriptor id', 422, "notAnID");
+    deleteTestDescriptor('DELETE /api/testDescriptor/:id - test descriptor does not exist', 404, 1000000);
 });
 
 function getAllTestDescriptors(description, expectedHTTPStatus, results) {
@@ -127,9 +128,8 @@ function getAllTestDescriptors(description, expectedHTTPStatus, results) {
 function getTestDescriptor(description, expectedHTTPStatus, id, result=undefined) {
     it(description, async function () {
         try {
-            const myId = id ? id : result.id;
             let startTime = performance.now();
-            const r = await agent.get(`/api/testDescriptors/${id}`);
+            const r = await agent.get(`/api/testDescriptors/${result ? result.id : id}`);
             let endTime = performance.now();
             (endTime-startTime).should.lessThanOrEqual(500);
             r.should.have.status(expectedHTTPStatus);
@@ -152,7 +152,12 @@ function addTestDescriptor(description, expectedHTTPStatus, result) {
             let endTime = performance.now();
             (endTime-startTime).should.lessThanOrEqual(500);
             if (rInsert.status==201) {
-                // if the insertion was successful, try the deletion
+                // if the insertion was successful, try the get-deletion
+                const res = await agent.get(`/api/testDescriptors`);
+                for (let r of res.body)
+                    if(r.description==result.description) {
+                        result.id = r.id;
+                    }
                 startTime = performance.now();
                 const rDelete = await agent.delete(`/api/testDescriptor/${result.id}`);
                 rDelete.should.have.status(204);
@@ -163,12 +168,11 @@ function addTestDescriptor(description, expectedHTTPStatus, result) {
     });       
 }
 
-function modifyTestDescriptor(description, expectedHTTPStatus, id, newTD) {
+function modifyTestDescriptor(description, expectedHTTPStatus, newTD, id, result=undefined) {
     it(description, async function () {
-        const myId = id ? id : newTD.id;
         try {
             let startTime = performance.now();
-            const rUpdate = await agent.put(`/api/testDescriptor/${myId}`).send(newTD);
+            const rUpdate = await agent.put(`/api/testDescriptor/${result ? result.id : id}`).send(newTD);
             rUpdate.should.have.status(expectedHTTPStatus);
             let endTime = performance.now();
             (endTime-startTime).should.lessThanOrEqual(500);
@@ -176,11 +180,11 @@ function modifyTestDescriptor(description, expectedHTTPStatus, id, newTD) {
     });       
 }
 
-function deleteTestDescriptor(description, expectedHTTPStatus, id) {
+function deleteTestDescriptor(description, expectedHTTPStatus, id, result=undefined) {
     it(description, async function () {
         try {
             let startTime = performance.now();
-            const r = await agent.delete(`/api/testDescriptor/${id}`);
+            const r = await agent.delete(`/api/testDescriptor/${result ? result.id : id}`);
             r.should.have.status(expectedHTTPStatus);
             let endTime = performance.now();
             (endTime-startTime).should.lessThanOrEqual(500);
