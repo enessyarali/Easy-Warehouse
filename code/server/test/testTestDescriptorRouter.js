@@ -83,7 +83,7 @@ describe('test test descriptor apis', () => {
 
     getAllTestDescriptors('GET /api/testDescriptors - retrive all test descriptors', 200, [td1, td2]);
 
-    getTestDescriptor('GET /api/testDescriptors/:id - retrive a test descriptor given its id', 200, td1.id, td1);
+    getTestDescriptor('GET /api/testDescriptors/:id - retrive a test descriptor given its id', 200, null, td1);
     getTestDescriptor('GET /api/testDescriptors/:id - retrive a test descriptor given its id', 404, 789);
     getTestDescriptor('GET /api/testDescriptors/:id - retrive a test descriptor given its id', 422, "");
 
@@ -91,13 +91,13 @@ describe('test test descriptor apis', () => {
     addTestDescriptor('POST /api/testDescriptor - idSKU not found', 404, new_td_invalid1);
     addTestDescriptor('POST /api/testDescriptor - invalid idSKU', 422, new_td_invalid2);
 
-    modifyTestDescriptor('PUT /api/testDescriptor/:id - correctly modify a test descriptor', 200, td1.id, updated_td1);
+    modifyTestDescriptor('PUT /api/testDescriptor/:id - correctly modify a test descriptor', 200, null, updated_td1);
     modifyTestDescriptor('PUT /api/testDescriptor/:id - no test descriptor associated to given id', 404, 888, updated_td1);
-    modifyTestDescriptor('PUT /api/testDescriptor/:id - no sku associated to given idSKU', 404, td1.id, updated_td_invalid1);
+    modifyTestDescriptor('PUT /api/testDescriptor/:id - no sku associated to given idSKU', 404, null, updated_td_invalid1);
     modifyTestDescriptor('PUT /api/testDescriptor/:id - invalid test descriptor id', 422, -12, updated_td1);
-    modifyTestDescriptor('PUT /api/testDescriptor/:id - invalid body', 422, td1.id, updated_td_invalid2);
+    modifyTestDescriptor('PUT /api/testDescriptor/:id - invalid body', 422, null, updated_td_invalid2);
 
-    deleteTestDescriptor('DELETE /api/testDescriptor/:id - correctly delete a test descriptor', 204, tr1.id);
+    deleteTestDescriptor('DELETE /api/testDescriptor/:id - correctly delete a test descriptor', 204, td1.id);
     deleteTestDescriptor('DELETE /api/testDescriptor/:id - invalid test descriptor id', 422, "notAnID");
 });
 
@@ -127,6 +127,7 @@ function getAllTestDescriptors(description, expectedHTTPStatus, results) {
 function getTestDescriptor(description, expectedHTTPStatus, id, result=undefined) {
     it(description, async function () {
         try {
+            const myId = id ? id : result.id;
             let startTime = performance.now();
             const r = await agent.get(`/api/testDescriptors/${id}`);
             let endTime = performance.now();
@@ -164,9 +165,10 @@ function addTestDescriptor(description, expectedHTTPStatus, result) {
 
 function modifyTestDescriptor(description, expectedHTTPStatus, id, newTD) {
     it(description, async function () {
+        const myId = id ? id : newTD.id;
         try {
             let startTime = performance.now();
-            const rUpdate = await agent.put(`/api/testDescriptor/${id}`).send(newTD);
+            const rUpdate = await agent.put(`/api/testDescriptor/${myId}`).send(newTD);
             rUpdate.should.have.status(expectedHTTPStatus);
             let endTime = performance.now();
             (endTime-startTime).should.lessThanOrEqual(500);
