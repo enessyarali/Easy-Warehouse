@@ -64,6 +64,19 @@ exports.voidUser = async () => {
 
     await resetUser();
 }
+exports.voidSkuItem = async () => {
+    await cleanSkuItem();
+
+    await resetSkuItem();
+}
+exports.createSkuItemDependency = async () => {
+    await insertSKU('test3',300,300,'test3',3,300,null);
+    await insertSkuItem('666', 3, 0,'2022/04/04');
+
+    await insertSkuItemRko(2, 3, 5);
+    await insertTestResult(5, 1, '2022/04/04','Fail');
+    await insertProductRfidIO(3,3,5);
+}
 
 //empty db
 async function cleanTable() {
@@ -108,10 +121,10 @@ async function fillTable() {
     await insertSKU('test1',1,1,'test1',1,100,1);
     await insertSKU('test2',100,100,'test2',1,100,null);
 
-    await insertSkuItem("123", 1, '2022/04/04');
-    await insertSkuItem("456", 2, '2022/04/04');
-    await insertSkuItem("789", 2, '2022/04/04');
-    await insertSkuItem("999", 1 ,'2022/04/04');
+    await insertSkuItem("123", 1, 0,'2022/04/04');
+    await insertSkuItem("456", 2, 1,'2022/04/04');
+    await insertSkuItem("789", 2, 1,'2022/04/04');
+    await insertSkuItem("999", 1, 0,'2022/04/04');
 
     await insertRestockOrder('2022/04/04', 'ISSUED', 5);
     await insertProductRko(1, 1, "descrizione1", 1, 1);
@@ -180,10 +193,10 @@ function insertSKU(description, weight, volume, notes, price, availableQuantity,
     });
 }
 
-function insertSkuItem(rfid, skuId, dateOfStock) {
+function insertSkuItem(rfid, skuId, available, dateOfStock) {
     return new Promise((resolve, reject) => {
-        const sqlInsert = 'INSERT INTO "SKU-ITEMS" (RFID, SKUId, Available, DateOfStock) VALUES(?,?,0,?)';
-        db.run(sqlInsert, [rfid, skuId, dateOfStock], (err) => {
+        const sqlInsert = 'INSERT INTO "SKU-ITEMS" (RFID, SKUId, Available, DateOfStock) VALUES(?,?,?,?)';
+        db.run(sqlInsert, [rfid, skuId, available, dateOfStock], (err) => {
             if (err) {
                 reject(err);
                 return;
