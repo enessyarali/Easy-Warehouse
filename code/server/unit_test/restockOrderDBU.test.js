@@ -17,10 +17,10 @@ describe('Load Restock Order', () => {
         await dbSet.prepareTable();
     });
     //at the end of all tests in this file
-     afterAll(async () => {
+    afterAll(async () => {
         //clear DB at the end
         await dbSet.resetTable();
-    }); 
+    });
 
     const db = new RestockOrderDBU('ezwh.db');
 
@@ -59,12 +59,17 @@ function testGetRestockOrder(db) {
         expect(res[0].skuItems[0].rfid).to.equal('123');
     });
 
-     test('retrive item to return', async () => {
+    test('retrive item to return', async () => {
         var res = await db.selectReturnItems(1);
 
         expect(res[0].SKUId).to.equal(1);
         expect(res[0].rfid).to.equal('123');
-    }); 
+    });
+    test('check state', async () => {
+        var res = await db.retriveState(1);
+
+        expect(res).to.equal('ISSUED');
+    })
 }
 
 describe('Insert and modify Restock Order', () => {
@@ -165,33 +170,33 @@ function testInsertWrongRestockOrder(db) {
     test('Insert a new wrong Restock Order', async () => {
         var p = new ProductRKO(1, "descrizione1", 1, 1);
 
-        try{
+        try {
             await db.insertRestockOrder('2022/04/04', p, 4); //wrong supplier
         }
-        catch (err){
+        catch (err) {
             expect(err.message).to.equal("Supplier does not exist. Operation aborted.");
         }
     });
 }
 
-function testUpdateWrongRestockOrderd(db){
+function testUpdateWrongRestockOrderd(db) {
     test('Update skuItem of an existing Restock Order with wrong SKUId', async () => {
         var si = { rfid: 123, SKUId: 5 };
-        try{
+        try {
             await db.patchRestockOrderSkuItems(1, si); //wrong skuId
         }
-        catch(err){
+        catch (err) {
             expect(err.message).to.equal("SKUitem does not exist. Operation aborted.");
         }
     });
 }
 
-function testDeleteRestockOrderWithDependencies(db){
+function testDeleteRestockOrderWithDependencies(db) {
     test('Delete a Restock Order who has dependencies', async () => {
-        try{
+        try {
             await db.deleteRestockOrder(1); //there is a ReturnOrder that depends on this RestockOrder
         }
-        catch(err){
+        catch (err) {
             expect(err.message).to.equal("Dependency detected. Delete aborted.");
         }
     });
