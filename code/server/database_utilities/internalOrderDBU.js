@@ -184,20 +184,6 @@ class InternalOrderDBU {
         });
    }
 
-   #checkSKU(skuId) {
-        const sql = 'SELECT id FROM skus WHERE id=?'
-        return new Promise((resolve, reject) => {
-            this.db.get(sql, [skuId], (err, row) => {
-                if(err) {
-                    reject(err);
-                    return;
-                }
-                console.log(row);
-                resolve(row ? true : false);
-            })
-        });
-   }
-
    // private method to insert an order in the relative table. It returns the assigned orderID.
    #insertOrder(issueDate, customerId) {
         return new Promise((resolve, reject) => {
