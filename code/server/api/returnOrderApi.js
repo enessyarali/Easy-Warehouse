@@ -40,7 +40,8 @@ router.get('/api/returnOrders/:id', async (req,res) => {
 // add a new returnOrder to the database
 router.post('/api/returnOrder', async (req,res) => {
   if (req.body === undefined || req.body.returnDate == undefined || !validators.dateIsValid(req.body.returnDate)
-    || req.body.products === undefined || req.body.restockOrderId === undefined 
+    || req.body.products === undefined || !Array.isArray(req.body.products)
+    || req.body.restockOrderId === undefined 
     || req.body.products.some(p => (p.SKUId === undefined || typeof p.SKUId !== 'number' ||
     p.SKUId <= 0 || p.description === undefined || p.price === undefined ||
     typeof p.price !== 'number' || p.price <= 0 || p.RFID === undefined ||
