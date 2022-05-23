@@ -31,10 +31,7 @@ Version: 1.0
     <One step will correspond to API testing>
 
   Since all `model` classes have few to none logic, we never test them explicitly - except `SKU` and `Position`. We simply check their behaviour is correct by source code inspection.
-  Moreover, we decided not to use mock-ups, since by design 
-  # idea di supercazzola
-  il nostro applicativo prevede esclusivamente due livelli. Quello delle Api, in cui vengono effettuati tutti i controlli di correttezza formale dei dati inseriti. Il secondo e ultimo livello è quello di interazione con il database, in cui vengono effettuati tutti i controlli di consistency interni al Db
-  # --------supercazzola per farlo sembrare clever--------------
+  Moreover, we did not use mock-ups, since we decided to design our application without including a middleware: its functionalities are already embedded in the `database_utilites` layer.
   Overall, we use a bottom-up approach:
 
   |Stack|Step 1|Step 2|Step 3|Step 4|Step 5|
@@ -87,7 +84,7 @@ Step2 is API testing for all stacks but `SKU` and `Position` ---------------
 
 
 ## Step 3
-Step3 is API testing for`Position` and model testing for  `SKU`
+Step3 is API testing for`Position` and model testing for `SKU`
   
 | Classes  |Jest test cases |
 |--|--|
@@ -114,11 +111,11 @@ Step4 is Api testing for `SKU`
 
 | Scenario ID | Functional Requirements covered | Mocha  Test(s) | 
 | ----------- | ------------------------------- | ----------- | 
-|  Scenario 1-1 | FR2.1 | PUT /api/sku/:id - correctly modify a SKU |
+|  **Scenario 1-1** | FR2.1 | PUT /api/sku/:id - correctly modify a SKU |
    |||PUT /api/sku/:id - SKU does not exist|
    |||PUT /api/sku/:id - available quantity is negative|
    |||PUT /api/sku/:id - position cannot contain weight and volume |
-|  Scenario 1-2 | FR2.1 | PUT /api/sku/:id - correctly modify a SKU |
+|  **Scenario 1-2** | FR2.1 | PUT /api/sku/:id - correctly modify a SKU |
   |||PUT /api/sku/:id - SKU does not exist|
   |||PUT /api/sku/:id - available quantity is negative|
   |||PUT /api/sku/:id - position cannot contain weight and volume |
@@ -133,14 +130,14 @@ Step4 is Api testing for `SKU`
   |||PUT /api/position/:posID/changeID - short old positionID|
   |||PUT /api/position/:posID/changeID - position does not exist|
   |||PUT /api/position/:posID/changeID - new id already exists|
-|  Scenario 1-3 | FR2.4 | GET /api/skus/:id - correctly get a SKU|
+|  **Scenario 1-3** | FR2.4 | GET /api/skus/:id - correctly get a SKU|
   |||GET /api/skus/:id - passing a negative id|
   |||GET /api/skus/:id - SKU does not exist|
   ||FR2.1|PUT /api/sku/:id - correctly modify a SKU |
   |||PUT /api/sku/:id - SKU does not exist|
   |||PUT /api/sku/:id - available quantity is negative|
   |||PUT /api/sku/:id - position cannot contain weight and volume |
-|  Scenario 2-1 | FR3.1.4 | PUT /api/position/:posID - correctly modify a position|
+|  **Scenario 2-1** | FR3.1.4 | PUT /api/position/:posID - correctly modify a position|
   |||PUT /api/position/:posID - passing a field with a typo |
   |||PUT /api/position/:posID - position does not exist |
   |||PUT /api/position/:posID/changeID - correctly patch id|
@@ -148,7 +145,7 @@ Step4 is Api testing for `SKU`
   |||PUT /api/position/:posID/changeID - short old positionID|
   |||PUT /api/position/:posID/changeID - position does not exist|
   |||PUT /api/position/:posID/changeID - new id already exists|
-|  Scenario 2-2 | FR3.1.4 |PUT /api/position/:posID - correctly modify a position|
+|  **Scenario 2-2** | FR3.1.4 |PUT /api/position/:posID - correctly modify a position|
   |||PUT /api/position/:posID - passing a field with a typo |
   |||PUT /api/position/:posID - position does not exist |
   |||PUT /api/position/:posID/changeID - correctly patch id|
@@ -156,7 +153,7 @@ Step4 is Api testing for `SKU`
   |||PUT /api/position/:posID/changeID - short old positionID|
   |||PUT /api/position/:posID/changeID - position does not exist|
   |||PUT /api/position/:posID/changeID - new id already exists|
-|  Scenario 2-3 | FR3.1.4 | PUT /api/position/:posID - correctly modify a position|
+|  **Scenario 2-3** | FR3.1.4 | PUT /api/position/:posID - correctly modify a position|
   |||PUT /api/position/:posID - passing a field with a typo |
   |||PUT /api/position/:posID - position does not exist |
   |||PUT /api/position/:posID/changeID - correctly patch id|
@@ -164,7 +161,7 @@ Step4 is Api testing for `SKU`
   |||PUT /api/position/:posID/changeID - short old positionID|
   |||PUT /api/position/:posID/changeID - position does not exist|
   |||PUT /api/position/:posID/changeID - new id already exists|
-|  Scenario 2-4 | FR3.1.4 | PUT /api/position/:posID - correctly modify a position|
+|  **Scenario 2-4** | FR3.1.4 | PUT /api/position/:posID - correctly modify a position|
   |||PUT /api/position/:posID - passing a field with a typo |
   |||PUT /api/position/:posID - position does not exist |
   |||PUT /api/position/:posID/changeID - correctly patch id|
@@ -172,37 +169,37 @@ Step4 is Api testing for `SKU`
   |||PUT /api/position/:posID/changeID - short old positionID|
   |||PUT /api/position/:posID/changeID - position does not exist|
   |||PUT /api/position/:posID/changeID - new id already exists|
-|  Scenario 2-5 | FR3.1.2 | DELETE /api/position/:posID - correctly delete a position|
+|  **Scenario 2-5** | FR3.1.2 | DELETE /api/position/:posID - correctly delete a position|
   |||DELETE /api/position/:posID - short positionID|
   |||DELETE /api/position/:posID - position does not exist|
-|  Scenario 3-1 | FR5.1, FR5.3, FR5.5, FR5.6|POST /api/restockOrder - correctly adding a restock order|
+|  **Scenario 3-1** | FR5.1, FR5.3, FR5.5, FR5.6|POST /api/restockOrder - correctly adding a restock order|
   |||POST /api/restockOrder - wrong date format|
   |||POST /api/restockOrder - date is in the future|
   |||POST /api/restockOrder - product has missing SKUId|
   |||POST /api/restockOrder - supplier does not exist|
   |||POST /api/restockOrder - product has negative quantity|
-|  Scenario 3-2 | FR5.1, FR5.5, FR5.3, FR5.6 | POST /api/restockOrder - correctly adding a restock order|
+|  **Scenario 3-2** | FR5.1, FR5.5, FR5.3, FR5.6 | POST /api/restockOrder - correctly adding a restock order|
   |||POST /api/restockOrder - wrong date format|
   |||POST /api/restockOrder - date is in the future|
   |||POST /api/restockOrder - product has missing SKUId|
   |||POST /api/restockOrder - supplier does not exist|
   |||POST /api/restockOrder - product has negative quantity|
-|  Scenario 4-1 | FR1.1 | POST /api/newUser - correctly add a new user|
+|  **Scenario 4-1** | FR1.1 | POST /api/newUser - correctly add a new user|
   |||POST /api/newUser - user already existing|
   |||POST /api/newUser - wrong user data|
   |||POST /api/newUser - trying to create a manager|
-|  Scenario 4-2 | FR1.1, FR1.5 | PUT /api/users/:username - correctly modify user type|
+|  **Scenario 4-2** | FR1.1, FR1.5 | PUT /api/users/:username - correctly modify user type|
   |||PUT /api/users/:username - wrong username|
   |||PUT /api/users/:username - wrong old |
   |||PUT /api/users/:username - invalid username|
   |||PUT /api/users/:username - invalid body|
   |||PUT /api/users/:username - trying to change type of a manager|
-|  Scenario 4-3 | FR1.4| GET /api/users - retrive all users(excluding managers) in the system|
+|  **Scenario 4-3** | FR1.4| GET /api/users - retrive all users(excluding managers) in the system|
   ||FR1.2 |DELETE /api/users/:username/:type - correctly delete a user|
   |||DELETE /api/users/:username/:type - invalid data|
   |||DELETE /api/users/:username/:type - trying to delete a manager|
   |||DELETE /api/users/:username/:type - correctly delete a user|
-|  Scenario 5-1-1 |FR5.8.1|PUT /api/restockOrder/:id/skuItems - correctly add a list of sku items to an order|
+|  **Scenario 5-1-1** |FR5.8.1|PUT /api/restockOrder/:id/skuItems - correctly add a list of sku items to an order|
   |||PUT /api/restockOrder/:id/skuItems - item is not inside an array|
   |||PUT /api/restockOrder/:id/skuItems - order state is not DELIVERED|
   |||PUT /api/restockOrder/:id/skuItems - order id is 0|
@@ -211,28 +208,28 @@ Step4 is Api testing for `SKU`
   ||FR5.7 |PUT /api/restockOrder/:id - correctly patch the state of an order|
   |||PUT /api/restockOrder/:id - state does not exist|
   |||PUT /api/restockOrder/:id - order does not exist|
-|  Scenario 5-2-1 |FR5.8.2| POST /api/skuitems/testResult - result is not boolean|
+|  **Scenario 5-2-1** |FR5.8.2| POST /api/skuitems/testResult - result is not boolean|
   |||POST /api/skuitems/testResult - sku item does not exist|
   |||POST /api/skuitems/testResult - test descriptor does not exist|
   |||POST /api/skuitems/testResult - sku item is too short|
   ||FR5.7|PUT /api/restockOrder/:id - correctly patch the state of an order|
   |||PUT /api/restockOrder/:id - state does not exist|
   |||PUT /api/restockOrder/:id - order does not exist|
-|  Scenario 5-2-2 | FR5.8.2|POST /api/skuitems/testResult - result is not boolean|
+|  **Scenario 5-2-2** | FR5.8.2|POST /api/skuitems/testResult - result is not boolean|
   |||POST /api/skuitems/testResult - sku item does not exist|
   |||POST /api/skuitems/testResult - test descriptor does not exist|
   |||POST /api/skuitems/testResult - sku item is too short|
   ||FR5.7|PUT /api/restockOrder/:id - correctly patch the state of an order|
   |||PUT /api/restockOrder/:id - state does not exist|
   |||PUT /api/restockOrder/:id - order does not exist|
-|  Scenario 5-2-3 | FR5.8.2|POST /api/skuitems/testResult - result is not boolean|
+|  **Scenario 5-2-3** | FR5.8.2|POST /api/skuitems/testResult - result is not boolean|
   |||POST /api/skuitems/testResult - sku item does not exist|
   |||POST /api/skuitems/testResult - test descriptor does not exist|
   |||POST /api/skuitems/testResult - sku item is too short|
   ||FR5.7|PUT /api/restockOrder/:id - correctly patch the state of an order|
   |||PUT /api/restockOrder/:id - state does not exist|
   |||PUT /api/restockOrder/:id - order does not exist|
-|  Scenario 5-3-1 | FR5.8.3|POST /api/skuitem/ - correctly add a sku item|
+|  **Scenario 5-3-1** | FR5.8.3|POST /api/skuitem/ - correctly add a sku item|
   |||POST /api/skuitem/ - unexisting sku with matching id|
   |||POST /api/skuitem/ - wrong sku item data |
   ||FR3.1.4|PUT /api/position/:posID - correctly modify a position|
@@ -253,10 +250,10 @@ Step4 is Api testing for `SKU`
   ||FR5.7|PUT /api/restockOrder/:id - correctly patch the state of an order|
   |||PUT /api/restockOrder/:id - state does not exist|
   |||PUT /api/restockOrder/:id - order does not exist|
-|  Scenario 5-3-2 | FR5.7 | PUT /api/restockOrder/:id - correctly patch the state of an order|
+|  **Scenario 5-3-2** | FR5.7 | PUT /api/restockOrder/:id - correctly patch the state of an order|
   |||PUT /api/restockOrder/:id - state does not exist|
   |||PUT /api/restockOrder/:id - order does not exist|
-|  Scenario 5-3-3 | FR5.8.3| |
+|  **Scenario 5-3-3** | FR5.8.3| |
   ||FR3.1.4|PUT /api/position/:posID - correctly modify a position|
   |||PUT /api/position/:posID - passing a field with a typo |
   |||PUT /api/position/:posID - position does not exist |
@@ -275,7 +272,7 @@ Step4 is Api testing for `SKU`
   ||FR5.7|PUT /api/restockOrder/:id - correctly patch the state of an order|
   |||PUT /api/restockOrder/:id - state does not exist|
   |||PUT /api/restockOrder/:id - order does not exist|
-|  Scenario 6-1 | FR5.9|POST /api/returnOrder - wrong date format|
+|  **Scenario 6-1** | FR5.9|POST /api/returnOrder - wrong date format|
   |||POST /api/returnOrder - restock order does not exist|
   |||POST /api/returnOrder - restock order id equal to 0|
   |||POST /api/returnOrder - product has negative price|
@@ -285,7 +282,7 @@ Step4 is Api testing for `SKU`
   ||FR5.11|DELETE /api/restockOrder/:id - correctly delete an order|
   |||DELETE /api/restockOrder/:id - passing a negative id|
   |||DELETE /api/restockOrder/:id - order does not exist|
-|  Scenario 6-2 | FR5.9| POST /api/returnOrder - wrong date format|
+|  **Scenario 6-2** | FR5.9| POST /api/returnOrder - wrong date format|
   |||POST /api/returnOrder - restock order does not exist|
   |||POST /api/returnOrder - restock order id equal to 0|
   |||POST /api/returnOrder - product has negative price|
@@ -310,7 +307,7 @@ Step4 is Api testing for `SKU`
   ||FR5.11|DELETE /api/restockOrder/:id - correctly delete an order|
   |||DELETE /api/restockOrder/:id - passing a negative id|
   |||DELETE /api/restockOrder/:id - order does not exist|
-|  Scenario 7-1 | FR1.5 |POST /api/managerSessions - correct manager log in|
+|  **Scenario 7-1** | FR1.5 |POST /api/managerSessions - correct manager log in|
   |||POST /api/managerSessions - wrong manager credentials|
   |||POST /api/customerSessions - correct customer log in|
   |||POST /api/customerSessions - wrong customer credentials|
@@ -322,7 +319,7 @@ Step4 is Api testing for `SKU`
   |||POST /api/qualityEmployeeSessions - wrong quality employee credentials|
   |||POST /api/deliveryEmployeeSessions - correct delivery employee log in|
   |||POST /api/deliveryEmployeeSessions - wrong delivery employee credentials|
-|  Scenario 9-1 | FR6.1| |
+|  **Scenario 9-1** | FR6.1| |
   ||FR6.2||
   ||FR6.3||
   ||FR3.1.4|PUT /api/position/:posID - correctly modify a position|
@@ -342,7 +339,7 @@ Step4 is Api testing for `SKU`
   |||PUT /api/sku/:id - position cannot contain weight and volume |
   ||FR6.6||
   ||FR6.7||
-|  Scenario 9-2 | FR6.1| |
+|  **Scenario 9-2** | FR6.1| |
   ||FR6.2||
   ||FR6.3||
   ||FR3.1.4|PUT /api/position/:posID - correctly modify a position|
@@ -362,7 +359,7 @@ Step4 is Api testing for `SKU`
   |||PUT /api/sku/:id - position cannot contain weight and volume |
   ||FR6.6||
   ||FR6.7||
-|  Scenario 9-3 | FR6.1| |
+|  **Scenario 9-3** | FR6.1| |
   ||FR6.2||
   ||FR6.3||
   ||FR3.1.4|PUT /api/position/:posID - correctly modify a position|
@@ -382,12 +379,12 @@ Step4 is Api testing for `SKU`
   |||PUT /api/sku/:id - position cannot contain weight and volume |
   ||FR6.6||
   ||FR6.7||
-|  Scenario 10-1 | FR5.10| DELETE /api/skuitems/:rfid - correctly delete|
+|  **Scenario 10-1** | FR5.10| DELETE /api/skuitems/:rfid - correctly delete|
   |||DELETE /api/skuitems/:rfid - wrong rfid|
   |||FR6.10| |
   ||FR6.8||
   ||FR6.7||
-|  Scenario 11-1 | FR7|POST /api/item - correctly adding an item|
+|  **Scenario 11-1** | FR7|POST /api/item - correctly adding an item|
   |||POST /api/item - SKUId does not match any sku|
   |||POST /api/item - supplier does not exist|
   |||POST /api/item - supplier already sells SKU|
@@ -395,33 +392,31 @@ Step4 is Api testing for `SKU`
   || FR2.4 |GET /api/skus/:id - correctly get a SKU|
   |||GET /api/skus/:id - passing a negative id|
   |||GET /api/skus/:id - SKU does not exist|
-|  Scenario 11-2 | FR7 | GET /api/items/:id - correctly get an item|
+|  **Scenario 11-2** | FR7 | GET /api/items/:id - correctly get an item|
   |||GET /api/items/:id - passing a negative id|
   |||GET /api/items/:id - item does not exist|
   |||PUT /api/item/:id - correctly modify an item|
   |||PUT /api/item/:id - item does not exist|
   |||PUT /api/item/:id - price is negative|
-|  Scenario 12-1 | FR2.4 | GET /api/skus/:id - correctly get a SKU|
+|  **Scenario 12-1** | FR2.4 | GET /api/skus/:id - correctly get a SKU|
   |||GET /api/skus/:id - passing a negative id|
   |||GET /api/skus/:id - SKU does not exist|
-|  Scenario 12-2 | FR3.2.2 | PUT /api/testDescriptor/:id - correctly modify a test descriptor|
+|  **Scenario 12-2** | FR3.2.2 | PUT /api/testDescriptor/:id - correctly modify a test descriptor|
   |||PUT /api/testDescriptor/:id - test descriptor does not exist|
   |||PUT /api/testDescriptor/:id - no sku associated to given idSKU|
   |||PUT /api/testDescriptor/:id - negative test descriptor id|
   |||PUT /api/testDescriptor/:id - sku id is not a number|
-|  Scenario 12-3 | FR3.2.3 |DELETE /api/testDescriptor/:id - correctly delete a test descriptor|
+|  **Scenario 12-3** | FR3.2.3 |DELETE /api/testDescriptor/:id - correctly delete a test descriptor|
   |||DELETE /api/testDescriptor/:id - invalid test descriptor id|
   |||DELETE /api/testDescriptor/:id - test descriptor does not exist |
 
 
 # Coverage of Non Functional Requirements
 
-### 
-
 | Non Functional Requirement | Test name |
 | -------------------------- | --------- |
-|NFR2|GET /api/suppliers - retrive all suppliers in the system|
-||It's checked in every function of every test of every file in the test folder|
-|NFR3|User's password are saved in the DB encrypted with a salt and hash algorithm|
-|NFR4|PUT /api/position/:posID - position does not exist |
+|NFR2|Every time that an API is called, the time to receive the result is computed and checked by the test|
+|NFR3|User's passwords are saved in the DB encrypted with a salt and hash algorithm|
+|NFR4|PUT /api/position/:posID/changeID - short new positionID |
 |NFR6|DELETE /api/skuitems/:rfid - wrong rfid|
+|NFR9|POST /api/restockOrder - wrong date format|
