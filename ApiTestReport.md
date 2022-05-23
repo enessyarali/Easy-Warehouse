@@ -136,11 +136,23 @@ Report also for each of the scenarios the (one or more) API Mocha tests that cov
 
 | Scenario ID | Functional Requirements covered | Mocha  Test(s) | 
 | ----------- | ------------------------------- | ----------- | 
-|  Scenario 1-1 | FR2.1 | Mocha Test Here |
-|  Scenario 1-2 | FR2.4, FR2.1, FR3.1.1 | |
+|  Scenario 1-1 | FR2.1 | PUT /api/sku/:id - correctly modify a SKU |
+   |||PUT /api/sku/:id - SKU does not exist|
+   |||PUT /api/sku/:id - available quantity is negative|
+   |||PUT /api/sku/:id - position cannot contain weight and volume |
+|  Scenario 1-2 | FR2.1 | PUT /api/sku/:id - correctly modify a SKU |
+  |||PUT /api/sku/:id - SKU does not exist|
+  |||PUT /api/sku/:id - available quantity is negative|
+  |||PUT /api/sku/:id - position cannot contain weight and volume |
+  ||FR2.4|    getSKU(GET /api/skus/:id - correctly get a SKU|
+  |||getSKU(GET /api/skus/:id - passing a negative id|
+  |||getSKU(GET /api/skus/:id - SKU does not exist|
+  ||FR3.1.4| PUT /api/position/:posID - correctly modify a position|
+  |||PUT /api/position/:posID - passing a field with a typo|
+  |||PUT /api/position/:posID - position does not exist|
 |  Scenario 1-3 | FR2.4, FR2.1 | |
-|  Scenario 2-1 | FR3.1.1 | |
-|  Scenario 2-2 | FR3.1.1 | |
+|  Scenario 2-1 | FR3.1.4 | |
+|  Scenario 2-2 | FR3.1.4 | |
 |  Scenario 2-3 | FR3.1.4 | |
 |  Scenario 2-4 | FR3.1.4 | |
 |  Scenario 2-5 | FR3.1.2 | |
