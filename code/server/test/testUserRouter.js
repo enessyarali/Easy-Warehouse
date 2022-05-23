@@ -1,6 +1,5 @@
 'use strict';
 
-const User = require('../model/user')
 const dbSet = require('../unit_test/dataBaseSetUp');
 
 const chai = require('chai');

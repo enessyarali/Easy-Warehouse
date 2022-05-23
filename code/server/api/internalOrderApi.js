@@ -97,9 +97,9 @@ router.post('/api/internalOrders', async (req,res) => {
 router.put('/api/internalOrders/:id', async (req,res) => {
   const id = parseInt(req.params.id);
   if (req.body === undefined || id === undefined || req.body.newState ===undefined|| !getState(req.body.newState) || 
-     (getState(req.body.newState)=="COMPLETED" && (req.body.products===undefined || !Array.isArray(req.body.products) ||
-      req.body.products.some((i) => (i.SkuID===undefined || typeof p.SkuID !== 'number' ||
-    p.SkuID <= 0 || i.RFID===undefined || !validators.rfidIsValid(i.RFID)))))) {
+      (getState(req.body.newState)=="COMPLETED" && (req.body.products===undefined || !Array.isArray(req.body.products) ||
+      req.body.products.some((i) => (i.SkuID===undefined || typeof i.SkuID !== 'number' ||
+      i.SkuID <= 0 || i.RFID===undefined || !validators.rfidIsValid(i.RFID)))))) {
     return res.status(422).json({error: `Invalid item data.`});
   }
   try{
