@@ -49,6 +49,21 @@ describe('test internal order apis', () => {
         {"SKUId":2,"description":"Chiara Ferragni's brand water","price":1000.99,"qty":1},
         {"SKUId":4,"description":"Banana","price":0.99,"qty":1}
     ]);
+    const io2_afterUpdate = new InternalOrder(2, "2022/05/23 12:00", "COMPLETED", 1);
+    io2_afterUpdate.setProducts([
+        {
+            "SKUId":2,
+            "description":"Chiara Ferragni's brand water",
+            "price":1000.99,
+            "RFID":"12345678901234567890123456789016"
+        },
+        {
+            "SKUId":4,
+            "description":"Banana",
+            "price":0.99,
+            "RFID":"12345678901234567890123456789017"
+        }
+    ]);
     const io3 = new InternalOrder(3, "2022/05/23 13:30", "ACCEPTED", 1);
     io3.setProducts([
         {"SKUId":1,"description":"Eurovision 2022 CD","price":10.99,"qty":2},
@@ -60,12 +75,12 @@ describe('test internal order apis', () => {
         {"SKUId":4,"description":"Banana","price":0.99,"qty":1}
     ]);
     const io_invalid1 = new InternalOrder(5, "DnAoTtE", undefined, 1);
-    io4.setProducts([
+    io_invalid1.setProducts([
         {"SKUId":2,"description":"Chiara Ferragni's brand water","price":1000.99,"qty":1},
         {"SKUId":4,"description":"Banana","price":0.99,"qty":1}
     ]);
     const io_invalid2 = new InternalOrder(6, "2022/05/23 14:30", "ISSUED", 1);
-    io4.setProducts([
+    io_invalid2.setProducts([
         {"SKUId":2,"description":"Chiara Ferragni's brand water","price":1000.99,"qty":1},
         {"SKUId":"Not a SKU"}
     ]);
@@ -95,8 +110,9 @@ describe('test internal order apis', () => {
         await agent.post('/api/sku').send(sku4);
         await agent.post('/api/skuitem').send(si1);
         await agent.post('/api/skuitem').send(si2);
-        await agent.post('/api/internalOrder').send(io1);
-        await agent.post('/api/internalOrder').send(io2);
+        await agent.post('/api/internalOrders').send(io1);
+        await agent.post('/api/internalOrders').send(io2);
+        await agent.post('/api/internalOrders').send(io3);
         await agent.put(`/api/internalOrders/${io2.id}`).send({
             "newState":"COMPLETED",
             "products":[
@@ -110,8 +126,9 @@ describe('test internal order apis', () => {
     });
     // de-populate the DB
     afterEach( async () => {
-        await agent.delete(`/api/internalOrder/1`);
-        await agent.delete(`/api/internalOrder/2`);
+        await agent.delete(`/api/internalOrders/1`);
+        await agent.delete(`/api/internalOrders/2`);
+        await agent.delete('/api/internalOrders/3');
         await agent.delete('/api/skuitems/12345678901234567890123456789016');
         await agent.delete('/api/skuitems/12345678901234567890123456789017');
         await agent.delete(`/api/skus/1`);
@@ -120,11 +137,11 @@ describe('test internal order apis', () => {
         await agent.delete(`/api/skus/4`);
     });
 
-    getAllInternalOrders('GET /api/internalOrders - retrieve all internal orders in the system', 200, [io1, io2]);
+    getAllInternalOrders('GET /api/internalOrders - retrieve all internal orders in the system', 200, [io1, io2_afterUpdate, io3]);
     getAllInternalOrders('GET /api/internalOrdersIssued - retrieve all ISSUED internal orders in the system', 200, [io1], "Issued");
     getAllInternalOrders('GET /api/internalOrdersAccepted - retrieve all ACCEPTED internal orders in the system', 200, [io3], "Accepted");
 
-    getInternalOrder('GET /api/internalOrders/:id - correctly get an internal order', 200, 2, io2);
+    getInternalOrder('GET /api/internalOrders/:id - correctly get an internal order', 200, 2, io2_afterUpdate);
     getInternalOrder('GET /api/internalOrders/:id - unexisting internal order id', 404, 2048);
     getInternalOrder('GET /api/internalOrders/:id - wrong internal order id', 422, "minecraft");
 
@@ -147,7 +164,19 @@ function getAllInternalOrders(description, expectedHTTPStatus, ios, status="") {
     it(description, async function () {
         try {
             let startTime = performance.now();
-            const r = await agent.get(`/api/internalOrders${status}`);
+            //const r = await agent.get(`/api/internalOrders${status}`);
+            let r;
+            switch(status){
+                case "Issued":
+                    r = await agent.get(`/api/internalOrdersIssued`);
+                    break;
+                case "Accepted":
+                    r = await agent.get(`/api/internalOrdersAccepted`);
+                    break;
+                default:
+                    r = await agent.get(`/api/internalOrders`);
+                    break;
+            }
             let endTime = performance.now();
             (endTime-startTime).should.lessThanOrEqual(500);
             r.should.have.status(expectedHTTPStatus);
@@ -237,7 +266,7 @@ function deleteInternalOrder(description, expectedHTTPStatus, id) {
     it(description, async function () {
         try {
             let startTime = performance.now();
-            const r = await agent.delete(`/api/restockOrder/${id}`);
+            const r = await agent.delete(`/api/internalOrders/${id}`);
             r.should.have.status(expectedHTTPStatus);
             let endTime = performance.now();
             (endTime-startTime).should.lessThanOrEqual(500);

@@ -92,11 +92,11 @@ router.post('/api/internalOrders', async (req,res) => {
   }
 });
 
-// PUT /api/internalOrder/:id
+// PUT /api/internalOrders/:id
 // Modify the state of an internal order, given its id. If newState is = COMPLETED an array of RFIDs is sent
 router.put('/api/internalOrders/:id', async (req,res) => {
   const id = parseInt(req.params.id);
-  if (req.body === undefined || id === undefined || req.body.newState ===undefined|| !getState(req.body.newState) || 
+  if (req.body === undefined || id === undefined || req.body.newState ===undefined|| !Number.isInteger(id) || !getState(req.body.newState) || 
       (getState(req.body.newState)=="COMPLETED" && (req.body.products===undefined || !Array.isArray(req.body.products) ||
       req.body.products.some((i) => (i.SkuID===undefined || typeof i.SkuID !== 'number' ||
       i.SkuID <= 0 || i.RFID===undefined || !validators.rfidIsValid(i.RFID)))))) {
