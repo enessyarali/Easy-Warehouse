@@ -56,18 +56,29 @@ function testSKU(db){
         expect(s.position).to.equal('222');
     });
     test('Modify Sku', async () => {
-        const s = new Sku(1,'test1',1,1,'test1',undefined,1,3);
+        const s = new Sku(1,'test1',1,1,'test1','222',1,10);
 
-        s.modify(db.db,'altroTest',2,2,'testNote',2,4);
+        await s.modify(db.db,'altroTest',2,2,'testNote',2,4);
 
         expect(s.id).to.equal(1);
         expect(s.description).to.equal('altroTest');
         expect(s.weight).to.equal(2);
         expect(s.volume).to.equal(2);
         expect(s.notes).to.equal('testNote');
-        expect(s.position).to.equal(undefined);
+        expect(s.position).to.equal('222');
         expect(s.price).to.equal(2);
         expect(s.availableQuantity).to.equal(4);
+    });
+    test('Remove position', async () => {
+        const s = new Sku(1,'test1',1,1,'test1','222',1,10);
+
+        await s.setPosition(db.db, null);
+        let res = await db.loadPosition('222');
+
+        expect(s.position).to.equal(null);
+        expect(res[0].occupiedWeight).to.equal(0);
+        expect(res[0].occupiedVolume).to.equal(0);
+
     });
     test('Delete Sku', async () => {
         const s = new Sku(1,'test1',1,1,'test1','222',1,3);
