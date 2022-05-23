@@ -177,6 +177,25 @@ router.post('/api/qualityEmployeeSessions', async (req,res) => {
     }
   });
 
+// POST /api/deliveryEmployeeSessions
+// allow delivery employee login
+router.post('/api/deliveryEmployeeSessions', async (req,res) => {
+  if (req.body === undefined || req.body.username === undefined || !validators.mailIsValid(req.body.username) ||
+      req.body.password === undefined || req.body.password.length < 8 ) {
+    return res.status(401).json({error: `Invalid username or password.`});
+  }
+  try{
+    const db = new UserDBU('ezwh.db');
+    const info = await db.checkPassword(req.body.username, "deliveryEmployee", req.body.password);
+    if (!info)
+      return res.status(401).json({error: `Invalid username or password.`});
+      return res.status(200).json(info);
+  }
+  catch(err){
+    return res.status(500).json({error: `Something went wrong...`, message: err.message});
+  }
+});
+
 // POST /api/logout
 // allow logout
 router.post('/api/logout', async (req,res) => {
