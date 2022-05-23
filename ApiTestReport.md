@@ -25,14 +25,9 @@ Version: 1.0
      
 # Integration approach
 
-    <Write here the integration sequence you adopted, in general terms (top down, bottom up, mixed) and as sequence
-    (ex: step1: class A, step 2: class A+B, step 3: class A+B+C, etc)> 
-    <Some steps may correspond to unit testing (ex step1 in ex above), presented in other document UnitTestReport.md>
-    <One step will correspond to API testing>
-
-  Since all `model` classes have few to none logic, we never test them explicitly - except `SKU` and `Position`. We simply check their behaviour is correct by source code inspection.
-  Moreover, we did not use mock-ups, since we decided to design our application without including a middleware: its functionalities are already embedded in the `database_utilites` layer.
-  Overall, we use a bottom-up approach:
+  Since all `model` classes have very little logic - except `SKU` and `Position` - we never test them explicitly: we simply check their behaviour is correct by source code inspection.
+  Moreover, we did not use mock-ups, since we decided to design our application without including a middleware: its functionalities are already embedded in the `database_utilites` layer.  
+  Overall, we used a bottom-up approach:
 
   |Stack|Step 1|Step 2|Step 3|Step 4|Step 5|
   |-----|------|------|------|------|------|
