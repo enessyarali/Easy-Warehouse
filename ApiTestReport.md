@@ -134,17 +134,41 @@ Step4 is Api testing for `SKU`
 Report also for each of the scenarios the (one or more) API Mocha tests that cover it. >  Mocha test cases should be here code/server/test
 
 
-
-
 | Scenario ID | Functional Requirements covered | Mocha  Test(s) | 
 | ----------- | ------------------------------- | ----------- | 
-|  ..         | FRx                             |             |             
-|  ..         | FRy                             |             |             
-| ...         |                                 |             |             
-| ...         |                                 |             |             
-| ...         |                                 |             |             
-| ...         |                                 |             |             
-
+|  Scenario 1-1 | FR2.1 | Mocha Test Here |
+|  Scenario 1-2 | FR2.4, FR2.1, FR3.1.1 | |
+|  Scenario 1-3 | FR2.4, FR2.1 | |
+|  Scenario 2-1 | FR3.1.1 | |
+|  Scenario 2-2 | FR3.1.1 | |
+|  Scenario 2-3 | FR3.1.4 | |
+|  Scenario 2-4 | FR3.1.4 | |
+|  Scenario 2-5 | FR3.1.2 | |
+|  Scenario 3-1 | FR5.1, FR5.3, FR5.5, FR5.6 | |
+|  Scenario 3-2 | FR5.1, FR5.5, FR5.3, FR5.6 | |
+|  Scenario 4-1 | FR1.1 | |
+|  Scenario 4-2 | FR1.1, FR1.5 | |
+|  Scenario 4-3 | FR1.4, FR1.2 | |
+|  Scenario 5-1-1 | FR3.2.1, FR5.8.1, FR5.7 | |
+|  Scenario 5-2-1 | FR3.2.1, FR5.8.2, FR5.7 | |
+|  Scenario 5-2-2 | FR3.2.1, FR5.8.2, FR5.7 | |
+|  Scenario 5-2-3 | FR3.2.1, FR5.8.2, FR5.7 | |
+|  Scenario 5-3-1 | FR5.8.3, FR3.1.4, FR2.4, FR2.1 FR5.7 | |
+|  Scenario 5-3-2 | FR5.7 | |
+|  Scenario 5-3-3 | FR5.8.3, FR3.1.4, FR2.4, FR2.1 FR5.7 | |
+|  Scenario 6-1 | FR5.9, FR5.10, FR5.11 | |
+|  Scenario 6-2 | FR5.9, FR5.10, FR3.1.4, FR2.4, FR2.1, FR5.11 | |
+|  Scenario 7-1 | FR1.4 | |
+|  Scenario 7-2 | FR1.5 | |
+|  Scenario 9-1 | FR6.1, FR6.2, FR6.3, FR3.1.4, FR2.4, FR2.1, FR6.6, FR6.7  | |
+|  Scenario 9-2 | FR6.1, FR6.2, FR6.3, FR3.1.4, FR2.4, FR2.1, FR6.6, FR6.7  | |
+|  Scenario 9-3 | FR6.1, FR6.2, FR6.3, FR3.1.4, FR2.4, FR2.1, FR6.6, FR6.7  | |
+|  Scenario 10-1 | FR5.10, FR6.10, FR6.8, FR6.7 | |
+|  Scenario 11-1 | FR7, FR2.4 | |
+|  Scenario 11-2 | FR7 | |
+|  Scenario 12-1 | FR3.2.1, FR2.4 | |
+|  Scenario 12-2 | FR3.2.2 | |
+|  Scenario 12-3 | FR3.2.3 | |
 
 
 # Coverage of Non Functional Requirements
@@ -159,3 +183,4 @@ Report also for each of the scenarios the (one or more) API Mocha tests that cov
 | -------------------------- | --------- |
 |                            |           |
 
+## Every test in the Apı measure the tıme needed to perform the operatıons and it checks if it is less than 500ms 
