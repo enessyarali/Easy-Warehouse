@@ -1,6 +1,7 @@
 'use strict';
 
 const User = require('../model/user')
+const dbSet = require('../unit_test/dataBaseSetUp');
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -24,6 +25,7 @@ const agent = chai.request.agent(app);
 describe('test user apis', () => {
 
     let u1 = {
+        "id": 7,
         "name":"Luca",
         "surname":"Scibetta",
         "email":"clerk2@ezwh.com",
@@ -47,7 +49,7 @@ describe('test user apis', () => {
         "email":"user1@ezwh.com",
         "username":"user1@ezwh.com",
         "type":"customer",
-        "password":"myPass"
+        "password":"myPass00000"
     };
 
     let u_invalid2 = {
@@ -70,68 +72,68 @@ describe('test user apis', () => {
 
     const c1 = {
         "username":"manager1@ezwh.com",
-        "password":"oduc+F0kCin6RqAvc34itVMdRFvy3GlnEMZ2CtD2kIiZbR8DLdE4cZX1OxORTuTzidVfwWDm0A7PtJQ++PFKwg=="
+        "password":"testpassword"
     };
 
     const i1 = {
         "id":6,
         "username":"manager1@ezwh.com",
-        "name":"Andy",
+        "name":"Andy"
     };
 
     const c2 = {
         "username":"user1@ezwh.com",
-        "password":"iMTux9GwCPqrhdXSDk30kMYemB2UyzgL0Zy2MDedNSSbSbXPG00JcqMVnbqjhQq0kK/eC0Q4CFNxDnN6XvcLCwbg=="
+        "password":"testpassword"
     };
 
     const i2 = {
         "id":1,
         "username":"user1@ezwh.com",
-        "name":"John",
+        "name":"John"
     };
 
     const c3 = {
         "username":"supplier1@ezwh.com",
-        "password":"SEL5Qj2mK6MfoNfaSjNWON7Vgd4FxYVPhmPDmmt/CUz/+zIDxK6/ZxLggWyM1r7xX0jF2YyY++gPEXza+UYaDg=="
+        "password":"testpassword"
     };
 
     const i3 = {
         "id":5,
         "username":"supplier1@ezwh.com",
-        "name":"Ben",
+        "name":"Ben"
     };
 
     const c4 = {
         "username":"clerk1@ezwh.com",
-        "password":"GXLk4tKsDYs+3S64luKAXk/IVjek15f8LwL3pa695+8xMCSQ4xsfRNjY0z2WemkvRY1aujFDeq2RnWI7VufwpQ=="
+        "password":"testpassword"
     };
 
     const i4 = {
         "id":3,
         "username":"clerk1@ezwh.com",
-        "name":"Hugo",
+        "name":"Hugo"
     };
 
     const c5 = {
         "username":"qualityEmployee1@ezwh.com",
-        "password":"4Ehqbsh2XjnZg3pkKiYqjOM6Nam2OFfmb1C/IhPmalJ2q6IcoREbXIOdJhuI9f+RDa7ssd0B7hy652uE4/6LHA=="
+        "password":"testpassword"
     };
 
     const i5 = {
         "id":2,
-        "username":"qualityemployee1@ezwh.com",
+        "username":"qualityEmployee1@ezwh.com",
         "name":"Paul",
     };
 
     const c6 = {
         "username":"deliveryEmployee1@ezwh.com",
-        "password":"tZvIde5C0zHfNozUTgOLL3HG3/w2fdI9kLw8GQ/mTc68biCgiLjsx6tdzCH07QUxztTVa/viTqau13Z0AJz6Mg=="
+        "password":"testpassword"
     };
 
     const i6 = {
         "id":4,
-        "username":"deliveryemployee@ezwh.com",
-        "name":"Sayid",
+        "username":"deliveryEmployee1@ezwh.com",
+        "name":"Sayid"
     };
 
     const c_invalid1 = {
@@ -141,7 +143,7 @@ describe('test user apis', () => {
 
     const c_invalid2 = {
         "username":"notauser@ezwh.com",
-        "password":"iMTux9GwCPqrhdXSDk30kMYemB2UyzgL0Zy2MDedNSSbSbXPG00JcqMVnbqjhQq0kK/eC0Q4CFNxDnN6XvcLCwbg=="
+        "password":"testpassword"
     };
 
     const c_invalid3 = {
@@ -156,7 +158,7 @@ describe('test user apis', () => {
 
     const c_invalid5 = {
         "username":"evilEmployee@ezwh.com",
-        "password":"4Ehqbsh2XjnZg3pkKiYqjOM6Nam2OFfmb1C/IhPmalJ2q6IcoREbXIOdJhuI9f+RDa7ssd0B7hy652uE4/6LHA=="
+        "password":"testpassword"
     };
 
     const c_invalid6 = {
@@ -224,11 +226,8 @@ describe('test user apis', () => {
 
     // populate the DB
     beforeEach(async () => {
-        const adding = await agent.post('/api/newUser').send(u1);
-        if(adding.status === 201){
-            const users = await agent.get('/api/users');
-            myUsers.push(users.body[5]);
-        }
+        await dbSet.resetAutoInc();
+        await agent.post('/api/newUser').send(u1);
     });
     // de-populate the DB
     afterEach( async () => {
@@ -237,7 +236,7 @@ describe('test user apis', () => {
 
     getSuppliers('GET /api/suppliers - retrive all suppliers in the system', 200, [myUsers[4]]);
 
-    getUsers('GET /api/users - retrive all users(excluding managers) in the system', 200, myUsers);
+    getUsers('GET /api/users - retrive all users(excluding managers) in the system', 200, [...myUsers, u1]);
 
     addUser('POST /api/newUser - correctly add a new user', 201, u2);
     addUser('POST /api/newUser - user already existing', 409, u_invalid1);
@@ -262,12 +261,12 @@ describe('test user apis', () => {
     loginDeliveryEmployee('POST /api/deliveryEmployeeSessions - correct delivery employee log in', 200, c6, i6);
     loginDeliveryEmployee('POST /api/deliveryEmployeeSessions - wrong delivery employee credentials', 401, c_invalid6, i6);
 
-    modifyUser('PUT /api/users/:username - correctly modify user type', 200, u1.username, newU1);
-    modifyUser('PUT /api/users/:username - wrong username', 404, "thismaildoesnotexist@ezwh.com", newU1);
-    modifyUser('PUT /api/users/:username - wrong old type', 404, u1.username, newU_invalid1);
-    modifyUser('PUT /api/users/:username - invalid username', 422, "this is not a mail", newU1);
-    modifyUser('PUT /api/users/:username - invalid body', 422, u1.username, newU_invalid2);
-    modifyUser('PUT /api/users/:username - trying to change type of a manager', 422, "manager1@ezwh.com", newU2);
+    modifyUser('PUT /api/users/:username - correctly modify user type', 200, u1, newU1);
+    modifyUser('PUT /api/users/:username - wrong username', 404, {username:"thismaildoesnotexist@ezwh.com"}, newU1);
+    modifyUser('PUT /api/users/:username - wrong old type', 404, u1, newU_invalid1);
+    modifyUser('PUT /api/users/:username - invalid username', 422, {username:"this is not a mail"}, newU1);
+    modifyUser('PUT /api/users/:username - invalid body', 422, u1, newU_invalid2);
+    modifyUser('PUT /api/users/:username - trying to change type of a manager', 422, {username:"manager1@ezwh.com"}, newU2);
 
     deleteUser('DELETE /api/users/:username/:type - correctly delete a user', 204, u1.username, u1.type);
     deleteUser('DELETE /api/users/:username/:type - invalid data', 422, "not mail", u1.type);
@@ -350,8 +349,8 @@ function loginManager(description, expectedHTTPStatus, c, i) {
             (endTime-startTime).should.lessThanOrEqual(500);
             if(rLogin.status === 200) {
                 rLogin.body.id.should.equal(i.id);
-                rLogin.body.username.equal(i.username);
-                rLogin.body.name.equal(i.name);
+                rLogin.body.username.should.equal(i.username);
+                rLogin.body.name.should.equal(i.name);
             }
         } catch(err) {console.log(err);}
     });
@@ -367,8 +366,8 @@ function loginCustomer(description, expectedHTTPStatus, c, i) {
             (endTime-startTime).should.lessThanOrEqual(500);
             if(rLogin.status === 200) {
                 rLogin.body.id.should.equal(i.id);
-                rLogin.body.username.equal(i.username);
-                rLogin.body.name.equal(i.name);
+                rLogin.body.username.should.equal(i.username);
+                rLogin.body.name.should.equal(i.name);
             }
         } catch(err) {console.log(err);}
     });
@@ -384,8 +383,8 @@ function loginSupplier(description, expectedHTTPStatus, c, i) {
             (endTime-startTime).should.lessThanOrEqual(500);
             if(rLogin.status === 200) {
                 rLogin.body.id.should.equal(i.id);
-                rLogin.body.username.equal(i.username);
-                rLogin.body.name.equal(i.name);
+                rLogin.body.username.should.equal(i.username);
+                rLogin.body.name.should.equal(i.name);
             }
         } catch(err) {console.log(err);}
     });
@@ -401,8 +400,8 @@ function loginClerk(description, expectedHTTPStatus, c, i) {
             (endTime-startTime).should.lessThanOrEqual(500);
             if(rLogin.status === 200) {
                 rLogin.body.id.should.equal(i.id);
-                rLogin.body.username.equal(i.username);
-                rLogin.body.name.equal(i.name);
+                rLogin.body.username.should.equal(i.username);
+                rLogin.body.name.should.equal(i.name);
             }
         } catch(err) {console.log(err);}
     });
@@ -418,8 +417,8 @@ function loginQualityEmployee(description, expectedHTTPStatus, c, i) {
             (endTime-startTime).should.lessThanOrEqual(500);
             if(rLogin.status === 200) {
                 rLogin.body.id.should.equal(i.id);
-                rLogin.body.username.equal(i.username);
-                rLogin.body.name.equal(i.name);
+                rLogin.body.username.should.equal(i.username);
+                rLogin.body.name.should.equal(i.name);
             }
         } catch(err) {console.log(err);}
     });
@@ -435,23 +434,23 @@ function loginDeliveryEmployee(description, expectedHTTPStatus, c, i) {
             (endTime-startTime).should.lessThanOrEqual(500);
             if(rLogin.status === 200) {
                 rLogin.body.id.should.equal(i.id);
-                rLogin.body.username.equal(i.username);
-                rLogin.body.name.equal(i.name);
+                rLogin.body.username.should.equal(i.username);
+                rLogin.body.name.should.equal(i.name);
             }
         } catch(err) {console.log(err);}
     });
 }
 
 // FR1.1 Modify a user type
-function modifyUser(description, expectedHTTPStatus, username, newT) {
+function modifyUser(description, expectedHTTPStatus, u, newT) {
     it(description, async function () {
         try {
             let startTime = performance.now();
-            const rUpdate = await agent.put(`/api/users/${username}`).send(newT);
+            const rUpdate = await agent.put(`/api/users/${u.username}`).send(newT);
             rUpdate.should.have.status(expectedHTTPStatus);
             let endTime = performance.now();
             if(rUpdate.status === 200)
-                u1.type = newT.newType;
+                u.type = newT.newType;
             (endTime-startTime).should.lessThanOrEqual(500);
         } catch(err) {console.log(err);}
     });       
