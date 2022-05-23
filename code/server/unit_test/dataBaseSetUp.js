@@ -17,6 +17,25 @@ exports.resetTable = async () => {
     await cleanTable();
 }
 
+exports.resetAutoInc = async () => {
+    //reset the autoincrement
+    await resetSku();
+    await resetSkuItem();
+    await resetRestockOrder();
+    await resetProductRko();
+    await resetSkuItemRko();
+    await resetTestDescriptor()
+    await resetTestResult();
+    await resetReturnOrder();
+    await resetProductRto();
+    await resetInternalOrder();
+    await resetProductSkuIO();
+    await resetProductRfidIO();
+    await resetItem();
+    await resetUser();
+    await resetPosition();
+}
+
 exports.voidRestockOrder = async () => {
     await cleanRestockOrder();
     await cleanProductRko();
