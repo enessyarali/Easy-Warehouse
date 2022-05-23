@@ -32,6 +32,8 @@ Version: 1.0
 
   Since all `model` classes have few to none logic, we never test them explicitly - except `SKU` and `Position`. We simply check their behaviour is correct by source code inspection.
   Moreover, we decided not to use mock-ups, since by design 
+  # idea di supercazzola
+  il nostro applicativo prevede esclusivamente due livelli. Quello delle Api, in cui vengono effettuati tutti i controlli di correttezza formale dei dati inseriti. Il secondo e ultimo livello è quello di interazione con il database, in cui vengono effettuati tutti i controlli di consistency interni al Db
   # --------supercazzola per farlo sembrare clever--------------
   Overall, we use a bottom-up approach:
 
@@ -50,9 +52,6 @@ Version: 1.0
     
 
 #  Integration Tests
-
-   <define below a table for each integration step. For each integration step report the group of classes under test, and the names of
-     Jest test cases applied to them, and the mock ups used, if any> Jest test cases should be here code/server/unit_test
 
 ## Step 1
 Step1 actually corresponds to unit testing.
@@ -111,28 +110,7 @@ Step4 is Api testing for `SKU`
 
 # API testing - Scenarios
 
-
-<If needed, define here additional scenarios for the application. Scenarios should be named
- referring the UC in the OfficialRequirements that they detail>
-
-## Scenario UCx.y
-
-| Scenario |  name |
-| ------------- |:-------------:| 
-|  Precondition     |  |
-|  Post condition     |   |
-| Step#        | Description  |
-|  1     |  ... |  
-|  2     |  ... |
-
-
-
-# Coverage of Scenarios and FR
-
-
-<Report in the following table the coverage of  scenarios (from official requirements and from above) vs FR. 
-Report also for each of the scenarios the (one or more) API Mocha tests that cover it. >  Mocha test cases should be here code/server/test
-
+## Coverage of Scenarios and FR
 
 | Scenario ID | Functional Requirements covered | Mocha  Test(s) | 
 | ----------- | ------------------------------- | ----------- | 
@@ -144,9 +122,9 @@ Report also for each of the scenarios the (one or more) API Mocha tests that cov
   |||PUT /api/sku/:id - SKU does not exist|
   |||PUT /api/sku/:id - available quantity is negative|
   |||PUT /api/sku/:id - position cannot contain weight and volume |
-  ||FR2.4|    getSKU(GET /api/skus/:id - correctly get a SKU|
-  |||getSKU(GET /api/skus/:id - passing a negative id|
-  |||getSKU(GET /api/skus/:id - SKU does not exist|
+  ||FR2.4|    GET /api/skus/:id - correctly get a SKU|
+  |||GET /api/skus/:id - passing a negative id|
+  |||GET /api/skus/:id - SKU does not exist|
   ||FR3.1.4| PUT /api/position/:posID - correctly modify a position|
   |||PUT /api/position/:posID - passing a field with a typo |
   |||PUT /api/position/:posID - position does not exist |
@@ -155,9 +133,9 @@ Report also for each of the scenarios the (one or more) API Mocha tests that cov
   |||PUT /api/position/:posID/changeID - short old positionID|
   |||PUT /api/position/:posID/changeID - position does not exist|
   |||PUT /api/position/:posID/changeID - new id already exists|
-|  Scenario 1-3 | FR2.4 | getSKU(GET /api/skus/:id - correctly get a SKU|
-  |||getSKU(GET /api/skus/:id - passing a negative id|
-  |||getSKU(GET /api/skus/:id - SKU does not exist|
+|  Scenario 1-3 | FR2.4 | GET /api/skus/:id - correctly get a SKU|
+  |||GET /api/skus/:id - passing a negative id|
+  |||GET /api/skus/:id - SKU does not exist|
   ||FR2.1|PUT /api/sku/:id - correctly modify a SKU |
   |||PUT /api/sku/:id - SKU does not exist|
   |||PUT /api/sku/:id - available quantity is negative|
@@ -265,9 +243,9 @@ Report also for each of the scenarios the (one or more) API Mocha tests that cov
   |||PUT /api/position/:posID/changeID - short old positionID|
   |||PUT /api/position/:posID/changeID - position does not exist|
   |||PUT /api/position/:posID/changeID - new id already exists|
-  ||FR2.4|getSKU(GET /api/skus/:id - correctly get a SKU|
-  |||getSKU(GET /api/skus/:id - passing a negative id|
-  |||getSKU(GET /api/skus/:id - SKU does not exist|
+  ||FR2.4|GET /api/skus/:id - correctly get a SKU|
+  |||GET /api/skus/:id - passing a negative id|
+  |||GET /api/skus/:id - SKU does not exist|
   ||FR2.1|PUT /api/sku/:id - correctly modify a SKU |
   |||PUT /api/sku/:id - SKU does not exist|
   |||PUT /api/sku/:id - available quantity is negative|
@@ -278,7 +256,7 @@ Report also for each of the scenarios the (one or more) API Mocha tests that cov
 |  Scenario 5-3-2 | FR5.7 | PUT /api/restockOrder/:id - correctly patch the state of an order|
   |||PUT /api/restockOrder/:id - state does not exist|
   |||PUT /api/restockOrder/:id - order does not exist|
-|  Scenario 5-3-3 | FR5.8.3, , ,  | |
+|  Scenario 5-3-3 | FR5.8.3| |
   ||FR3.1.4|PUT /api/position/:posID - correctly modify a position|
   |||PUT /api/position/:posID - passing a field with a typo |
   |||PUT /api/position/:posID - position does not exist |
@@ -287,9 +265,9 @@ Report also for each of the scenarios the (one or more) API Mocha tests that cov
   |||PUT /api/position/:posID/changeID - short old positionID|
   |||PUT /api/position/:posID/changeID - position does not exist|
   |||PUT /api/position/:posID/changeID - new id already exists|
-  ||FR2.4|getSKU(GET /api/skus/:id - correctly get a SKU|
-  |||getSKU(GET /api/skus/:id - passing a negative id|
-  |||getSKU(GET /api/skus/:id - SKU does not exist|
+  ||FR2.4|GET /api/skus/:id - correctly get a SKU|
+  |||GET /api/skus/:id - passing a negative id|
+  |||GET /api/skus/:id - SKU does not exist|
   ||FR2.1|PUT /api/sku/:id - correctly modify a SKU |
   |||PUT /api/sku/:id - SKU does not exist|
   |||PUT /api/sku/:id - available quantity is negative|
@@ -322,9 +300,9 @@ Report also for each of the scenarios the (one or more) API Mocha tests that cov
   |||PUT /api/position/:posID/changeID - short old positionID|
   |||PUT /api/position/:posID/changeID - position does not exist|
   |||PUT /api/position/:posID/changeID - new id already exists|
-  ||FR2.4|getSKU(GET /api/skus/:id - correctly get a SKU|
-  |||getSKU(GET /api/skus/:id - passing a negative id|
-  |||getSKU(GET /api/skus/:id - SKU does not exist|
+  ||FR2.4|GET /api/skus/:id - correctly get a SKU|
+  |||GET /api/skus/:id - passing a negative id|
+  |||GET /api/skus/:id - SKU does not exist|
   ||FR2.1|PUT /api/sku/:id - correctly modify a SKU |
   |||PUT /api/sku/:id - SKU does not exist|
   |||PUT /api/sku/:id - available quantity is negative|
@@ -355,9 +333,9 @@ Report also for each of the scenarios the (one or more) API Mocha tests that cov
   |||PUT /api/position/:posID/changeID - short old positionID|
   |||PUT /api/position/:posID/changeID - position does not exist|
   |||PUT /api/position/:posID/changeID - new id already exists|
-  ||FR2.4|getSKU(GET /api/skus/:id - correctly get a SKU|
-  |||getSKU(GET /api/skus/:id - passing a negative id|
-  |||getSKU(GET /api/skus/:id - SKU does not exist|
+  ||FR2.4|GET /api/skus/:id - correctly get a SKU|
+  |||GET /api/skus/:id - passing a negative id|
+  |||GET /api/skus/:id - SKU does not exist|
   ||FR2.1|PUT /api/sku/:id - correctly modify a SKU |
   |||PUT /api/sku/:id - SKU does not exist|
   |||PUT /api/sku/:id - available quantity is negative|
@@ -375,9 +353,9 @@ Report also for each of the scenarios the (one or more) API Mocha tests that cov
   |||PUT /api/position/:posID/changeID - short old positionID|
   |||PUT /api/position/:posID/changeID - position does not exist|
   |||PUT /api/position/:posID/changeID - new id already exists|
-  ||FR2.4|getSKU(GET /api/skus/:id - correctly get a SKU|
-  |||getSKU(GET /api/skus/:id - passing a negative id|
-  |||getSKU(GET /api/skus/:id - SKU does not exist|
+  ||FR2.4|GET /api/skus/:id - correctly get a SKU|
+  |||GET /api/skus/:id - passing a negative id|
+  |||GET /api/skus/:id - SKU does not exist|
   ||FR2.1|PUT /api/sku/:id - correctly modify a SKU |
   |||PUT /api/sku/:id - SKU does not exist|
   |||PUT /api/sku/:id - available quantity is negative|
@@ -395,17 +373,17 @@ Report also for each of the scenarios the (one or more) API Mocha tests that cov
   |||PUT /api/position/:posID/changeID - short old positionID|
   |||PUT /api/position/:posID/changeID - position does not exist|
   |||PUT /api/position/:posID/changeID - new id already exists|
-  ||FR2.4|getSKU(GET /api/skus/:id - correctly get a SKU|
-  |||getSKU(GET /api/skus/:id - passing a negative id|
-  |||getSKU(GET /api/skus/:id - SKU does not exist|
+  ||FR2.4|GET /api/skus/:id - correctly get a SKU|
+  |||GET /api/skus/:id - passing a negative id|
+  |||GET /api/skus/:id - SKU does not exist|
   ||FR2.1|PUT /api/sku/:id - correctly modify a SKU |
   |||PUT /api/sku/:id - SKU does not exist|
   |||PUT /api/sku/:id - available quantity is negative|
   |||PUT /api/sku/:id - position cannot contain weight and volume |
   ||FR6.6||
   ||FR6.7||
-|  Scenario 10-1 | FR5.10 DELETE /api/skuitems/:rfid - correctly delete|
-  |||DELETE /api/skuitems/:rfid - wronf rfid|
+|  Scenario 10-1 | FR5.10| DELETE /api/skuitems/:rfid - correctly delete|
+  |||DELETE /api/skuitems/:rfid - wrong rfid|
   |||FR6.10| |
   ||FR6.8||
   ||FR6.7||
@@ -414,18 +392,18 @@ Report also for each of the scenarios the (one or more) API Mocha tests that cov
   |||POST /api/item - supplier does not exist|
   |||POST /api/item - supplier already sells SKU|
   |||POST /api/item - supplier already sells item|
-  || FR2.4 |getSKU(GET /api/skus/:id - correctly get a SKU|
-  |||getSKU(GET /api/skus/:id - passing a negative id|
-  |||getSKU(GET /api/skus/:id - SKU does not exist|
+  || FR2.4 |GET /api/skus/:id - correctly get a SKU|
+  |||GET /api/skus/:id - passing a negative id|
+  |||GET /api/skus/:id - SKU does not exist|
 |  Scenario 11-2 | FR7 | GET /api/items/:id - correctly get an item|
   |||GET /api/items/:id - passing a negative id|
   |||GET /api/items/:id - item does not exist|
   |||PUT /api/item/:id - correctly modify an item|
   |||PUT /api/item/:id - item does not exist|
   |||PUT /api/item/:id - price is negative|
-|  Scenario 12-1 | FR2.4 | getSKU(GET /api/skus/:id - correctly get a SKU|
-  |||getSKU(GET /api/skus/:id - passing a negative id|
-  |||getSKU(GET /api/skus/:id - SKU does not exist|
+|  Scenario 12-1 | FR2.4 | GET /api/skus/:id - correctly get a SKU|
+  |||GET /api/skus/:id - passing a negative id|
+  |||GET /api/skus/:id - SKU does not exist|
 |  Scenario 12-2 | FR3.2.2 | PUT /api/testDescriptor/:id - correctly modify a test descriptor|
   |||PUT /api/testDescriptor/:id - test descriptor does not exist|
   |||PUT /api/testDescriptor/:id - no sku associated to given idSKU|
@@ -438,14 +416,12 @@ Report also for each of the scenarios the (one or more) API Mocha tests that cov
 
 # Coverage of Non Functional Requirements
 
-
-<Report in the following table the coverage of the Non Functional Requirements of the application - only those that can be tested with automated testing frameworks.>
-
-
 ### 
 
 | Non Functional Requirement | Test name |
 | -------------------------- | --------- |
-|                            |           |
-
-## Every test in the Apı measure the tıme needed to perform the operatıons and it checks if it is less than 500ms 
+|NFR2|GET /api/suppliers - retrive all suppliers in the system|
+||It's checked in every function of every test of every file in the test folder|
+|NFR3|User's password are saved in the DB encrypted with a salt and hash algorithm|
+|NFR4|PUT /api/position/:posID - position does not exist |
+|NFR6|DELETE /api/skuitems/:rfid - wrong rfid|
