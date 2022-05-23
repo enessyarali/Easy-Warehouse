@@ -159,3 +159,4 @@ Report also for each of the scenarios the (one or more) API Mocha tests that cov
 | -------------------------- | --------- |
 |                            |           |
 
+## Every test in the Apı measure the tıme needed to perform the operatıons and it checks if it is less than 500ms 
