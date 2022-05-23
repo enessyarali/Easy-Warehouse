@@ -28,12 +28,12 @@ describe('Load Internal Order', () => {
 });
 
 function testGetInternalOrder(db) {
-    test('retrive all InternalOrder', async () => {
+    test('retrieve all InternalOrder', async () => {
         var res = await db.loadInternalOrder();
         expect(res.length).to.equal(2); //should return 2 InternalOrder
     });
 
-    test('retrive an InternalOrder by Id', async () => {
+    test('retrieve an InternalOrder by Id', async () => {
         var res = await db.loadInternalOrder(1);
 
         expect(res[0].issueDate).to.equal('2022/04/04');
@@ -46,7 +46,7 @@ function testGetInternalOrder(db) {
         expect(res[0].products[0].RFID).to.equal('999');
     });
 
-    test('retrive InternalOrder by State', async () => {
+    test('retrieve InternalOrder by State', async () => {
         var res = await db.loadInternalOrder(undefined, 'ISSUED');
 
         expect(res[0].issueDate).to.equal('2022/04/04');
@@ -57,6 +57,14 @@ function testGetInternalOrder(db) {
         expect(res[0].products[0].price).to.equal(1);
         expect(res[0].products[0].qty).to.equal(1);
         expect(res[0].products[0].RFID).to.equal('999');
+    });
+    test('try ProductIO delete fields', async () => {
+        let p1 = new ProductIO(1, "product1", 3.99, null, null);
+        let p2 = new ProductIO(1, "product1", 3.99);
+        expect(p1.qty).to.be.undefined;
+        expect(p1.RFID).to.be.undefined;
+        expect(p2.qty).to.be.undefined;
+        expect(p2.RFID).to.be.undefined;
     });
 }
 
@@ -98,6 +106,15 @@ function testInsertInternalOrder(db) {
         expect(res[0].products[0].price).to.equal(1);
         expect(res[0].products[0].qty).to.equal(1);
     
+    });
+    test('Insert a new Internal Order - id does not match any customer', async () => {
+        //create new product to insert
+        var p = new ProductIO(1,'d1',1,1,'999');
+        try {
+            await db.insertInternalOrder('2022/04/04', p, 100);
+        } catch(err) {
+            expect(err.message).to.equal("The provided id does not match any customer.");
+        }
     });
 }
 
