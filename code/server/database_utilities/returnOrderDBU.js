@@ -115,7 +115,7 @@ class ReturnOrderDBU {
                     return;
                 }
                 const products = rows.map(async (p) => {
-                    const rfId = await this.#retriveRFID(p.skuItemId);
+                    const rfId = await this.#retrieveRFID(p.skuItemId);
                     return new ProductRTO(p.skuId, p.description, p.price, rfId);});
                 Promise.all(products).then((p) => resolve(p));
             });
@@ -162,7 +162,7 @@ class ReturnOrderDBU {
         });
     }
     
-    #retriveRFID(skuItemId) {
+    #retrieveRFID(skuItemId) {
         const sql = 'SELECT RFID AS rfid FROM "SKU-ITEMS" WHERE id = ?'
         return new Promise((resolve, reject) => {
             this.db.get(sql, [skuItemId], (err, row) => {

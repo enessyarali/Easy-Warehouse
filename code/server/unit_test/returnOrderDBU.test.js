@@ -29,12 +29,12 @@ describe('Load Return Order', () => {
 
 function testGetReturnOrder(db) {
 
-    test('retrive all ReturnOrder', async () => {
+    test('retrieve all ReturnOrder', async () => {
         var res = await db.loadReturnOrder();
         expect(res.length).to.equal(2); //shoudl return 2 ReturnOrder
     });
 
-    test('retrive a ReturnOrder by Id', async () => {
+    test('retrieve a ReturnOrder by Id', async () => {
         var res = await db.loadReturnOrder(1);
         
         expect(res[0].returnDate).to.equal('2022/04/04');
@@ -43,6 +43,12 @@ function testGetReturnOrder(db) {
         expect(res[0].products[0].description).to.equal('desc1');
         expect(res[0].products[0].price).to.equal(1);
         expect(res[0].products[0].RFID).to.equal('123');
+    });
+
+    test('clear a ReturnOrder field', async () => {
+        var res = await db.loadReturnOrder(1);
+        
+        expect(res[0].clean(['id']).id).to.be.undefined;
     });
 }
 
