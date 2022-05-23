@@ -85,7 +85,7 @@ describe('test sku item apis', () => {
     modifySKUItem('PUT /api/skuitems/:rfid - wrong sku item data', 422, si1.RFID, newSi_invalid3);
 
     deleteSKUItem('DELETE /api/skuitems/:rfid - correctly delete a sku item', 204, si1.RFID);
-    deleteSKUItem('DELETE /api/skuitems/:rfid - wronf rfid', 422, "Raffaello-Donatello-Michelangelo-Leonardo");
+    deleteSKUItem('DELETE /api/skuitems/:rfid - wrong rfid', 422, "Raffaello-Donatello-Michelangelo-Leonardo");
 });
 
 function getAllSKUItems(description, expectedHTTPStatus, sis) {
