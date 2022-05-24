@@ -117,7 +117,7 @@ The changes are propagated by calling db.updateSKUitem(skuItem).
 `.delete('/api/skuitems/:rfid')`  
 Delete it by calling db.deleteSKUitem(rfid).
 
-**positionApi**
+**positionApi**  
 `.get('/api/positions')`
 Returns a list of all the positions in the database, by calling db.loadPosition(null).
 
@@ -156,7 +156,7 @@ Fetches from the database the test descriptor which id match the one in input by
 Check if the testId is valid.
 Delete it by calling db.deleteTestDescriptor(testId).
 
-**testResultApi**
+**testResultApi**  
 `.get('/api/skuitems/:rfid/testResults')`  
 Returns a list of all the test results in the database correspondent to a SKUitem whose rfid matches the one in input, by calling db.loadTestResult(rfid).
 
@@ -192,23 +192,44 @@ Create a new User by calling db.insertUser() with the parameters fetched from th
 `.post('/api/deliveryEmployeeSessions')`  
 Check if username and password are correct calling db.checkPassword(username, type of user, password).
 
-`.post('/api/logout')`
-Not provided
-
 `.put('/api/users/:username')`  
 Fetches from the the database usr = db.loadUser(username, oldType), then calls usr.setType(newType). The changes are made persistent by calling db.updateUser(usr).
 
-`.delete('/api/users/:username:type')`  
+`.delete('/api/users/:username/:type')`  
 Calls db.deleteUser(username, type). If type = administrator an error is raised.
 
-**restockOrderApi**
+**restockOrderApi**  
+`.get('/api/restockOrders')`  
+Returns a list of all the restock orders in the database by calling db.loadRestockOrder().
+
+`.get('/api/restockOrdersIssued')`  
+Returns a list of all the restock orders in the database in the ISSUED state by calling db.loadRestockOrder(unll,'ISSUED').
+
+`.get('/api/restockOrders/:id')`  
+Searches in the database the restock order whose id matches the one in input, by calling db.loadRestockOrder(orderId).
+Returns the requested RestockOrder.
+
+`.get('/api/restockOrders/:id/returnItems')`  
+Calls db.selectReturnItems(orderId). This function is done at a lower level to avoid many unnecessary loads from the database.
+
+`.post('/api/restockOrder')`
+Create a new Restock Order by calling db.insertRestockOrder() with the parameters fetched from the request's body.
+
+`.put('/api/restockOrder/:id')`  
+Calls db.patchRestockOrderState(id, state)
+
+`.put('/api/restockOrder/:id/skuItems')`  
+
+
+
+
 
 
 
 
 
 # VECCHIE INTERFACCE
- **SKU**  
+ **SKU**
 **SkuItemApi**
 **Position**
 **TestDescriptor**
@@ -216,21 +237,6 @@ Calls db.deleteUser(username, type). If type = administrator an error is raised.
 **User**
 **RestockOrder**
 
-`  Array<String> getAllRestockOrders()`  
-Returns a list of all the restock orders in the database by calling db.loadRestockOrder().
-
-`  Array<String> getRestockOrdersIssued()`  
-Returns a list of all the restock orders in the database in the ISSUED state by calling db.loadRestockOrder(state = ISSUED).
-
-`  String getRestockOrderById(orderId :Integer)`  
-Searches in the database the restock order whose id matches the one in input, by calling db.loadRestockOrder(orderId).
-Returns the requested RestockOrder.
-
-`  Array<String> getRestockOrderReturnItems(orderId :Integer)`  
-Calls db.selectReturnItems(orderId). This function is done at a lower level to avoid many unnecessary loads from the database.
-
-`  void addRestockOrder(issueDate :Date, products :Array<String>, supplierId :Integer)`  
-Fetches from the database the supplier whose id matches the one in input by calling usr = db.loadUser(supplierId, type = SUPPLIER). It checks we are not ordering more items than what the warehouse is capable of storing, by calling modify(+qty) for each item.SKU, and that all selected items are provided by the same supplier. Then, it creates a new RestockOrder object by calling its constructor. Finally, if no exceptions have been raised, the order is added in the database by calling db.insertRestockOrder().
 
 `  void modifyRestockOrderState(orderId :Integer, newState :String)`  
 Fetches from the the database the requested restock order restock = db.loadRestockOrder(orderId). Then, calls restock.setState(newState). Finally, if no exceptions have been raised, the order is updated by calling db.updateRestockOrder(restock).
