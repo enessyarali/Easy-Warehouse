@@ -440,8 +440,8 @@ Delete from the database the Item with matching skuId.
 
 # Verification traceability matrix
 
-|  | User/API/DBU | SKU/API/DBU | SKUitem/API/DBU | Item/API/DBU | Position/API/DBU | TestDescriptor/API/DBU | TestResult/API/DBU | RestockOrder/API/DBU | ReturnOrder/API/DBU | InternalOrder/API/DBU |
-| ------------- |:-------------:| :-----:| :-----:| :-----:| :-----:| :-----:| :-----:| :-----:| :-----:| :-----: | :-----: | :-----: | :-----: |
+| | User/API/DBU | SKU/API/DBU | SKUitem/API/DBU | Item/API/DBU | Position/API/DBU | TestDescriptor/API/DBU | TestResult/API/DBU | RestockOrder/API/DBU | ReturnOrder/API/DBU | InternalOrder/API/DBU |
+| ------------- |:-------------|:-----|:-----|:-----|:-----|:-----|:-----|:-----|:-----|:-----|
 | FR1  | X | | | | | | | | | |
 | FR2  | | X | | | X | | | | | |
 | FR3  | | | | | X | X | X | | | |
