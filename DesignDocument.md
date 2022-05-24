@@ -154,13 +154,58 @@ Returns the requested TestDescriptor.
 Create a new TestDescriptor by calling db.insertTestDescriptor() with the parameters fetched from the request's body.
 
 `.put('/api/testDescriptors/:id')`  
-Fetches from the database the test descriptor which id match the one in input by calling test = db.loadTestDescriptor(testId. Then the changes are made persistent by calling db.updateTestDescriptor(test).
+Fetches from the database the test descriptor which id match the one in input by calling test = db.loadTestDescriptor(testId). Then the changes are made persistent by calling db.updateTestDescriptor(test).
 
 `.delete('/api/testDescriptors/:id')`  
-Check if the positionID is valid.
-Delete it by calling db.deletePosition(positionID).
+Check if the testId is valid.
+Delete it by calling db.deleteTestDescriptor(testId).
 
 **testResultApi**
+`.get('/api/skuitems/:rfid/testResults')`  
+Returns a list of all the test results in the database correspondent to a SKUitem whose rfid matches the one in input, by calling db.loadTestResult(rfid).
+
+`.get('/api/skuitems/:rfid/testResults/:id')`  
+Searches in the database the test result whose pair (rfid, id) matches the one in input, by calling db.loadTestResult(rfid, resultId).
+Returns the requested TestResult.
+
+`.post('/api/skuitems/testResults')`  
+Create a new TestResult by calling db.insertTestResult() with the parameters fetched from the request's body.
+
+`.put('/api/skuitems/:rfid/testResults/:id')`  
+Check if rfid and testId are valid. Then the changes are made persistent by calling db.updateTestResult(...).
+
+`.delete('/api/skuitems/:rfid/testResults/:id')`  
+Check if rfid and testId are valid.
+Delete it by calling db.deleteTestResult(rfid,testId).
+
+**userApi**  
+`.get('/api/suppliers')`  
+Returns a list of all the suppliers in the database by calling db.loadUser(null, 'aupplier').
+
+`.get('/api/users')`  
+Returns a list of all the users in the database by calling db.loadUser().
+
+`.post('/api/newUser')`  
+Create a new User by calling db.insertUser() with the parameters fetched from the request's body.
+
+`.post('/api/managerSessions')`  
+`.post('/api/customerSessions')`  
+`.post('/api/supplierSessions')`  
+`.post('/api/clerkSessions')`  
+`.post('/api/qualityEmployeeSessions')`  
+`.post('/api/deliveryEmployeeSessions')`  
+Check if username and password are correct calling db.checkPassword(username, type of user, password).
+
+`.post('/api/logout')`
+Not provided
+
+`.put('/api/users/:username')`  
+Fetches from the the database usr = db.loadUser(username, oldType), then calls usr.setType(newType). The changes are made persistent by calling db.updateUser(usr).
+
+`.delete('/api/users/:username:type')`  
+Calls db.deleteUser(username, type). If type = administrator an error is raised.
+
+**restockOrderApi**
 
 
 
@@ -172,51 +217,7 @@ Delete it by calling db.deletePosition(positionID).
 **Position**
 **TestDescriptor**
 **TestResult**
-
-`  Array<String> getTestResultsByRfid(rfid :String)`  
-Returns a list of all the test results in the database correspondent to a SKUitem whose rfid matches the one in input, by calling db.loadTestResult(rfid).
-
-`  String getTestResultbyId(rfid :String, resultId :Integer)`  
-Searches in the database the test result whose pair (rfid, id) matches the one in input, by calling db.loadTestResult(rfid, resultId).
-Returns the requested TestResult.
-
-`  void addTestResult (rfid :String, testId :Integer, testDescription :String, date :Date, result :Boolean)`  
-Fetches from the database the SKUitem whose rfid matches the one in input by calling skuItem = db.loadSKUitem(rfid) and the descriptor whose id matches the one in input by calling test = db.loadTestDescriptor(testId). Then, checks whether test.getSkuId() == skuItem.getSkuId() and creates a new TestResult object by calling its constructor. Finally, if no exceptions have been raised, the descriptor is added in the database by calling db.intertTestDescriptor().
-
-`  void modifyTestResult (rfid :String, resultId :Integer, newTestDescription :String, newDate :Date, newResult :Boolean)`  
-Creates a new test result, then calls db.updateTestResult().
-
-`  void deleteTestResult(rfid :String, resultId :Integer)`  
-Simply calls db.deleteTestResult(rfid, resultId).
-
-------------------------------------------------------------
 **User**
-
-`  String getUserInfo()`  
-Returns the content of currentlyLoggedUser. If no user is logged in, it throws NotLoggedInException.
-
-`  Array<String> getAllSuppliers()`  
-Returns a list of all the suppliers in the database by calling db.loadUser(type = SUPPLIER).
-
-`  Array<String> getAllUsers()`  
-Returns a list of all the users in the database by calling db.loadUser().
-
-`  void addUser(username :String, name :String, surname :String, password :String, type :String)`  
-Creates a new user object by calling its constructor, then calls db.insertUser(). If type = MANAGER, ManagerException is raised.
-
-`  void login(username :String, password :String, type :String)`  
-Fetches from the the database usr = db.loadUser(username, type), then compares the password. If they are different, WrongPasswordException is raised. Otherwise, currentlyLoggedUser is set to usr.
-
-`  void logout()`  
-Sets currentlyLoggedUser to null. If it is already null, AlreadyLoggedoutException is thrown.
-
-`  void modifyUserRole(username :String, oldType :String, newType :String)`  
-Fetches from the the database usr = db.loadUser(username, oldType), then calls usr.setType(newType). If type = MANAGER, ManagerException is raised. Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateUser(usr). 
-
-`  void deleteUser(username :String, type :String)`  
-Calls db.deleteUser(username, type). If type = MANAGER, ManagerException is raised. 
-
-------------------------------------------------------------
 **RestockOrder**
 
 `  Array<String> getAllRestockOrders()`  
