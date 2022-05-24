@@ -137,7 +137,7 @@ router.delete('/api/skus/:id', async (req,res) => {
       const skuList = await db.loadSKU(id);
       if(skuList.length > 0){
         const sku = skuList.pop();
-        sku.delete(db.db);
+        await sku.delete(db.db);
         // now, delete the sku
         await db.deleteSKU(id);
       } else return res.status(404).json({error: `No SKU with matching id.`});
