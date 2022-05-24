@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "chai-as-promised": "^7.1.1",
     "express": "^4.17.3",
     "password-salt-and-hash": "^1.0.5",
     "sqlite3": "^5.0.6"

@@ -2,6 +2,9 @@
 
 const { expect } = require('chai');
 const dbSet = require('./dataBaseSetUp');
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
+chai.use(chaiAsPromised);
 
 const userDBU = require('../database_utilities/userDBU');
 
@@ -97,6 +100,10 @@ function testInsertUser(db){
         expect(res[0].email).to.equal('test@ezwh.com');
         expect(res[0].type).to.equal('customer');
     });
+    test('Insert user - already present', async() =>{
+        expect(db.insertUser('test@ezwh.com', 'testName', 'testSurname', '1234', 'customer')).to.eventually.be.rejected;
+
+    });
     test('Insert new role for already registered username', async() =>{
         await db.insertUser('user1@ezwh.com', 'testName', 'testSurname', '1234', 'supplier'); 
 
@@ -107,13 +114,6 @@ function testInsertUser(db){
         expect(res[0].surname).to.equal('testSurname');
         expect(res[0].email).to.equal('user1@ezwh.com');
         expect(res[0].type).to.equal('supplier');
-    });
-    test('user already present', async() =>{
-        try {
-            await db.insertUser('manager1@ezwh.com', 'testName', 'testSurname', '1234', 'manager');
-        } catch(err) {
-            expect(err.message).to.equal('User already exists.');
-        }
     });
 }
 

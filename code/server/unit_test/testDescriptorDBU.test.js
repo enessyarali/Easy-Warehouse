@@ -97,7 +97,10 @@ function testDeleteTestDescriptor(db){
             expect(err.message).to.equal("Dependency detected. Delete aborted.");
         }
     });
-
+    test('Delete Test Descriptor - descriptor not found' , async () => {
+        const deleted = await db.deleteTestDescriptor(99);
+        expect(deleted).to.equal(0);
+    });
 }
 
 

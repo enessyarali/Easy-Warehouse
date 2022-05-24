@@ -95,7 +95,7 @@ class TestDescriptorDBU {
     }
 
 // delete one or more TestDescriptor from the TEST-DESCRIPTORS table given different input. Return number of rows modified
-    async deleteTestDescriptor(testId=undefined) { 
+    async deleteTestDescriptor(testId) { 
         const dependency = await this.#checkDependency(testId);
         if (dependency) {
             // if there is at least 1 dependency
