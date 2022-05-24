@@ -11,7 +11,7 @@ Version: 1.7
 # Contents
 
 - [High level design](#package-diagram)
-- [Low level design](#class-diagram)
+- [Low level design](#model)
 - [Verification traceability matrix](#verification-traceability-matrix)
 - [Verification sequence diagrams](#verification-sequence-diagrams)
 
