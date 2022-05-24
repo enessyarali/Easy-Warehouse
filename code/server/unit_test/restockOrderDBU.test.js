@@ -28,12 +28,12 @@ describe('Load Restock Order', () => {
 });
 
 function testGetRestockOrder(db) {
-    test('retrive all RestockOrder', async () => {
+    test('retrieve all RestockOrder', async () => {
         var res = await db.loadRestockOrder();
         expect(res.length).to.equal(2); //shoudl return 2 RestockOrder
     });
 
-    test('retrive a RestockOrder by Id', async () => {
+    test('retrieve a RestockOrder by Id', async () => {
         var res = await db.loadRestockOrder(1);
 
         expect(res[0].issueDate).to.equal('2022/04/04');
@@ -45,8 +45,12 @@ function testGetRestockOrder(db) {
         expect(res[0].skuItems[0].SKUId).to.equal(1);
         expect(res[0].skuItems[0].rfid).to.equal('123');
     });
+    test('retrieve a RestockOrder by Id - restock order does not exist', async () => {
+        var res = await db.loadRestockOrder(999);
+        expect(res.body).to.equal(undefined);
+    });
 
-    test('retrive RestockOrder by State', async () => {
+    test('retrieve RestockOrder by State', async () => {
         var res = await db.loadRestockOrder(undefined, 'ISSUED');
 
         expect(res[0].issueDate).to.equal('2022/04/04');
@@ -59,7 +63,7 @@ function testGetRestockOrder(db) {
         expect(res[0].skuItems[0].rfid).to.equal('123');
     });
 
-    test('retrive item to return', async () => {
+    test('retrieve item to return', async () => {
         var res = await db.selectReturnItems(1);
 
         expect(res[0].SKUId).to.equal(1);

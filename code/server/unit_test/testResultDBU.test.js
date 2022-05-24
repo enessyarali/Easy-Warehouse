@@ -2,6 +2,9 @@
 
 const { expect } = require('chai');
 const dbSet = require('./dataBaseSetUp');
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
+chai.use(chaiAsPromised);
 
 const TestResultDBU = require('../database_utilities/testResultDBU');
 
@@ -25,12 +28,12 @@ describe('Load Test Result', () => {
 });
 
 function testGetTestResult(db) {
-    test('retrive a TestResult bi RFID', async () => {
+    test('retrieve a TestResult bi RFID', async () => {
         var res = await db.loadTestResult(456);
         expect(res.length).to.equal(2); //shoudl return 2 TestResult
     });
 
-    test('retrive a TestResult by RFID and TestDescriptorId', async () => {
+    test('retrieve a TestResult by RFID and TestDescriptorId', async () => {
         var res = await db.loadTestResult(123,1);
 
         expect(res[0].idTestDescriptor).to.equal(1);
@@ -85,6 +88,17 @@ function testUpdateTestResult(db) {
         expect(res[0].idTestDescriptor).to.equal(2);
         expect(res[0].Date).to.equal('2022/04/05');
         expect(res[0].Result).to.equal(true);
+    });
+    test('Update an existing Test Result - testDescriptor not found', async () => {
+        expect(db.updateTestResult(789,2,999,'2022/04/05','Pass')).to.eventually.be.rejected;
+    });
+    test('Update an existing Test Result - RFID not found', async () => {
+        expect(db.updateTestResult('999',2,999,'2022/04/05','Pass')).to.eventually.be.rejected;
+    });
+    test('Update an existing Test Result - testResult not found', async () => {
+        const res = await db.updateTestResult(789,9,2,'2022/04/05','Pass');
+
+        expect(res).to.equal(0);
     });
 }
 
