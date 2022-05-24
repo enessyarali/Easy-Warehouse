@@ -26,7 +26,6 @@ describe('Load SkuItem ',() => {
     testLoadSkuitem(db);
 })
 
-//ITEM needs to be uploaded to the db by databaseetup like marco did 
 function testLoadSkuitem(db){
     test('Retrieve all SkuItems',async () => {
         var res = await db.loadSKUitem()
@@ -45,11 +44,61 @@ function testLoadSkuitem(db){
         var res = await db.loadSKUitem(undefined, 2);
 
         expect(res.length).to.equal(2);
+    });
+    test('Try the load with both parameters' , async () => {
+        var res = await db.loadSKUitem('123', 2);
+
+        expect(res[0].RFID).to.equal('123');
+        expect(res[0].SKUId).to.equal(1);
+        expect(res[0].Available).to.equal(0);
+        expect(res[0].DateOfStock).to.equal('2022/04/04');
     }); 
     test('Try Clean' , async () => {
         var res = await db.loadSKUitem('123');
 
         expect(res[0].clean(['RFID']).RFID).to.be.undefined;
+    }); 
+}
+
+describe('Load SkuItem - not found ',() => {
+    //at the start
+    beforeAll(async () => {
+        //clear DB
+        await dbSet.resetTable();
+    });
+    //at the end of all tests in this file
+    afterAll(async () => {
+        //clear DB at the end
+        await dbSet.resetTable();
+    });
+
+    const db = new SkuitemDBU('ezwh.db');
+    
+    testLoadSkuitemEmpty(db);
+})
+
+function testLoadSkuitemEmpty(db){
+    test('Retrieve all SkuItems - not found',async () => {
+        var res = await db.loadSKUitem()
+        
+        expect(res.length).to.equal(0);
+    });
+    test('Retrieve SkuItem by rfid - not found' , async () => {
+        var res = await db.loadSKUitem('123');
+
+        expect(res.length).to.equal(0);
+    }); 
+    test('Retrieve SkuItem by SKUid - not found' , async () => {
+        try {
+            await db.loadSKUitem(undefined, 2);
+        } catch (err) {
+            expect(err.message).to.equal("Provided id does not match any SKU");
+        }
+    });
+    test('Try the load with both parameters - not found' , async () => {
+        var res = await db.loadSKUitem('123', 2);
+
+        expect(res.length).to.equal(0);
     }); 
 }
 
