@@ -35,154 +35,142 @@ Hence, we will not focus on it.
 
 ## Back End
 The back end is further divided into 3 different packages:
-- `warehouse`, which is used as a façade by the front end
-- `model`, containing all classes needed to manage and process data, as well as a façade to interact with the database
-- `exceptions`, to handle any incorrect action triggered either by a user or the system itself
+- `api`, containing apis used to handle interactions between front end and the database.
+- `model`, containing all classes needed to manage and to represent data, included errors.
+- `database_utilities`, containing functions to interact with the db. 
 
 # Low level design
 
-## Exceptions
-
-Whenever the system reaches an incorrect state, a proper exception is raised, in order to notify and possibly fix such state. Notice that the same exception can be used to raise different type of errors, depending on the case.
-
-```
-class NotLoggedInException
-class NotAuthorizedException
-
-class UndefinedSKUException 
-class UndefinedSKUitemException 
-class UndefinedPositionException 
-class UndefinedTestDescriptorException
-class UndefinedTestResultException
-class UndefinedRestockOrderException
-class UndefinedReturnOrderException
-class UndefinedInternalOrderException
-class UndefinedItemException
-class UndefinedUserException
-
-class AlreadyAddedUserException
-class AlreadyAddedItemException
-
-class PositionAlreadyAssignedException
-class OutOfSpaceException
-
-class WrongPositionFormatException
-class WrongDataFormatException
-class WrongPasswordFormatException
-
-class ManagerException
-class WrongUsernameException
-class WrongPasswordException
-class AlreadyLoggedoutException
-
-class WrongOrderStateException
-class DeliveryDateBeforeIssueDateException
-
-class NotEnoughItemsException
-
-class SystemErrorException
-```
-## Warehouse & Model
+## Model
 ![Design class diagram](./Design-diagrams/Class-diagram-design.svg "Design class diagram")
 
 Apart from the listed methods, all classes have:
-- one / many personalized constructors to initialize (part of) its attributes and possibly performing some consistency checks. 
-- getters for all attributes. 
+- one / many personalized constructors to initialize (part of) its attributes and, when needed, directly performing some consistency checks. 
+- getters and setters for some attributes when needed. 
 
 which have been omitted for the sake of brevity.  
 
-Notice that all classes have few methods, except for `EzWhInterface` and `DatabaseUtilities`, which are way more complex. This is a direct consequence of the fact that, as we will better show in the following part of the document, they are used as façades with the front end and the database, respectively (they are, by nature, longer).
+Notice that all classes in `model` have few to none methods, except for `sku`, that is more complex.
+This is a direct consequence of the fact that every change made on an Sku, has to be propagated in the rest of the system in order to keep consistency.
+`error` class define an object used to propagate errors betweeen database_utilities' functions and api.
 
-### EzWhInterface & EzWh
-The `EzWhInterface` interface, which in our case is implemented by the `EzWh` class, is the façade used by the front end to interact with the back end.  
-Its role is mainly _translational_, since every function
-1. Possibly converts from JSON to custom classes
-2. Interacts with the database by calling the proper low-level functions
-3. Possibly converts the result from custom classes to JSON  
+On the other hand, classes in `api` and `database_utilities` are, as expected, longer, due to the fact that every action of the application is handled by these.
 
+### Api
+The `api` interface is used by the front end to interact with the back end.  
+Its roles are:
+1. Checking correctness of the parameters received from the front end
+2. Interact with the database by calling the proper low-level functions
+3. Respond to the front end's request with the data provided by database_utilities classes.
+4. Convert potential errors in corresponding HTTP codes.
+
+### Database Utilities
+The `database_utilities` interface is used by the Api to interact with the database.
+Its roles are:
+1. Checking consistency of the parameters received from the front-end
+2. Interact with the database by executing the proper SQL-queries
+3. Respond to Api's calls with the data provided by the database.
+4. Convert potential database's errors in api's manageable errors.
 ------------------------------------------------------------
- **SKU**  
-`Array<String> getAllSKUs()`  
+## Model 
+**SKU**  
+`void modify(openDB, newDescription, newWeight, newVolume, newNotes, newPrice, newAvailableQuantity)`
+Apply modification at an object of type `sku` and propagate it with `#propapagatePosition`.
+
+`void #propagatePosition(openDB, position, occupiedWeight=0, occupiedVolume=0)`
+Propagate the changes of Sku to the database, in order to mantain consistency.
+
+## Api
+**skuApi**  
+`.get('/api/skus')`  
 Returns a list of all the SKUs in the database, by calling db.loadSKU(null).
 
-`String getSKUbyId(skuId :Integer)`  
-Searches in the database the SKU whose id matches the one in input, by calling db.loadSKU(skuId).
-Returns the requested SKU.
+`.get('/api/skus/:id')`  
+Return a single SKU identified by its Id, by calling db.loadSKU(skuId).
 
-`void addSKU (description :String, weight :Integer, volume :Integer, notes :String, price :Float, availableQuantity :Integer)`  
-Creates a new SKU by calling its constructor, then adds it in the database by calling db.intertSKU().
+`.post('/api/sku')`  
+Create a new SKU by calling db.insertSKU() with the parameters fetched from the request's body.
 
-`void modifySKU (skuId :Integer, newDescription :String, newWeight :Integer, newVolume :Integer, newNotes :String, newPrice :Float, newAvailableQuantity :Integer)`
-Fetches the SKU from the database by calling sku = db.loadSKU(skuId), then calls sku.modify(...). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKU(sku).
+`.put('/api/sku/:id')`
+Fetches the SKU from the database by calling db.loadSKU(skuId), then calls sku.modify(...). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKU(sku).
 
-`void setSKUposition(skuId :Integer, newPosition :String)`
-Fetches the SKU and the position from the database by calling sku = db.loadSKU(skuId) and p = db.loadPosition(newPosition), then calls sku.setPosition(p). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKU(sku) and db.updatePosition(p).
+`.put('/api/sku/:id/position')`  
+Fetches the SKU from the database by calling db.loadSKU(skuId), then calls sku.setPosition(p). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKU(sku) and db.updatePosition(p).
 
-`void deleteSKU(skuId :Integer)`
-Fetches the SKU and its assigned position - if any - from the database by calling first sku = db.loadSKU(skuId) and then p = db.loadPosition(sku.getPosition()). Then, it possibly calls p.setSKU(null). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updatePosition(p) and the SKU is deleted by calling db.deleteSKU(sku.getId()). 
+`.delete('/api/skus/:id')`  
+Fetches the SKU from the database by calling db.loadSKU(skuId), then delete it by calling db.deleteSKU(sku)
 
-------------------------------------------------------------
-**SKUitem**  
-
-`Array<String> getAllSKUitems()`  
+**SkuitemApi**  
+`.get('/api/skuitems')`  
 Returns a list of all the SKUitems in the database, by calling db.loadSKUitem(null).
 
-`Array<String> getSKUbySKUItemId(skuId :Integer)`  
+`.get('/api/skuitems/sku/:id)`  
 Searches in the database all SKUitems whose skuId matches the one in input, by calling db.loadSKUitem(skuId).
 Returns the requested SKUitems.
 
-`String getSKUitemByRfid(rfid :String)`  
+`.get('/api/skuitems/sku/:rfid)`  
 Searches in the database the SKUitem whose rfid matches the one in input, by calling db.loadSKUitem(rfid).
 Returns the requested SKUitem.
 
-`void addSKUitem(rfid :String, skuId :Integer, dateOfStock :Date)`  
-Creates a new SKUitem by calling its constructor, then calls skuItem.updateAvailableQuantity(+1). Finally, it adds it in the database by calling db.intertSKUitem().
+`.post('/api/skuitem')`
+Create a new SKUitem by calling db.insertSKUitem() with the parameters fetched from the request's body.
 
-`void modifySKUitem(rfid :String, newRfid :String, newAvailable :Boolean, newDateOfStock :Date)`  
-Fetches the SKUitem from the database by calling skuItem = db.loadSKUitem(rfid), then calls skuItem.modify(...). Then, if isAvailable has changed, it calls skuItem.updateAvailableQuantity(+1/-1).Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateSKUitem(skuItem).
+`.put('/api/skuitems/:rfid')`  
+The changes are propagated by calling db.updateSKUitem(skuItem).
 
-`void deleteSKUitem(rfid :String)`  
-Fetches the SKUitem from the database by calling skuItem = db.loadSKUitem(rfid), then calls skuItem.updateAvailableQuantity(-1).
-Finally, it calls db.deleteSKUitem(rfid).
+`.delete('/api/skuitems/:rfid')`  
+Delete it by calling db.deleteSKUitem(rfid).
 
-------------------------------------------------------------
-**Position**
-
-`Array<String> getAllPositions()`  
+**positionApi**
+`.get('/api/positions')`
 Returns a list of all the positions in the database, by calling db.loadPosition(null).
 
-`void addPosition(positionId :String, aisleId :String, row :String, col :String, maxWeight :Integer, maxVolume :Integer, occupiedWieght :Integer, occupiedVolume :Integer)`  
-Creates a new position by calling its constructor, then adds it in the database by calling db.intertPosition().
+`.post('/api/position')`  
+Create a new Position by calling db.insertPosition() with the parameters fetched from the request's body.
 
-`void modifyPosition(oldPositionId :String, newAisleId :String, newRow :String, newCol :String, newMaxWeight :Integer, newMaxVolume :Integer, newOccupiedWieght :Integer, newOccupiedVolume :Integer)`  
-Fetches the position from the database by calling p = db.loadPosition(oldPositionId), then calls p.modify(...). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updatePosition(p).
+`.put('/api/position/:positionID')`  
+Check if the positionID is valid.
+The changes are propagated by calling db.updatePosition(...).
 
-`void modifyPosition(oldPositionId :String, newPositionId :String)`  
-Fetches the position from the database by calling p = db.loadPosition(oldPositionId), then calls p.modify(newPositionId). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updatePosition(p).
 
-`void deleteSKUitemFromPosition(positionId :String)`  
-Removes a SKUitem from the position identified by positionId. In particular, the SKUitem with the lowest date of stock must be selected, to apply a FIFO-like criteria. To do so, db.fifoPopSKUitemFromPosition(positionId) is called.
+`.put('/api/position/:positionI/changeID')`  
+Check if the positionID is valid.
+The changes are propagated by calling db.updatePosition(...).
 
-------------------------------------------------------------
-**TestDescriptor**
+`.delete('/api/position/:positionID')`  
+Check if the positionID is valid.
+Delete it by calling db.deletePosition(positionID).
 
-`Array<String> getAllTestDescriptors()`  
+**testDescriptorApi**  
+`.get('/api/testDescriptors')`  
 Returns a list of all the test descriptors in the database, by calling db.loadTestDescriptor(null).
 
-`String getTestDescriptorbyId(testId :Integer)`  
+`.get('/api/testDescriptors/:id')`  
+Check if the id is valid.
 Searches in the database the test descriptor whose id matches the one in input, by calling db.loadTestDescriptor(testId).
 Returns the requested TestDescriptor.
-   
-`void addTestDescriptor (name :String, procedureDescription :String, skuId :Integer)`  
-Fetches from the database the SKU whose id matches the one in input by calling sku = db.loadSKU(skuId), and creates a new test descriptor by calling its constructor. Finally, if no exceptions have been raised, the descriptor is added in the database by calling db.insertTestDescriptor().
 
-`void modifyTestDescriptor (testId :Integer, newName :String, newProcedureDescription :String, newSKUId :Integer)`  
-Fetches from the database the test descriptor and SKU whose ids match the ones in input by calling test = db.loadTestDescriptor(testId) and sku = db.loadSKU(newSkuId). Then, it calls test.modify(...). Finally, if no exceptions have been raised, the changes are made persistent by calling db.updateTestDescriptor(test).
+`.post('/api/testDescriptors')`  
+Create a new TestDescriptor by calling db.insertTestDescriptor() with the parameters fetched from the request's body.
 
-`  void deleteTestDescriptor(testId :Integer)`  
-Simply calls db.deleteTestDescriptor(testId). 
+`.put('/api/testDescriptors/:id')`  
+Fetches from the database the test descriptor which id match the one in input by calling test = db.loadTestDescriptor(testId. Then the changes are made persistent by calling db.updateTestDescriptor(test).
 
-------------------------------------------------------------
+`.delete('/api/testDescriptors/:id')`  
+Check if the positionID is valid.
+Delete it by calling db.deletePosition(positionID).
+
+**testResultApi**
+
+
+
+
+
+# VECCHIE INTERFACCE
+ **SKU**  
+**SkuItemApi**
+**Position**
+**TestDescriptor**
 **TestResult**
 
 `  Array<String> getTestResultsByRfid(rfid :String)`  
