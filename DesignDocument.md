@@ -15,14 +15,10 @@ Version: 1.7
 - [Verification traceability matrix](#verification-traceability-matrix)
 - [Verification sequence diagrams](#verification-sequence-diagrams)
 
-# Instructions
-
-The design must satisfy the Official Requirements document, notably functional and non functional requirements, and be consistent with the APIs.
-
 # High level design 
 
 For our design, we have adopted a layered, model-view architectural style.  
-In particular, we have a front end, taking care of the presentational aspect, which interacts with a back end, managing the application logic and data.  
+In particular, we have a front end (`client`), taking care of the presentational aspect, which interacts with a back end (`server`), managing the application logic and data.  
 The back end is then further logically split into two parts, one taking care of the model and its logic, and another one which is used as an interface with the database. 
 
 ## Package diagram
@@ -52,7 +48,7 @@ which have been omitted for the sake of brevity.
 
 Notice that all classes in `model` have few to none methods, except for `sku`, that is more complex.
 This is a direct consequence of the fact that every change made on an Sku, has to be propagated in the rest of the system in order to keep consistency.
-`error` class define an object used to propagate errors betweeen database_utilities' functions and api.
+`error` class define an object used to propagate errors betweeen `database_utilities` functions and api.
 
 On the other hand, classes in `api` and `database_utilities` are, as expected, longer, due to the fact that every action of the application is handled by these.
 
