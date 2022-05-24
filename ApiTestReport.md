@@ -2,7 +2,7 @@
 
 Date: 23/05/2022
 
-Version: 1.0
+Version: 2.0
 
 # Contents
 
@@ -314,9 +314,14 @@ Step4 is Api testing for `SKU`
   |||POST /api/qualityEmployeeSessions - wrong quality employee credentials|
   |||POST /api/deliveryEmployeeSessions - correct delivery employee log in|
   |||POST /api/deliveryEmployeeSessions - wrong delivery employee credentials|
-|  **Scenario 9-1** | FR6.1| |
-  ||FR6.2||
-  ||FR6.3||
+|  **Scenario 9-1** | FR6.1| POST /api/internalOrder - correctly adding an internal order|
+  |||POST /api/internalOrder - wrong internal order data 1|
+  |||POST /api/internalOrder - wrong internal order data 2|
+  ||FR6.2, FR6.3, FR6.7|PUT /api/internalOrders/:id - correctly update state of an internal order|
+  |||PUT /api/internalOrders/:id - unexisting internal order id|
+  |||PUT /api/internalOrders/:id - wrong internal order id|
+  |||PUT /api/internalOrders/:id - wrong internal order data|
+  |||PUT /api/internalOrders/:id - wrong internal order (to COMPLETED)|
   ||FR3.1.4|PUT /api/position/:posID - correctly modify a position|
   |||PUT /api/position/:posID - passing a field with a typo |
   |||PUT /api/position/:posID - position does not exist |
@@ -332,11 +337,16 @@ Step4 is Api testing for `SKU`
   |||PUT /api/sku/:id - SKU does not exist|
   |||PUT /api/sku/:id - available quantity is negative|
   |||PUT /api/sku/:id - position cannot contain weight and volume |
-  ||FR6.6||
-  ||FR6.7||
-|  **Scenario 9-2** | FR6.1| |
-  ||FR6.2||
-  ||FR6.3||
+  ||FR6.6|DELETE /api/internalOrders/:id - correctly delete an internal order|
+  |||DELETE /api/internalOrders/:id - passing a negative id|
+|  **Scenario 9-2** | FR6.1|POST /api/internalOrder - correctly adding an internal order|
+  |||POST /api/internalOrder - wrong internal order data 1|
+  |||POST /api/internalOrder - wrong internal order data 2|
+  ||FR6.2, FR6.3, FR6.7|PUT /api/internalOrders/:id - correctly update state of an internal order|
+  |||PUT /api/internalOrders/:id - unexisting internal order id|
+  |||PUT /api/internalOrders/:id - wrong internal order id|
+  |||PUT /api/internalOrders/:id - wrong internal order data|
+  |||PUT /api/internalOrders/:id - wrong internal order (to COMPLETED)|
   ||FR3.1.4|PUT /api/position/:posID - correctly modify a position|
   |||PUT /api/position/:posID - passing a field with a typo |
   |||PUT /api/position/:posID - position does not exist |
@@ -352,11 +362,16 @@ Step4 is Api testing for `SKU`
   |||PUT /api/sku/:id - SKU does not exist|
   |||PUT /api/sku/:id - available quantity is negative|
   |||PUT /api/sku/:id - position cannot contain weight and volume |
-  ||FR6.6||
-  ||FR6.7||
-|  **Scenario 9-3** | FR6.1| |
-  ||FR6.2||
-  ||FR6.3||
+  ||FR6.6|DELETE /api/internalOrders/:id - correctly delete an internal order|
+  |||DELETE /api/internalOrders/:id - passing a negative id|
+|  **Scenario 9-3** | FR6.1| POST /api/internalOrder - correctly adding an internal order|
+  |||POST /api/internalOrder - wrong internal order data 1|
+  |||POST /api/internalOrder - wrong internal order data 2|
+  ||FR6.2, FR6.3, FR6.7|PUT /api/internalOrders/:id - correctly update state of an internal order|
+  |||PUT /api/internalOrders/:id - unexisting internal order id|
+  |||PUT /api/internalOrders/:id - wrong internal order id|
+  |||PUT /api/internalOrders/:id - wrong internal order data|
+  |||PUT /api/internalOrders/:id - wrong internal order (to COMPLETED)|
   ||FR3.1.4|PUT /api/position/:posID - correctly modify a position|
   |||PUT /api/position/:posID - passing a field with a typo |
   |||PUT /api/position/:posID - position does not exist |
@@ -372,13 +387,18 @@ Step4 is Api testing for `SKU`
   |||PUT /api/sku/:id - SKU does not exist|
   |||PUT /api/sku/:id - available quantity is negative|
   |||PUT /api/sku/:id - position cannot contain weight and volume |
-  ||FR6.6||
-  ||FR6.7||
+  ||FR6.6|DELETE /api/internalOrders/:id - correctly delete an internal order|
+  |||DELETE /api/internalOrders/:id - passing a negative id|
 |  **Scenario 10-1** | FR5.10| DELETE /api/skuitems/:rfid - correctly delete|
   |||DELETE /api/skuitems/:rfid - wrong rfid|
-  |||FR6.10| |
-  ||FR6.8||
-  ||FR6.7||
+  |||FR6.10|DELETE /api/skuitems/:rfid - correctly delete a sku item|
+  |||DELETE /api/skuitems/:rfid - wrong rfid |
+  ||FR6.8|PUT /api/internalOrders/:id - correctly update state of an internal order to COMPLETED|
+  ||FR6.7|PUT /api/internalOrders/:id - correctly update state of an internal order|
+  |||PUT /api/internalOrders/:id - unexisting internal order id|
+  |||PUT /api/internalOrders/:id - wrong internal order id|
+  |||PUT /api/internalOrders/:id - wrong internal order data|
+  |||PUT /api/internalOrders/:id - wrong internal order (to COMPLETED)|
 |  **Scenario 11-1** | FR7|POST /api/item - correctly adding an item|
   |||POST /api/item - SKUId does not match any sku|
   |||POST /api/item - supplier does not exist|
