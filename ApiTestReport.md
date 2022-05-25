@@ -63,7 +63,8 @@ For further information, please refer to [UnitTestReport.md](UnitTestReport.md).
 
 
 ## Step 2
-Step2 is API testing for all stacks but `SKU` and `Position` ---------------
+Step2 is API testing for all stacks but `SKU` and `Position`.  
+`PositionDBU` is tested at this step, while `SKU` is not tested yet, due to its dependency on `Position`. 
 
 | Classes |Jest test cases |
 |--|--|
@@ -79,7 +80,7 @@ Step2 is API testing for all stacks but `SKU` and `Position` ---------------
 
 
 ## Step 3
-Step3 is API testing for`Position` and model testing for `SKU`
+Step3 is API testing for`Position` and begin of model testing for `SKU`.
   
 | Classes  |Jest test cases |
 |--|--|
@@ -87,14 +88,14 @@ Step3 is API testing for`Position` and model testing for `SKU`
 |Position + PositionDBU + SKU|[sku.test.js](./code/server/unit_test/sku.test.js)|
 
 ## Step 4
-Step4 is Unit testing for `SKU`
+Step4 is DBU testing for `SKU`.
   
 | Classes  |Jest test cases |
 |--|--|
 |Position + PositionDBU + SKU + SkuDBU|[skuDBU.test.js](./code/server/unit_test/skuDBU.test.js)|
 
 ## Step 5
-Step4 is Api testing for `SKU`
+Step5 is - finally - Api testing for `SKU`.
   
 | Classes  |Jest test cases |
 |--|--|
