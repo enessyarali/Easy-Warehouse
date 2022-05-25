@@ -14,6 +14,7 @@
   },
   "scripts": {
     "apiTest": "./node_modules/.bin/mocha test --exit --runInBand",
-    "test": "node_modules/.bin/jest"
+    "test": "node_modules/.bin/jest --runInBand",
+    "allTest": "./node_modules/.bin/mocha test --exit --runInBand; node_modules/.bin/jest --runInBand"
   }
 }
