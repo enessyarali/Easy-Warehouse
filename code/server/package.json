@@ -13,7 +13,7 @@
     "mocha": "^9.2.2"
   },
   "scripts": {
-    "apiTest": "./node_modules/.bin/mocha test --exit --runInBand",
+    "apiTest": "./node_modules/.bin/mocha test --exit",
     "test": "node_modules/.bin/jest --runInBand",
     "allTest": "./node_modules/.bin/mocha test --exit --runInBand; node_modules/.bin/jest --runInBand"
   }
