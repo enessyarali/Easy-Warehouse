@@ -19,6 +19,8 @@ We report here the criteria we followed to perform black box testing on `databas
 Since all `database_utilities` classes have basically the same internal structure (a load, an insert, an update and a delete), we decided to report here a single analysis for each category, for the sake of brevity.  
 In particular, we tried to focus on some special cases, characterized by a slightly more complex logic with respect to the other ones.
 
+## Load
+
  ### **Class *SkuItemDBU* - method *loadSKUitem***
 
 **Criteria for method *loadSKUitem*:**
@@ -53,6 +55,7 @@ In particular, we tried to focus on some special cases, characterized by a sligh
 
 Notice that case 4 behaves exactly as case 2: the RFID is more important than the skuId, which in this case is simply ignored.
 
+## Insert
 
 ### **Class *UserDBU* - method *insertUser***
 
@@ -64,16 +67,17 @@ Notice that case 4 behaves exactly as case 2: the RFID is more important than th
 
 | Criteria                        | Predicate |
 |---------------------------------|-----------|
-| User with unique pair (username, type) is in database         | Yes       |
-|                                 | No        |
+| User with unique pair (username, type) is in database         | No       |
+|                                 | Yes        |
 
 **Combination of predicates**:
 
 | User with unique pair (username, type) is in database | Valid / Invalid | Description of the test case  | Jest test case            |
 |-------------------------|---------------------------------|-----------------|-------------------------------|
-| Yes | Valid | T1(validUser) -> true |`Insert user`|
-| No | Invalid | T2(invalidUser) -> false |`Insert user - already present`|
+| No | Valid | T1(validUser) -> true |`Insert user`|
+| Yes | Invalid | T2(invalidUser) -> false |`Insert user - already present`|
 
+## Update
 
 ### **Class *TestResultDBU* - method *updateTestResult***
 
@@ -102,6 +106,9 @@ Notice that case 4 behaves exactly as case 2: the RFID is more important than th
 | Yes | Yes | No | Invalid | T2(invalidResult) -> false | `Update an existing Test Result - testDescriptor not found` |
 | No | No | Not Care | Invalid | T3(invalidResult) -> false | `Update an existing Test Result - RFID not found` |
 | Yes | No | Yes | Valid | T4(validResult) -> true | `Update an existing Test Result - testResult not found` |
+
+
+## Delete
 
 ### **Class *TestDescriptorDBU* - method *deleteTestDescriptor***
 
