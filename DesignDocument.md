@@ -3,9 +3,9 @@
 
 Authors: Ilaria Pilo, Marco Sacchet, Luca Scibetta, Enes Yarali
 
-Date: 27 April 2022
+Date: 25 May 2022
 
-Version: 1.7
+Version: 1.8
 
 
 # Contents
@@ -46,32 +46,32 @@ Apart from the listed methods, all classes have:
 
 which have been omitted for the sake of brevity.  
 
-Notice that all classes in `model` have few to none methods, except for `sku`, that is more complex.
+Notice that all classes in `model` have few to none methods, except for `SKU`, that is more complex.
 This is a direct consequence of the fact that every change made on an Sku, has to be propagated in the rest of the system in order to keep consistency.
-`error` class define an object used to propagate errors betweeen `database_utilities` functions and api.
+`Error` class define an object used to propagate errors betweeen `database_utilities` functions and APIs.
 
 On the other hand, classes in `api` and `database_utilities` are, as expected, longer, due to the fact that every action of the application is handled by these.
 
 ### Api
 The `api` interface is used by the front end to interact with the back end.  
 Its roles are:
-1. Checking correctness of the parameters received from the front end
+1. Checking *correctness* of the parameters received from the front end
 2. Interact with the database by calling the proper low-level functions
-3. Respond to the front end's request with the data provided by database_utilities classes.
+3. Respond to the front end's request with the data provided by `database_utilities` classes.
 4. Convert potential errors in corresponding HTTP codes.
 
 ### Database Utilities
-The `database_utilities` interface is used by the Api to interact with the database.
+The `database_utilities` interface is used by the APIs to interact with the database.
 Its roles are:
-1. Checking consistency of the parameters received from the front-end
+1. Checking *consistency* of the parameters received from the front-end
 2. Interact with the database by executing the proper SQL-queries
-3. Respond to Api's calls with the data provided by the database.
-4. Convert potential database's errors in api's manageable errors.
+3. Respond to API calls with the data provided by the database.
+4. Convert potential database's errors in API manageable errors.
 ------------------------------------------------------------
 ## Model 
 **SKU**  
 `void modify(openDB, newDescription, newWeight, newVolume, newNotes, newPrice, newAvailableQuantity)`
-Apply modification at an object of type `sku` and propagate it with `#propapagatePosition`.
+Apply modification at an object of type `SKU` and propagate it with propapagatePosition.
 
 `void #propagatePosition(openDB, position, occupiedWeight=0, occupiedVolume=0)`
 Propagate the changes of Sku to the database, in order to mantain consistency.
