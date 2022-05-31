@@ -93,7 +93,7 @@ function testGetAllSkuItems(agent, size, skuitems, expCode) {
         it('Getting SKUitems', function (done) {
             agent.get('/api/skuitems')
             .then(function (res) {
-                console.log(res.body[0]);
+                //console.log(res.body[0]);
                 res.should.have.status(expCode);
                 res.body.should.be.a('array');
                 res.body.length.should.be.equal(size);

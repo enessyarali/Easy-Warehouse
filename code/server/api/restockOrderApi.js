@@ -8,7 +8,7 @@ let router = express.Router()
 
 
 function getState(str) {
-  const clean = str.trim().toUpperCase();
+  const clean = str && str.trim().toUpperCase();
   switch (clean) {
     case "ISSUED":
     case "DELIVERY":

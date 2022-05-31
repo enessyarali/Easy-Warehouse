@@ -192,7 +192,7 @@ function testEditRestockOrderSkuItems(agent, addskuitems, expCode){
                 agent.put('/api/restockOrder/'+idsearch+'/skuItems')
                 .send({"skuItems":thisskuitems})
                 .then(function(res2){
-                    //console.log(res2)
+                    console.log(res2.body)
                     res2.should.have.status(expCode);
                     done();
                 }).catch(err=>done(err));                 

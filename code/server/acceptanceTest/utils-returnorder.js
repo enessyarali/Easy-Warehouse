@@ -68,7 +68,7 @@ function testPostNewReturnOrder(agent, myretord, expCode){
             agent.post('/api/returnOrder')
             .send(retord)
             .then(function(res){
-                //console.log(res);
+                console.log(res.body);
                 //console.log(retord);
                 res.should.have.status(expCode);
                 done();

@@ -56,7 +56,7 @@ function testRestockOrderCRUD(){
     myrestocks[1] = restockorders.newRestockOrder("2022/05/17 19:00", myproducts, 1); 
     
 
-    describe.only('Test RestockOrder CRUD features', ()=>{
+    describe('Test RestockOrder CRUD features', ()=>{
         restockorders.deleteAllRestockOrders(agent);
         skuitems.deleteAllSkuItems(agent);      
         skus.deleteAllSkus(agent);
