@@ -34,6 +34,10 @@ function testPostNewPosition(agent, position, expCode){
     });
 }
 
+/* FIXME ---- same as deleteAllTestDescriptors, it works just because it is placed far from GETs.
+    Once GETs are reached, deletes have already been executed.
+    Again, just luck.
+*/
 
 function deleteAllPositions(agent){
     describe('Removing all Positions', function(){
@@ -46,9 +50,11 @@ function deleteAllPositions(agent){
                         agent.delete('/api/position/'+res.body[i].positionID)
                         .then(function(res2){
                             res2.should.have.status(204);
+                            console.log("Deleted " + res.body[i].positionID);
                         });
                     }
                 }
+                console.log("done!");
                 done();
             }).catch(err => done(err));
         });
