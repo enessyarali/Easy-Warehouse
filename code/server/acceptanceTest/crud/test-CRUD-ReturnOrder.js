@@ -96,11 +96,13 @@ function testReturnOrderCRUD(){
         restockorders.testGetAllRestockIssued(agent, 200);
         returnorders.testPostNewReturnOrder(agent, myreturnorders[0], 201);
         returnorders.testPostNewReturnOrder(agent, myreturnorderwithnosuppid, 404);
-        /*returnorders.testPostWrongNewReturnOrder(agent, myretnull, 422);
+        returnorders.testPostWrongNewReturnOrder(agent, myretnull, 422);
         returnorders.testGetAllReturnOrders(agent, myreturnorders, 200);
         returnorders.testGetReturnOrderById(agent, myreturnorders[0], 0, 200);
         returnorders.testGetWrongReturnOrderById(agent, 1000000, 404);
-        returnorders.testGetWrongReturnOrderById(agent, null, 422);*/
+        returnorders.testGetWrongReturnOrderById(agent, null, 422);
+        // FIXME - add delete to avoid problem when trying to delete restock orders
+        returnorders.deleteAllReturnOrders(agent);
     });
 }
 

@@ -154,6 +154,7 @@ function testDeleteAllNotManagerUsers(agent){
     describe(' Delete all not manager', function(){
         it('Cleaning db user util', async function(){
             const res = await agent.get('/api/users');
+            console.log(res.body);
             let res2;
             for(let i=0; i<res.body.length; i++){
                 //console.log(res.body[i].email);

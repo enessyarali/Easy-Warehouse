@@ -12,6 +12,8 @@ const users = require('../utils-users');
 const skus = require('../utils-sku');
 const skuitems = require('../utils-skuitems');
 const restockorders = require('../utils-restockorder');
+// FIXME - some users may be referenced by an internal order. To delete them, all internal orders must be deleted
+const internalorders = require('../utils-internalorder'); 
 
 testRestockOrderCRUD();
 
@@ -58,6 +60,9 @@ function testRestockOrderCRUD(){
 
     describe('Test RestockOrder CRUD features', ()=>{
         restockorders.deleteAllRestockOrders(agent);
+        //
+        internalorders.deleteAllInternalOrders(agent);
+        //
         skuitems.deleteAllSkuItems(agent);      
         skus.deleteAllSkus(agent);
         users.testDeleteAllNotManagerUsers(agent);
