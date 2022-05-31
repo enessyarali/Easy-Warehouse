@@ -98,9 +98,9 @@ function testGetAllInternalOrders(agent, size, expCode){
                 res.should.have.status(expCode);
                 res.body.should.be.a('array');
                 res.body.length.should.be.eql(size);
-                console.log('body length', res.body.length);
+                //console.log('body length', res.body.length);
                 for(let i=0; i<res.body.length; i++){
-                    console.log(res.body[i]);
+                    console.log(res.body[i].products);
                 }
                 done();
             }).catch(err=>done(err));
@@ -111,11 +111,15 @@ function testGetAllInternalOrders(agent, size, expCode){
 function testEditInternalOrder(agent, newState, expCode){
     describe(' put /api/internalOrders/:id', function(){
         it('Modify the state of an IO', function(done){
+            // FIXME ---- RFID and SkuID must match in order for the program to work
+            let id = ids.getIdSku();
             agent.get('/api/internalOrders')
             .then(function(res){
                 agent.put('/api/internalOrders/'+res.body[0].id)
-                .send({"newState":newState, "products":[{"SkuID":1,"RFID":"12345678901234567890123456789016"},{"SkuID":1,"RFID":"12345678901234567890123456789038"}]})
+                .send({"newState":newState, "products":[{"SkuID":id[0],"RFID":"12345678901234567890123456789016"},{"SkuID":id[0],"RFID":"12345678901234567890123456789038"}]})
                 .then(function(res2){
+                    console.log(res2.status);
+                    console.log(res2.body);
                     res2.should.have.status(expCode);
                     done();
                 }).catch(err=>done(err));
@@ -132,7 +136,7 @@ function testGetAllInternalOrdersIssued(agent, expcode){
                 res.should.have.status(expcode);
                 res.body.should.be.a('array');
                 for(let i=0; i<res.body.length; i++){
-                    console.log('inside get order issued', res.body[i]);
+                    //console.log('inside get order issued', res.body[i]);
                 }
                 done();
             }).catch(err=>done(err));
@@ -148,7 +152,7 @@ function testGetAllInternalOrdersAccepted(agent, expcode){
                 res.should.have.status(expcode);
                 res.body.should.be.a('array');
                 for(let i=0; i<res.body.length; i++){
-                    console.log('inside get order accepted', res.body[i]);
+                    //console.log('inside get order accepted', res.body[i]);
                 }
                 done();
             }).catch(err=>done(err));

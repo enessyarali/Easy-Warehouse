@@ -128,20 +128,38 @@ function testGetAllUsers(agent, expCode){
     })
 }
 
+/* FIXME --- wrong as always
 function testDeleteAllNotManagerUsers(agent){
     describe(' Delete all not manager', function(){
         it('Cleaning db user util', function(done){
             agent.get('/api/users')
             .then(function(res){
+                console.log(res.body);
                 for(let i=0; i<res.body.length; i++){
                     //console.log(res.body[i].email);
                     agent.delete('/api/users/'+res.body[i].email+'/'+res.body[i].type)
                     .then(function(res2){
                         res2.should.have.status(204);
+                        console.log("Deleted");
                     });
                 }
+                console.log("done!");
                 done();
             }).catch(err=>done(err));
+        });
+    });
+}*/
+
+function testDeleteAllNotManagerUsers(agent){
+    describe(' Delete all not manager', function(){
+        it('Cleaning db user util', async function(){
+            const res = await agent.get('/api/users');
+            let res2;
+            for(let i=0; i<res.body.length; i++){
+                //console.log(res.body[i].email);
+                res2 = await agent.delete('/api/users/'+res.body[i].email+'/'+res.body[i].type);
+                res2.should.have.status(204);
+            }
         });
     });
 }

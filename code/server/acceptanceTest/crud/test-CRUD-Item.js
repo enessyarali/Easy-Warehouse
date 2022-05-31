@@ -39,7 +39,7 @@ function testItemCRUD(){
     let myedititem = items.newItem(99, "newDesc", 99.99, 0, 0);
     
 
-    describe.only('Test Item CRUD features', () => {
+    describe('Test Item CRUD features', () => {
         // FIXME --- changed the order of deletes to enforce consistency of db
         items.deleteAllItems(agent);
         testdescriptors.deleteAllTestDescriptors(agent);

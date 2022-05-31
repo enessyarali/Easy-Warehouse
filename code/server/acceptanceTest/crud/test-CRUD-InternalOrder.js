@@ -21,6 +21,14 @@ function testInternalOrderCRUD(){
     mysku[0] = skus.newSku('a','b',20,30,40,10);
     mysku[1] = skus.newSku('c','d',40,30,20,10);
 
+    let rfids = [];
+    rfids[0] = '12345678901234567890123456789016';
+    rfids[1] = '12345678901234567890123456789038';
+    
+    let myskuitems = [];
+    myskuitems[0] = skuitems.newSkuItem(rfids[0], 0, '2021/11/29 12:30');
+    myskuitems[1] = skuitems.newSkuItem(rfids[1], 0, '2021/11/29 21:45');
+
     let myuser  = [];
     myuser[0] = users.newCompleteUser("supp1@ezwh.com", "supName", "supSur", "testpassword", "supplier");
     myuser[1] = users.newCompleteUser("customer1@ezwh.com", "custName", "custSur", "testpassword", "customer");
@@ -30,16 +38,20 @@ function testInternalOrderCRUD(){
     myproducts[1] = restockorders.newProduct(1, "descr2", 6.99, 20);
 
     let myinternalorders = [];
-    myinternalorders[0] = internalorders.newInternalOrder("2021/11/29 9:30", myproducts, 0);
+    // FIXME --- according to API.md, dates can be in the format "YYYY/MM/DD" or in format "YYYY/MM/DD HH:MM" 
+    //myinternalorders[0] = internalorders.newInternalOrder("2021/11/29 9:30", myproducts, 0);
+    myinternalorders[0] = internalorders.newInternalOrder("2021/11/29 09:30", myproducts, 0);
     myinternalorders[1] = internalorders.newInternalOrder("2021/11/30 21:30", myproducts, 0);
 
     describe('Test Internal Order CRUD features', () =>{
+        // FIXME --- changed the order of deletes to enforce consistency of db
+        internalorders.deleteAllInternalOrders(agent);
         skuitems.deleteAllSkuItems(agent);      
         skus.deleteAllSkus(agent);
+        //
         skus.testPostNewSku(agent, mysku[0],201);
         skus.testPostNewSku(agent, mysku[1],201);
         skus.testGetAllSkus(agent, mysku,2,200);
-        internalorders.deleteAllInternalOrders(agent);
         users.testDeleteAllNotManagerUsers(agent);
         users.testPostNewUser(agent, myuser[1], 201);
         internalorders.testPostNewInternalOrder(agent, myinternalorders[0], 201);
@@ -50,6 +62,10 @@ function testInternalOrderCRUD(){
         internalorders.testEditInternalOrder(agent, "ACCEPTED", 200);
         internalorders.testGetAllInternalOrdersIssued(agent, 200);
         internalorders.testGetAllInternalOrdersAccepted(agent, 200);
+        // FIXME --- these products do not exist!! We first insert them
+        skuitems.testPostNewSkuItem(agent, myskuitems[0], 201);
+        skuitems.testPostNewSkuItem(agent, myskuitems[1], 201);
+        //
         internalorders.testEditInternalOrder(agent, "COMPLETED", 200);
         internalorders.testGetAllInternalOrders(agent, 2, 200);
     });
