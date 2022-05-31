@@ -104,6 +104,7 @@ function testEditUser(agent, changetype, username,expCode){
             agent.put('/api/users/'+username)
             .send(changetype)
             .then(function(res){
+                //console.log(res.body);
                 res.should.have.status(expCode);
                 done();
             }).catch(err=>done(err));

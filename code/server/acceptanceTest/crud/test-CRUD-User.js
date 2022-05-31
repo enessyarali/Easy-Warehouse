@@ -17,10 +17,17 @@ function testUserCRUD(){
         users.testDeleteUser(agent, myuser.username, 'errtype', 422);
         users.testDeleteUser(agent, 'manager1@ezwh.com', 'manager', 422);
         users.testPostNewUser(agent, myuser,201);
+        //users.testGetAllUsers(agent, 200);
         users.testEditUser(agent, {"oldType":"customer", "newType":"clerk"}, myuser.username, 200);
         users.testEditUser(agent, {"oldType":"customer", "newType":"clerk"}, myuser.username, 404);
         users.testEditUser(agent, {"oldType":"customer", "newType":"clerk"}, 'notuser@aaa.com', 404);
         users.testEditUser(agent, null, 'notuser@aaa.com', 422);
+
+        /* FIXME - myuser type is changed so, the following time that this suite is executed,
+            the first delete has not effect and the first edit breaks a unique constraint.
+            By removing the edited user at the end we avoid this issue
+        */
+        users.testDeleteUser(agent, myuser.username, "clerk", 204);
     });
 }
 
