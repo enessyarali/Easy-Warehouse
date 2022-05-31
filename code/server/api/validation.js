@@ -55,12 +55,12 @@ function mailIsValid(str) {
 }
 
 function nameIsValid(str) {
-  const regex = /^[A-Z][a-z]+$/;
+  const regex = /^[A-Za-z]+$/;
   return regex.test(str);
 }
 
 function surnameIsValid(str) {
-  const regex = /^[A-Z][A-Za-z\s']+$/;
+  const regex = /^[A-Za-z\s']+$/;
   return regex.test(str);
 }
 
