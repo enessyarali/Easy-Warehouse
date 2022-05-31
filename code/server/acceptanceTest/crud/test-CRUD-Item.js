@@ -25,24 +25,30 @@ function testItemCRUD(){
 
     let myuser  = [];
     myuser[0] = users.newCompleteUser("supp1@ezwh.com", "supName", "supSur", "testpassword", "supplier");
-    myuser[1] = users.newCompleteUser("supp2@ezwh.com", "supName2", "supSur2", "testpassword", "supplier");
+    // FIXME --- names cannot have numbers in them (or can they?)
+    // myuser[1] = users.newCompleteUser("supp2@ezwh.com", "supName2", "supSur2", "testpassword", "supplier");
+    myuser[1] = users.newCompleteUser("supp2@ezwh.com", "supNameTwo", "supSurTwo", "testpassword", "supplier");
 
     let myitems = [];
-    myitems[0] = items.newItem(0, "desc0", 9.99, 0, 0);
-    myitemsnotfound = items.newItem(0, "desc0", 9.99, 1000000, 1);
+    // FIXME --- id=0 is not allowed by the database, since it must be a positive numebr
+    //myitems[0] = items.newItem(0, "desc0", 9.99, 0, 0);
+    //myitemsnotfound = items.newItem(0, "desc0", 9.99, 1000000, 1);
+    myitems[0] = items.newItem(1, "desc0", 9.99, 0, 0);
+    myitemsnotfound = items.newItem(1, "desc0", 9.99, 1000000, 1);
 
     let myedititem = items.newItem(99, "newDesc", 99.99, 0, 0);
     
 
-    describe('Test Item CRUD features', () => {
+    describe.only('Test Item CRUD features', () => {
+        // FIXME --- changed the order of deletes to enforce consistency of db
+        items.deleteAllItems(agent);
+        testdescriptors.deleteAllTestDescriptors(agent);
         skuitems.deleteAllSkuItems(agent);      
         skus.deleteAllSkus(agent);
-        testdescriptors.deleteAllTestDescriptors(agent);
         users.testDeleteAllNotManagerUsers(agent);
         skus.testPostNewSku(agent, mysku[0],201);
         skus.testPostNewSku(agent, mysku[1],201);
         skus.testGetAllSkus(agent, mysku,2,200);
-        items.deleteAllItems(agent);
         items.testGetAllItems(agent, 0, 200);
         users.testPostNewUser(agent, myuser[0], 201);
         users.testPostNewUser(agent, myuser[1], 201);
@@ -50,11 +56,14 @@ function testItemCRUD(){
         items.testPostNewItem(agent, myitems[0], 201);
         items.testPostNewItem(agent, myitemsnotfound, 404);
         items.testGetAllItems(agent, 1, 200);
-        items.testGetItem(agent, 0, myitems[0], 200);
+        //items.testGetItem(agent, 0, myitems[0], 200);
+        items.testGetItem(agent, 1, myitems[0], 200);
         items.testGetItemnotfound(agent, null, 422);
         items.testGetItemnotfound(agent, 100000000, 404);
-        items.testEditItem(agent, 0, 'desc0', 99.99, myedititem, 200);
-        items.testDeleteItem(agent, 0, 204);
+        //items.testEditItem(agent, 0, 'desc0', 99.99, myedititem, 200);
+        //items.testDeleteItem(agent, 0, 204);
+        items.testEditItem(agent, 1, 'desc0', 99.99, myedititem, 200);
+        items.testDeleteItem(agent, 1, 204);
         items.deleteAllItems(agent);
         skuitems.deleteAllSkuItems(agent);      
         skus.deleteAllSkus(agent);
