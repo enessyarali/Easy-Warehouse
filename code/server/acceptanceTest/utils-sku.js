@@ -95,6 +95,7 @@ function testGetAllSkus(agent, sku, size, expCode) {
         it('FR 2.3 -> List all SKUs', function (done) {
             agent.get('/api/skus')
             .then(function (res) {
+                console.log(res.body);
                 res.should.have.status(expCode);
                 res.body.should.be.a('array');
                 res.body.length.should.be.eql(size);
@@ -118,17 +119,19 @@ function testGetAllSkus(agent, sku, size, expCode) {
     
 }
 
+// FIXME - === must be used instead of ==
 function testGetSkuById(agent ,skuid, ith, sku, expCode) {
     describe('get /api/skus/:id', function() {
         it('FR 2.4 -> Search a SKU', function (done) {
             let id = ids.getIdSku();
             let procID;
-            if (skuid == null || skuid>id.length) {
+            if (skuid === null || skuid>id.length) {
                 procID = skuid;
             }
             else{
                 procID = id[ith]
             }
+            console.log(procID);
             agent.get('/api/skus/'+procID)
             .then(function (res) {
                 res.should.have.status(expCode);
@@ -191,6 +194,7 @@ function testDeleteSku(agent, skuid, ith, expCode) {
             if (skuid != null) {
                 procID = skuid;
             }
+            console.log(procID);
             agent.delete('/api/skus/'+procID)
             .then(function (res) {
                 res.should.have.status(expCode);
