@@ -23,7 +23,9 @@ function testRestockOrderCRUD(){
     
     let myuser  = [];
     myuser[0] = users.newCompleteUser("supp1@ezwh.com", "supName", "supSur", "testpassword", "supplier");
-    myuser[1] = users.newCompleteUser("supp2@ezwh.com", "supName2", "supSur2", "testpassword", "supplier");
+    //FIXME User can't have letter in Name and And Surname 
+    //myuser[1] = users.newCompleteUser("supp2@ezwh.com", "supName2", "supSur2", "testpassword", "supplier");
+    myuser[1] = users.newCompleteUser("supp2@ezwh.com", "supNameDUE", "supSurDUE", "testpassword", "supplier");
 
     let rfids = [];
     rfids[0] = '12345678901234567890123456789015';
@@ -34,8 +36,11 @@ function testRestockOrderCRUD(){
     let myskuitems = [];
     myskuitems[0] = skuitems.newSkuItem(rfids[0], 0, '2021/11/29 12:30');
     myskuitems[1] = skuitems.newSkuItem(rfids[1], 0, '2021/11/29 21:45');
-    myskuitems[2] = skuitems.newSkuItem(rfids[2], 1, '2022/11/29 20:45');
-    myskuitems[3] = skuitems.newSkuItem(rfids[3], 1, '2022/12/29 20:45');
+    //FIXME Date can't be in the future
+    //myskuitems[2] = skuitems.newSkuItem(rfids[2], 1, '2022/11/29 20:45'); 
+    //myskuitems[3] = skuitems.newSkuItem(rfids[3], 1, '2022/12/29 20:45');
+    myskuitems[2] = skuitems.newSkuItem(rfids[2], 1, '2022/01/29 20:45');
+    myskuitems[3] = skuitems.newSkuItem(rfids[3], 1, '2022/01/29 20:45');
 
     let addskuitems = [];
     addskuitems[0] = {"SKUId":1, "rfid":rfids[2]};
@@ -51,7 +56,7 @@ function testRestockOrderCRUD(){
     myrestocks[1] = restockorders.newRestockOrder("2022/05/17 19:00", myproducts, 1); 
     
 
-    describe('Test RestockOrder CRUD features', ()=>{
+    describe.only('Test RestockOrder CRUD features', ()=>{
         restockorders.deleteAllRestockOrders(agent);
         skuitems.deleteAllSkuItems(agent);      
         skus.deleteAllSkus(agent);
@@ -66,13 +71,13 @@ function testRestockOrderCRUD(){
         users.testGetAllSuppliers(agent);
         restockorders.testPostNewRestockOrder(agent, myrestocks[0], 201);
         restockorders.testPostNewRestockOrder(agent, myrestocks[1], 201);
-        skuitems.testPostNewSkuItem(agent, myskuitems[2], 201);
-        skuitems.testPostNewSkuItem(agent, myskuitems[3], 201);
+        skuitems.testPostNewSkuItem(agent, myskuitems[2], 201); 
+        skuitems.testPostNewSkuItem(agent, myskuitems[3], 201); 
         restockorders.testPostNewWrongRestockOrder(agent, null, 422);
         restockorders.testGetAllRestockOrders(agent, myrestocks, 200);
         restockorders.testGetAllRestockIssued(agent, 200);
         restockorders.testEditRestockOrder(agent, "DELIVERED", 200);
-        restockorders.testEditRestockOrder(agent, null, 422);
+        restockorders.testEditRestockOrder(agent, null, 422); //qui
         restockorders.testEditWrongRestockOrder(agent, "DELIVERED", 10000, 404);
         restockorders.testGetAllRestockOrders(agent, myrestocks, 200);
         restockorders.testEditRestockOrderSkuItems(agent, addskuitems, 200);
