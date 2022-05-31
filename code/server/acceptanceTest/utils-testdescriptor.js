@@ -28,20 +28,27 @@ function newTestDescriptorEdit(newName, newProcedureDescription, newIdSKU){
 //---------------------------------------------------------------------------------------------------------
 
 
+/* FIXME ---- this function works just because it is (or better, it SHOULD) be
+    executed as first delete, so once the get is reached all deletes are done.
+    However, this is just luck
+*/
 function deleteAllTestDescriptors(agent){
     describe('removing all test descriptors', function(){
         it('Getting test descriptors', function(done){
             agent.get('/api/testDescriptors')
             .then(function(res){
+                console.log(res.body);
                 res.should.have.status(200);
                 if(res.body.length !==0){
                     for (let i=0; i<res.body.length; i++){
                         agent.delete('/api/testDescriptor/'+res.body[i].id)
                         .then(function(res2){
                             res2.should.have.status(204);
+                            console.log("Deleted "+res.body[i].id)
                         });
                     }
                 }
+                console.log("done!");
                 done();
             }).catch(err=>done(err));
         });

@@ -80,10 +80,10 @@ function deleteAllSkuItems(agent) {
                 for (let i = 0; i < res.body.length; i++) {
                     res2 = await agent.delete('/api/skuitems/'+res.body[i].RFID);
                     res2.should.have.status(204);
-                    console.log("Deleted "+ res.body[i].RFID);
+                    //console.log("Deleted "+ res.body[i].RFID);
                 }
             }
-            console.log("done!");
+            //console.log("done!");
         });
     });
 }
