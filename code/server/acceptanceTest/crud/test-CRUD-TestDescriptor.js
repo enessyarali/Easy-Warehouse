@@ -30,10 +30,12 @@ function testTestDescriptorCRUD(){
     newtdwrongidsku = testdescriptors.newTestDescriptor('wrongnewtd1', 'wrongnewdescr1',1000000);
     
     describe('Test TestDescriptor CRUD features', () =>{
+        // FIXME --- changed the order of deletes to enforce consistency of db
         // db cleaning
         testdescriptors.deleteAllTestDescriptors(agent);
         skuitems.deleteAllSkuItems(agent);      
         skus.deleteAllSkus(agent);
+        //
         skus.testPostNewSku(agent, mysku[0],201);
         skus.testPostNewSku(agent, mysku[1],201);
         skus.testGetAllSkus(agent, mysku,2,200);

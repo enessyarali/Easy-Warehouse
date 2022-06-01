@@ -46,6 +46,7 @@ function testItemCRUD(){
         skuitems.deleteAllSkuItems(agent);      
         skus.deleteAllSkus(agent);
         users.testDeleteAllNotManagerUsers(agent);
+        //
         skus.testPostNewSku(agent, mysku[0],201);
         skus.testPostNewSku(agent, mysku[1],201);
         skus.testGetAllSkus(agent, mysku,2,200);

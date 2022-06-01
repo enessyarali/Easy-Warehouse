@@ -1,10 +1,10 @@
 # Problemi Test [gruppo 34]
 
 Questa è una raccolta di problemi che abbiamo riscontrato nei test.  
-In particolare, come già anticipato al Professor Morisio in classe, ci siamo ritrovati con circa 150 su 174 test non passati causati da problemi nei test (piuttosto che nel nostro programma), soprattutto perché questi non rispettano la consistency del database, causando fallimenti a catena.  
+In particolare, come già anticipato al Professor Morisio in classe, ci siamo ritrovati con circa 165 su 174 test non passati causati da problemi nei test (piuttosto che nel nostro programma), soprattutto perché questi non rispettano la consistency del database, causando fallimenti a catena.  
 Questo ci rende frustrati e dispiaciuti, perché abbiamo lavorato molto su questo progetto e ora ci ritroviamo a "peggiorare" il nostro codice, modificandolo in modo invasivo, per fare in modo che questi test non falliscano.  
-Abbiamo quindi deciso di segnalare i problemi riscontrati, sperando in una patch che li risolva. Tutti questi fix non cambiano la performance di tutti i progetti che non si sono preoccupati della consistency, ma fanno davvero la differenza per chi si è impegnato per mantenerla.  
-Per cercare di testare il nostro codice per trovare dei veri difetti, abbiamo dovuto modificare il codice dei test. Le nostre modifiche sono raccolte in un apposito branch `test-fixing-branch` sul GitLab del corso, e segnalate da `FIXME`.
+Abbiamo quindi deciso di segnalare i problemi riscontrati, sperando in una patch che li risolva. Questi fix non cambiano la performance di tutti i progetti che non si sono preoccupati della consistency, ma fanno davvero la differenza per chi si è impegnato per mantenerla.  
+Per cercare di testare il nostro codice per trovare dei veri difetti, abbiamo dovuto modificare il codice dei test. Le nostre modifiche sono raccolte in un apposito branch `test-fixing-branch` sul GitLab del corso, e segnalate da `FIXME`. Queste modifiche risolvono ***tutti i problemi*** elencati di sotto.
 
 ## Bug nelle funzioni di `deleteAll`
 Come già scritto al professor Ardito, il comportamento di tutte le funzioni di `deleteAll` è scorretto.  
@@ -178,7 +178,7 @@ La stessa cosa accade in altre CRUD suite:
 In generale, tutti i test non lasciano il database nello stato in cui lo hanno trovato, ma si preoccupano semplicemente di eliminare ciò che *credono* gli servirà all'inizio (senza eliminare quello che hanno inserito). Questo causa, di nuovo, problemi di consistency, questa volta più sottili e difficili da identificare.
 Ad esempio, in test-CRUD-internalOrder, gli internal order vengono creati, ma NON eliminati alla fine dei test.  
 Poiché ogni internal order ha una dipendenza da un customer (cioè un user), la volta successiva che `testDeleteAllNotManagerUsers` viene chiamata, l'operazione fallisce a causa della dipendenza dagli internal order, causando - di nuovo - fallimenti a cascata.   
-Un problema simile si ha, in generale, con tutti gli altri ordini.
+Un problema simile si ha, in generale, con **tutti i CRUD** più la suite `testEzWhAPI`.
 
 ## Bug in `test-CRUD-user`
 In questa test suite, l'utente `user12@ezwh.com, customer` viene aggiunto. Dopodiché, il suo tipo viene modificato, e l'utente diventa `user12@ezwh.com, clerk`.  
@@ -209,15 +209,14 @@ Nella condizione dell'if a riga 109, `skuid==null` dovrebbe essere sostituito da
 
 ## Problemi di `testEzWhAPI`
 1. Alla riga 110, si cerca di eliminare lo SKU con id 0. Poiché le nostre APIs accettano valori strettamente positivi di id, la delete ritorna con 422.
-
-
-
+2. Prima di cancellare tutti gli SKU a linea 131, bisognerebbe eliminare prima i test descriptor, per evitare di rompere la consistency.
 
 ## Postfazione
-Ci scusiamo davvero molto per questo elenco lunghissimo di richieste di fix.  
+Ci scusiamo davvero molto per questo elenco lunghissimo.  
 Speriamo vivamente che capiate il nostro stato d'animo: ci siamo impegnati davvero tanto, lavorando per molte ore al giorno, e ora ci troviamo in una posizione in cui avremmo ottenuto risultati nettamente migliori lavorando la metà - se non addirittuara meno.
-Questo ci sconforta molto, soprattutto perché questa situazione scomoda va contro 
-# FINIRE
+Questo ci sconforta molto, soprattutto perché, con queste correzioni e senza alcuna modifica al nostro codice, avremmo fallito soltanto una decina di test. Restiamo comunque soddisfatti del nostro lavoro, nonostante ci si sia ritorto contro.  
+Inoltre, questa situazione ci costringe a cambiare il nostro codice in peggio; i controlli di consistency richiedono molte modifiche, alcuni sono addirittura intrinsechi nel design.  
+Ovviamente, dove necessario, lo faremo: speriamo solo di aver mostrato in qualche modo le features di un progetto di cui andiamo molto fieri, e che sentiamo non sia correttamente rappresentato né dall'alto numero di test falliti, né tantomeno da tutte le righe di codice che dovremmo modificare per farli passare.  
 
 Grazie infinite per la vostra attenzione, come al solito.  
 

@@ -36,9 +36,11 @@ function testTestResultCRUD(){
     mytestresults[0] = testresults.newTestResult(rfids[0], 0, "2022/05/06", true);
     
     describe('Test TestResult CRUD', () => {
+        // FIXME --- changed the order of deletes to enforce consistency of db
         testdescriptors.deleteAllTestDescriptors(agent); 
         skuitems.deleteAllSkuItems(agent);      
-        skus.deleteAllSkus(agent);       
+        skus.deleteAllSkus(agent);
+        //       
         skus.testPostNewSku(agent, mysku[0],201);
         skus.testPostNewSku(agent, mysku[1],201);
         skus.testGetAllSkus(agent, mysku,2,200);
@@ -65,7 +67,8 @@ function testTestResultCRUD(){
         // DELETE
         testresults.testGetTestResultByRFID(agent, 200, rfids[0]);
         testresults.testDeleteTestResultByRFIDandID(agent, 204,rfids[0]);
-        testresults.testDeleteAllTestResultByRFID(agent, 200, rfids[0]);  
+        testresults.testDeleteAllTestResultByRFID(agent, 200, rfids[0]); 
+        // FIXME --- changed the order of deletes to enforce consistency of db 
         testdescriptors.deleteAllTestDescriptors(agent);      
         skuitems.deleteAllSkuItems(agent);      
         skus.deleteAllSkus(agent);
