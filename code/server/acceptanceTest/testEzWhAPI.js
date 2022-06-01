@@ -63,8 +63,11 @@ function testFR(){
     let myskuitems = [];
     myskuitems[0] = skuitems.newSkuItem(rfids[0], 0, '2021/11/29 12:30');
     myskuitems[1] = skuitems.newSkuItem(rfids[1], 0, '2021/11/29 21:45');
-    myskuitems[2] = skuitems.newSkuItem(rfids[2], 1, '2022/11/29 20:45');
-    myskuitems[3] = skuitems.newSkuItem(rfids[3], 1, '2022/12/29 20:45');
+    // FIXME - date is in the future
+    //myskuitems[2] = skuitems.newSkuItem(rfids[2], 1, '2022/11/29 20:45');
+    //myskuitems[3] = skuitems.newSkuItem(rfids[3], 1, '2022/12/29 20:45');
+    myskuitems[2] = skuitems.newSkuItem(rfids[2], 1, '2021/11/29 20:45');
+    myskuitems[3] = skuitems.newSkuItem(rfids[3], 1, '2021/12/29 20:45');
 
     let mytd = [];
     mytd[0] = testdescriptors.newTestDescriptor('td1','descr1',0);
@@ -94,12 +97,14 @@ function testFR(){
     myretnull = returnorders.newReturnOrder(null, null, 0);
 
     describe('Testing Functional requirements', () => {
+        // FIXME - change order of delete
+        restockorders.deleteAllRestockOrders(agent); 
         users.testDeleteAllNotManagerUsers(agent);
-        skus.deleteAllSkus(agent);
-        positions.deleteAllPositions(agent);
         testdescriptors.deleteAllTestDescriptors(agent);
         skuitems.deleteAllSkuItems(agent);  
-        restockorders.deleteAllRestockOrders(agent); 
+        skus.deleteAllSkus(agent);
+        positions.deleteAllPositions(agent);
+        //
         users.testPostNewUser(agent, myuser,201);
         users.testEditUser(agent, {"oldType":"customer", "newType":"clerk"}, myuser.username, 200);
         users.testGetAllUsers(agent, 200);
@@ -107,9 +112,12 @@ function testFR(){
         skus.testPostNewSku(agent, mysku[0], 201);
         skus.testGetAllSkus(agent, mysku, 1, 200);
         skus.testEditSku(agent, myeditedskuToPut, 0, 0, 200);
-        skus.testDeleteSku(agent, 0, 0, 204);
+        // FIXME - it's passing 0 as skuId!! 422 should be the output
+        //skus.testDeleteSku(agent, 0, 0, 204);     <- anyways, it is not supposed to delete
+        skus.testDeleteSku(agent, 0, 0, 422);
         skus.testPostNewSku(agent, mysku[0], 201);
         skus.testGetSkuById(agent, 0, 0, mysku[0], 200);
+        skus.testGetSkuById(agent, 1, 0, mysku[0], 200);
         positions.testPostNewPosition(agent, mypositions[0], 201);
         positions.testEditPosition(agent, updateposition, mypositions[0].positionID, 200);
         positions.testPostNewPosition(agent, mypositions[1], 201);
@@ -126,7 +134,9 @@ function testFR(){
         skuitems.testPostNewSkuItem(agent, myskuitems[0], 201);
         skuitems.testPostNewSkuItem(agent, myskuitems[1], 201);
         testdescriptors.testPostNewTestDescriptor(agent, mytd[0], 201);
+        // FIXME - add a delete test descriptor otherwise deleteAllSku fails due to consistency break
         restockorders.deleteAllRestockOrders(agent);
+        testdescriptors.deleteAllTestDescriptors(agent);
         skuitems.deleteAllSkuItems(agent);      
         skus.deleteAllSkus(agent);
         users.testDeleteAllNotManagerUsers(agent);
@@ -154,6 +164,14 @@ function testFR(){
         skuitems.testPostNewSkuItem(agent, myskuitems[1], 201);
         testdescriptors.testPostNewTestDescriptor(agent, mytd[0], 201);
         skuitems.testEditSkuItem(agent, mynewskuitem, 200);
+        // FIXME - to keep everything consistent
+        restockorders.deleteAllRestockOrders(agent); 
+        users.testDeleteAllNotManagerUsers(agent);
+        testdescriptors.deleteAllTestDescriptors(agent);
+        skuitems.deleteAllSkuItems(agent);  
+        skus.deleteAllSkus(agent);
+        positions.deleteAllPositions(agent);
+        //
 
     });
 }

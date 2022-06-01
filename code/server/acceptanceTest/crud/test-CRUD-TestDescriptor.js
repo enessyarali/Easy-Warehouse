@@ -63,6 +63,10 @@ function testTestDescriptorCRUD(){
         mynewtd[0] = mytd[1];
         testdescriptors.testGetAllTestDescriptors(agent, 1, mynewtd, 200);
         testdescriptors.testDeleteTestDescriptorById(agent, null, 422);
+        // FIXME - db cleaning
+        testdescriptors.deleteAllTestDescriptors(agent);
+        skuitems.deleteAllSkuItems(agent);      
+        skus.deleteAllSkus(agent);
     });
 }
 

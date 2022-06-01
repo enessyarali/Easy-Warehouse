@@ -168,8 +168,11 @@ testdescriptors.deleteAllTestDescriptors(agent);
 skuitems.deleteAllSkuItems(agent);      
 skus.deleteAllSkus(agent);
 ```
-La stessa cosa accade in molte altre CRUD suite.
-# LISTA?????????????????????????????????????????????
+La stessa cosa accade in altre CRUD suite:
+- test-CRUD-InternalOrder
+- test-CRUD-Item
+- test-CRUD-TestResult
+
 
 ## Modifiche del database
 In generale, tutti i test non lasciano il database nello stato in cui lo hanno trovato, ma si preoccupano semplicemente di eliminare ciò che *credono* gli servirà all'inizio (senza eliminare quello che hanno inserito). Questo causa, di nuovo, problemi di consistency, questa volta più sottili e difficili da identificare.
@@ -204,6 +207,8 @@ Nella condizione dell'if a riga 109, `skuid==null` dovrebbe essere sostituito da
 1. *[come in restock order]* - L'utente creato alla riga 28 ha dei numeri nel nome-cognome. In uno scenario reale, questo non dovrebbe essere possibile. L'inserimento di questo utente ritorna con stato 422, facendo quindi fallire il test (e molti altri a catena).
 2. Alle righe 31-32, gli item vengono definiti con id pari a 0. Poiché le nostre APIs accettano valori strettamente positivi di id, la creazione ritorna sempre 422 (causando di nuovo fallimenti a catena).
 
+## Problemi di `testEzWhAPI`
+1. Alla riga 110, si cerca di eliminare lo SKU con id 0. Poiché le nostre APIs accettano valori strettamente positivi di id, la delete ritorna con 422.
 
 
 

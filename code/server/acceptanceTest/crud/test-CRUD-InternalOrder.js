@@ -68,8 +68,10 @@ function testInternalOrderCRUD(){
         //
         internalorders.testEditInternalOrder(agent, "COMPLETED", 200);
         internalorders.testGetAllInternalOrders(agent, 2, 200);
-        // FIXME - add delete to avoid problem when trying to delete users
+        // FIXME - add delete to avoid problems
         internalorders.deleteAllInternalOrders(agent);
+        skuitems.deleteAllSkuItems(agent);      
+        skus.deleteAllSkus(agent);
     });
 }
 

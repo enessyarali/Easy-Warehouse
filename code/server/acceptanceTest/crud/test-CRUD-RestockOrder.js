@@ -60,9 +60,6 @@ function testRestockOrderCRUD(){
 
     describe('Test RestockOrder CRUD features', ()=>{
         restockorders.deleteAllRestockOrders(agent);
-        //
-        internalorders.deleteAllInternalOrders(agent);
-        //
         skuitems.deleteAllSkuItems(agent);      
         skus.deleteAllSkus(agent);
         users.testDeleteAllNotManagerUsers(agent);

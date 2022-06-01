@@ -82,6 +82,8 @@ function deleteAllSkus(agent) {
                 let res2;
                 for (let i = 0; i < res.body.length; i++) {
                     res2 = await agent.delete('/api/skus/'+res.body[i].id)
+                    console.log(res2.body);
+                    console.log(res.body[i].id);
                     res2.should.have.status(204);
                 }
             } 
@@ -190,11 +192,13 @@ function testDeleteSku(agent, skuid, ith, expCode) {
     describe('delete /api/sku/:id', function() {
         it('FR 2.2 -> Delete a SKU', function (done) {
             let id = ids.getIdSku();
+            //console.log(id);
             var procID = id[ith];
+            //console.log(skuid != null);
             if (skuid != null) {
                 procID = skuid;
             }
-            console.log(procID);
+            //console.log(procID);
             agent.delete('/api/skus/'+procID)
             .then(function (res) {
                 res.should.have.status(expCode);

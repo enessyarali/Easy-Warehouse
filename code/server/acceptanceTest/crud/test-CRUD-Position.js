@@ -63,6 +63,9 @@ function testPositionCRUD(){
         //DELETE
         positions.testDeletePosition(agent, newpositionid.newPositionID, 204);
         positions.testDeletePosition(agent, "somethingwrong", 422);
+
+        // FIXME - db cleaning to avoid problems
+        positions.deleteAllPositions(agent);
     });       
 }
 

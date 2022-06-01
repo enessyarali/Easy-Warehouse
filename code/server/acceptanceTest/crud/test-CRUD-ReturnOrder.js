@@ -103,6 +103,10 @@ function testReturnOrderCRUD(){
         returnorders.testGetWrongReturnOrderById(agent, null, 422);
         // FIXME - add delete to avoid problem when trying to delete restock orders
         returnorders.deleteAllReturnOrders(agent);
+        restockorders.deleteAllRestockOrders(agent);
+        skuitems.deleteAllSkuItems(agent);      
+        skus.deleteAllSkus(agent);
+        users.testDeleteAllNotManagerUsers(agent);
     });
 }
 

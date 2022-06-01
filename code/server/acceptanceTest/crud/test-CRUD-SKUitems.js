@@ -61,6 +61,9 @@ function testSkuItemsCRUD() {
         skuitems.testGetSkuItemsByRFID(agent, myskuitems[0], 1, 200);
         skuitems.testGetSkuItemsByRFID(agent, notaddedskuitems, 0, 404);
         skuitems.testGetSkuItemsByRFID(agent, myskuitemsnull, 0, 422);
+        //FIXME - db cleaning 
+        skuitems.deleteAllSkuItems(agent);      
+        skus.deleteAllSkus(agent);
     });
 }
 
