@@ -36,9 +36,9 @@ function testTestResultCRUD(){
     mytestresults[0] = testresults.newTestResult(rfids[0], 0, "2022/05/06", true);
     
     describe('Test TestResult CRUD', () => {
+        testdescriptors.deleteAllTestDescriptors(agent); 
         skuitems.deleteAllSkuItems(agent);      
         skus.deleteAllSkus(agent);
-        testdescriptors.deleteAllTestDescriptors(agent);        
         skus.testPostNewSku(agent, mysku[0],201);
         skus.testPostNewSku(agent, mysku[1],201);
         skus.testGetAllSkus(agent, mysku,2,200);

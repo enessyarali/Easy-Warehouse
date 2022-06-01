@@ -9,7 +9,7 @@ const users = require('../utils-users');
 testUserCRUD();
 
 function testUserCRUD(){
-    myuser = users.newCompleteUser('user12@ezwh.com','John', 'Smith', 'testpassword', 'customer');
+    myuser = users.newCompleteUser('user1@ezwh.com','John', 'Smith', 'testpassword', 'customer');
     
     describe('Test user CRUD features', ()=>{
         users.testDeleteUser(agent, myuser.username, myuser.type, 204);

@@ -38,8 +38,8 @@ function testSkuCRUD() {
         skus.testPostNewSku(agent, skus.newSku('sku', 'note', 50, 50, 50, -50), 422);
         skus.testPostNewSku(agent, skus.newSku('sku', '', 50, 50, 50, 50), 422);
         skus.testPostNewSku(agent, skus.newSku('', 'note', 50, 50, 50, 50), 422);
-        skus.testPostNewSku(agent, skus.newSku('sku', 'note', 50.1, 50, 50, 50), 422);
-        skus.testPostNewSku(agent, skus.newSku('sku', 'note', 50, 50.1, 50, 50), 422);
+        skus.testPostNewSku(agent, skus.newSku('skui', 'note', 50, 50, 50, 50), 201);
+        skus.testPostNewSku(agent, skus.newSku('skui2', 'note', 50, 50, 50, 50), 201);
         skus.testPostNewSku(agent, skus.newSku('sku', 'note', 50, 50, 50.1, 50),422);
         skus.testPostNewSku(agent, skus.newSku('sku', 'note', '50x', 50, 50, 50),422);
         skus.testPostNewSku(agent, skus.newSku('sku', 'note', 50, '50x', 50, 50),422);

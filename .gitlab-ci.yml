@@ -12,7 +12,7 @@ install_dependencies:
   stage: build
   script:
     - cd code/server/ 
-    - npm install
+    - npm ci
   artifacts:
     paths:
       - code/server/node_modules/

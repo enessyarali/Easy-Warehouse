@@ -48,6 +48,7 @@ function testPostNewSkuItem(agent, myskuitem, expCode) {
     });
 }
 
+/*
 function deleteAllSkuItems(agent) {
     describe('removing all skuitems', function() {
         it('Getting SKUitems', function (done) {
@@ -68,6 +69,28 @@ function deleteAllSkuItems(agent) {
         });
     });
 }
+*/
+function deleteAllSkuItems(agent) {
+    describe('removing all skuitems', function() {
+        it('Getting SKUitems', async function () {
+            const res = await agent.get('/api/skuitems');
+            console.log(res.body);
+            res.should.have.status(200);
+            if (res.body.length !==0) {
+                let res2;
+                for (let i = 0; i < res.body.length; i++) {
+                    res2 = await
+                    agent.delete('/api/skuitems/'+res.body[i].RFID);
+                    res2.should.have.status(204);
+                    console.log("Deleted "+ res.body[i].RFID);
+                }
+            }
+            console.log("done!");
+        });
+    });
+}
+
+
 
 function testGetAllSkuItems(agent, size, skuitems, expCode) {
     describe('get /api/skuitems', function() {
