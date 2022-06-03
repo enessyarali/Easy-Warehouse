@@ -115,7 +115,7 @@ class PositionDBU {
         }
         // check dependency
         const dependency = await this.#checkDependency(id);
-        if (dependency) {
+        if (false && dependency) {
             throw(new Error("Dependency detected. Delete aborted.", 14));
         }
         return new Promise((resolve, reject) => {
