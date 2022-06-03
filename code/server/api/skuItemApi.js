@@ -57,7 +57,7 @@ router.get('/api/skuitems/:rfid', async (req,res) => {
 router.post('/api/skuitem', async (req,res) => {
   if (req.body === undefined || req.body.RFID === undefined || typeof(req.body.RFID) !== 'string' || !validators.rfidIsValid(req.body.RFID) ||
       req.body.SKUId === undefined || !Number.isInteger(parseInt(req.body.SKUId)) || parseInt(req.body.SKUId) <= 0 ||
-      (req.body.DateOfStock && !validators.dateIsValid(req.body.DateOfStock))) {
+      (req.body.DateOfStock && !validators.dateIsValid(req.body.DateOfStock, false))) {
     return res.status(422).json({error: `Invalid SKU Item data.`});
   }
   try{
