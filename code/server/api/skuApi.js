@@ -128,7 +128,7 @@ router.put('/api/sku/:id/position', async (req,res) => {
 // remove a sku from the database
 router.delete('/api/skus/:id', async (req,res) => {
   const id = parseInt(req.params.id);
-  if (!Number.isInteger(id) || id < 1) {
+  if (!Number.isInteger(id) || id < 0) {
     return res.status(422).json({error: `Validation of id failed`});
   }
   try{
