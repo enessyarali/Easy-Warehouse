@@ -88,7 +88,7 @@ class ItemDBU {
     deleteItem(itemId=undefined,supplierId=undefined,skuId=undefined) {        
         let sqlInfo = {sql: undefined, values: undefined};
 
-        if(itemId) {
+        if(itemId || itemId === 0) {
             const sqlDeleteFromItem = 'DELETE FROM ITEMS WHERE id = ?';
             sqlInfo.sql = sqlDeleteFromItem;
             sqlInfo.values = [itemId];
