@@ -28,7 +28,7 @@ function newTestDescriptorEdit(newName, newProcedureDescription, newIdSKU){
 //---------------------------------------------------------------------------------------------------------
 
 
-function deleteAllTestDescriptors(agent){
+/*function deleteAllTestDescriptors(agent){
     describe('removing all test descriptors', function(){
         it('Getting test descriptors', function(done){
             agent.get('/api/testDescriptors')
@@ -46,7 +46,24 @@ function deleteAllTestDescriptors(agent){
             }).catch(err=>done(err));
         });
     });
+}*/
+function deleteAllTestDescriptors(agent){
+    describe('removing all test descriptors', function(){
+        it('Getting test descriptors', async function(){
+            const res = await agent.get('/api/testDescriptors');
+            res.should.have.status(200);
+            if(res.body.length !==0){
+                let res2;
+                for (let i=0; i<res.body.length; i++){
+                    res2 = await agent.delete('/api/testDescriptor/'+res.body[i].id)
+                    res2.should.have.status(204);
+                }
+            }
+        });
+    });
 }
+
+
 
 function testPostNewTestDescriptor(agent, mytd, expCode){
     describe('test adding a test descriptor with post', function(){
