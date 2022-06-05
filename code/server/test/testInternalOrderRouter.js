@@ -103,7 +103,8 @@ describe('test internal order apis', () => {
 
     // populate the DB
     beforeEach(async () => {
-        await dbSet.resetAutoInc();
+        await dbSet.resetTable();
+        await dbSet.setupHardCodedUsers();
         await agent.post('/api/sku').send(sku1);
         await agent.post('/api/sku').send(sku2);
         await agent.post('/api/sku').send(sku3);

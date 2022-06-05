@@ -2,6 +2,7 @@
 
 const Item = require('../model/item');
 const SKU = require('../model/sku');
+const dbSet = require('../unit_test/dataBaseSetUp');
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -54,6 +55,8 @@ describe('test item apis', () => {
 
     // populate the DB
     beforeEach(async () => {
+        await dbSet.resetTable();
+        await dbSet.setupHardCodedUsers();
         await agent.post('/api/sku').send(sku1);
         await agent.post('/api/sku').send(sku2);
         await agent.post('/api/sku').send(sku3);

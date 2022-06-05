@@ -133,7 +133,6 @@ class RestockOrderDBU {
         for (let ski of sI) {
             // check if SKUitem exists
             const isSKUitem = await this.#checkSKUitem(ski);
-            console.log(isSKUitem);
             if (!isSKUitem)
                 throw (new Error("SKUitem does not exist. Operation aborted.", 9));
             // save SkuItemId and SKUid
