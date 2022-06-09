@@ -158,13 +158,13 @@ async function fillTable() {
     await insertSkuItem("999", 1, 0,'2022/04/04');
 
     await insertRestockOrder('2022/04/04', 'ISSUED', 5);
-    await insertProductRko(1, 1, "descrizione1", 1, 1);
-    await insertSkuItemRko(1, 1, 1);
+    await insertProductRko(1, 1, "descrizione1", 1, 1, 1);
+    await insertSkuItemRko(1, 1, 1, 1);
 
     await insertRestockOrder('2022/04/04', 'COMPLETEDRETURN', 5);
-    await insertProductRko(2, 1, "descrizione2", 1, 1);
-    await insertSkuItemRko(2, 1, 2);
-    await insertSkuItemRko(2, 2, 3);
+    await insertProductRko(2, 1, "descrizione2", 1, 1, 1);
+    await insertSkuItemRko(2, 1, 2, 1);
+    await insertSkuItemRko(2, 2, 3, 2);
 
     await insertTestDescriptor('td1','test1',1);
     await insertTestResult(1,1,'2022/04/04','Fail');
@@ -175,10 +175,10 @@ async function fillTable() {
     await insertTestResult(3,2,'2022/04/04','Pass');
 
     await insertReturnOrder('2022/04/04',1);
-    await insertProductRto(1,1,'desc1',1,1);
+    await insertProductRto(1,1,'desc1',1,1,1);
 
     await insertReturnOrder('2022/04/04',2);
-    await insertProductRto(2,2,'desc2',1,3);
+    await insertProductRto(2,2,'desc2',1,3,2);
 
     await insertInternalOrder('2022/04/04','ISSUED',1);
     await insertProductSkuIO(1,1,'d1',1,1);
@@ -253,10 +253,10 @@ function insertRestockOrder(newDate, newState, supplierId, transportNote = '') {
     });
 }
 
-function insertProductRko(orderId, SKUId, description, price, qty) {
+function insertProductRko(orderId, SKUId, description, price, qty, itemId) {
     return new Promise((resolve, reject) => {
-        const insert = 'INSERT INTO "products-rko" (orderId, skuId, description, price, quantity) VALUES (?,?,?,?,?)';
-        db.run(insert, [orderId, SKUId, description, price, qty], function (err) {
+        const insert = 'INSERT INTO "products-rko" (orderId, skuId, description, price, quantity, itemId) VALUES (?,?,?,?,?,?)';
+        db.run(insert, [orderId, SKUId, description, price, qty, itemId], function (err) {
             if (err) {
                 reject(err);
                 return;
@@ -265,10 +265,10 @@ function insertProductRko(orderId, SKUId, description, price, qty) {
     });
 }
 
-function insertSkuItemRko(orderId, SKUId, SKUItemId) {
+function insertSkuItemRko(orderId, SKUId, SKUItemId, itemId) {
     return new Promise((resolve, reject) => {
-        const addItem = 'INSERT INTO "sku-items-rko" (orderId, skuItemId, skuId) VALUES (?,?,?)';
-        db.run(addItem, [orderId, SKUItemId, SKUId], function (err) {
+        const addItem = 'INSERT INTO "sku-items-rko" (orderId, skuItemId, skuId, itemId) VALUES (?,?,?,?)';
+        db.run(addItem, [orderId, SKUItemId, SKUId, itemId], function (err) {
             if (err) {
                 reject(err);
                 return;
@@ -315,10 +315,10 @@ function insertReturnOrder(returnDate, restockOrderId){
     });
 }
 
-function insertProductRto(orderId, SKUId, description, price, skuItemId) {
+function insertProductRto(orderId, SKUId, description, price, skuItemId, itemId) {
     return new Promise((resolve, reject) => {
-        const insert = 'INSERT INTO "products-rto" (orderId, skuId, description, price, skuItemId) VALUES (?,?,?,?,?)';
-        db.run(insert, [orderId, SKUId, description, price, skuItemId], function (err) {
+        const insert = 'INSERT INTO "products-rto" (orderId, skuId, description, price, skuItemId, itemId) VALUES (?,?,?,?,?,?)';
+        db.run(insert, [orderId, SKUId, description, price, skuItemId, itemId], function (err) {
             if (err) {
                 reject(err);
                 return;

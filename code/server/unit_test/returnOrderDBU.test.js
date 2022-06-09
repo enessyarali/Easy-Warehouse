@@ -31,7 +31,7 @@ function testGetReturnOrder(db) {
 
     test('retrieve all ReturnOrder', async () => {
         var res = await db.loadReturnOrder();
-        expect(res.length).to.equal(2); //shoudl return 2 ReturnOrder
+        expect(res.length).to.equal(2); //should return 2 ReturnOrder
     });
 
     test('retrieve a ReturnOrder by Id', async () => {
@@ -43,6 +43,7 @@ function testGetReturnOrder(db) {
         expect(res[0].products[0].description).to.equal('desc1');
         expect(res[0].products[0].price).to.equal(1);
         expect(res[0].products[0].RFID).to.equal('123');
+        expect(res[0].products[0].itemId).to.equal(1);
     });
 
     test('clear a ReturnOrder field', async () => {
@@ -58,9 +59,9 @@ describe('Insert and Modify Return Order', () => {
         //clear DB
         await dbSet.resetTable();
         //popolate DB 
-        await dbSet.prepareTable();
+        //await dbSet.prepareTable();
         //removing ReturnOrder dependencies to test the insertion
-        await dbSet.voidReturnOrder();
+        //await dbSet.voidReturnOrder();
     });
 
     afterAll(async () => {
@@ -77,7 +78,7 @@ describe('Insert and Modify Return Order', () => {
 function testInsertReturnOrder(db) {
     test('Insert a new Return Order', async () => {
         //create new product to insert
-        var p = new ProductRTO(1, 'desc1', 1, '123');
+        var p = new ProductRTO(1, 'desc1', 1, '123', 1);
         await db.insertReturnOrder('2022/04/04', p, 1);
 
         var res = await db.loadReturnOrder(1);
@@ -88,6 +89,7 @@ function testInsertReturnOrder(db) {
         expect(res[0].products[0].description).to.equal('desc1');
         expect(res[0].products[0].price).to.equal(1);
         expect(res[0].products[0].RFID).to.equal('123');
+        expect(res[0].products[0].itemId).to.equal(1);
     });
 }
 
@@ -118,7 +120,7 @@ describe('Test Error of Return Order', () => {
 
 function testInsertWrongReturnOrder(db){
     test('Insert a new wrong Return Order', async () => {
-        var p = new ProductRTO(1, 'desc1', 1, '123');
+        var p = new ProductRTO(1, 'desc1', 1, '123', 1);
 
         try{
             await db.insertReturnOrder('2022/04/04', p, 5); //wrong RestockOrder

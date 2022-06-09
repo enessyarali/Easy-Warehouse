@@ -42,8 +42,10 @@ function testGetRestockOrder(db) {
         expect(res[0].products[0].description).to.equal('descrizione1');
         expect(res[0].products[0].price).to.equal(1);
         expect(res[0].products[0].qty).to.equal(1);
+        expect(res[0].products[0].itemId).to.equal(1);
         expect(res[0].skuItems[0].SKUId).to.equal(1);
         expect(res[0].skuItems[0].rfid).to.equal('123');
+        expect(res[0].skuItems[0].itemId).to.equal(1);
     });
     test('retrieve a RestockOrder by Id - restock order does not exist', async () => {
         var res = await db.loadRestockOrder(999);
@@ -59,8 +61,10 @@ function testGetRestockOrder(db) {
         expect(res[0].products[0].description).to.equal('descrizione1');
         expect(res[0].products[0].price).to.equal(1);
         expect(res[0].products[0].qty).to.equal(1);
+        expect(res[0].products[0].itemId).to.equal(1);
         expect(res[0].skuItems[0].SKUId).to.equal(1);
         expect(res[0].skuItems[0].rfid).to.equal('123');
+        expect(res[0].skuItems[0].itemId).to.equal(1);
     });
 
     test('retrieve item to return', async () => {
@@ -68,6 +72,7 @@ function testGetRestockOrder(db) {
 
         expect(res[0].SKUId).to.equal(1);
         expect(res[0].rfid).to.equal('123');
+        expect(res[0].itemId).to.equal(1);
     });
     test('check state', async () => {
         var res = await db.retriveState(1);
@@ -82,9 +87,9 @@ describe('Insert and modify Restock Order', () => {
         //clear DB
         await dbSet.resetTable();
         //popolate DB 
-        await dbSet.prepareTable();
+        //await dbSet.prepareTable();
         //removing RestockOrder dependencies to test the insertion
-        await dbSet.voidRestockOrder();
+        //await dbSet.voidRestockOrder();
     });
 
     afterAll(async () => {
@@ -102,36 +107,38 @@ describe('Insert and modify Restock Order', () => {
 function testInsertRestockOrder(db) {
     test('Insert a new Restock Order', async () => {
         //create new product to insert
-        var p = new ProductRKO(1, "descrizione1", 1, 1);
+        var p = new ProductRKO(1, "descrizione1", 1, 1, 1);
         await db.insertRestockOrder('2022/04/04', p, 5);
 
-        var res = await db.loadRestockOrder();
+        var res = await db.loadRestockOrder(1);
         //check if the insertion succeded correctly
         expect(res[0].issueDate).to.equal('2022/04/04');
         expect(res[0].products[0].SKUId).to.equal(1);
         expect(res[0].products[0].description).to.equal('descrizione1');
         expect(res[0].products[0].price).to.equal(1);
         expect(res[0].products[0].qty).to.equal(1);
+        expect(res[0].products[0].itemId).to.equal(1);
     });
 }
 
 function testUpdateRestockOrderd(db) {
     var orderId = 1;
     test('Update state of an existing Restock Order', async () => {
-        await db.patchRestockOrderState(orderId, 'ISSUED');
+        await db.patchRestockOrderState(orderId, 'COMPLETEDRETURN');
 
         var res = await db.loadRestockOrder(orderId);
-        expect(res[0].state).to.equal('ISSUED');
+        expect(res[0].state).to.equal('COMPLETEDRETURN');
     });
 
     test('Update skuItem of an existing Restock Order', async () => {
-        var si = { rfid: 123, SKUId: 1 };
+        var si = { rfid: '123', SKUId: 1, itemId: 3 };
         await db.patchRestockOrderSkuItems(orderId, si);
 
         var res = await db.loadRestockOrder(orderId);
 
         expect(res[0].skuItems[0].SKUId).to.equal(1);
         expect(res[0].skuItems[0].rfid).to.equal('123');
+        expect(res[0].skuItems[0].itemId).to.equal(1);
     });
 
     test('Update transportNote of an existing Restock Order', async () => {
@@ -172,7 +179,7 @@ describe('Test Error of Restock Order', () => {
 
 function testInsertWrongRestockOrder(db) {
     test('Insert a new wrong Restock Order', async () => {
-        var p = new ProductRKO(1, "descrizione1", 1, 1);
+        var p = new ProductRKO(1, "descrizione1", 1, 1, 1);
 
         try {
             await db.insertRestockOrder('2022/04/04', p, 4); //wrong supplier
@@ -185,7 +192,7 @@ function testInsertWrongRestockOrder(db) {
 
 function testUpdateWrongRestockOrderd(db) {
     test('Update skuItem of an existing Restock Order with wrong SKUId', async () => {
-        var si = { rfid: 123, SKUId: 5 };
+        var si = { rfid: '123', SKUId: 5, itemId: 1 };
         try {
             await db.patchRestockOrderSkuItems(1, si); //wrong skuId
         }
