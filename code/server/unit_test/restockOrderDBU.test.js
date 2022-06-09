@@ -87,7 +87,7 @@ describe('Insert and modify Restock Order', () => {
         //clear DB
         await dbSet.resetTable();
         //popolate DB 
-        //await dbSet.prepareTable();
+        await dbSet.prepareTable();
         //removing RestockOrder dependencies to test the insertion
         //await dbSet.voidRestockOrder();
     });
@@ -110,7 +110,7 @@ function testInsertRestockOrder(db) {
         var p = new ProductRKO(1, "descrizione1", 1, 1, 1);
         await db.insertRestockOrder('2022/04/04', p, 5);
 
-        var res = await db.loadRestockOrder(1);
+        var res = await db.loadRestockOrder(3);
         //check if the insertion succeded correctly
         expect(res[0].issueDate).to.equal('2022/04/04');
         expect(res[0].products[0].SKUId).to.equal(1);

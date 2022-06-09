@@ -185,7 +185,7 @@ describe('Test Error of Sku Item', () => {
         await dbSet.resetTable();
         //popolate DB
         await dbSet.prepareTable();
-        await dbSet.createSkuItemDependency();
+        //await dbSet.createSkuItemDependency();
     });
     //at the end of all tests in this file
      afterAll(async () => {

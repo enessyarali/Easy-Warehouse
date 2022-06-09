@@ -59,7 +59,7 @@ describe('Insert and Modify Return Order', () => {
         //clear DB
         await dbSet.resetTable();
         //popolate DB 
-        //await dbSet.prepareTable();
+        await dbSet.prepareTable();
         //removing ReturnOrder dependencies to test the insertion
         //await dbSet.voidReturnOrder();
     });
@@ -81,7 +81,7 @@ function testInsertReturnOrder(db) {
         var p = new ProductRTO(1, 'desc1', 1, '123', 1);
         await db.insertReturnOrder('2022/04/04', p, 1);
 
-        var res = await db.loadReturnOrder(1);
+        var res = await db.loadReturnOrder(3);
         //check if the insertion succeded correctly
         expect(res[0].returnDate).to.equal('2022/04/04');
         expect(res[0].restockOrderId).to.equal(1);
