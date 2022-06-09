@@ -71,7 +71,7 @@ function NavbarCustom(props) {
     else {
       return (
         <>
-          <Link to="/register" style={{ color: 'white' }}>
+          <Link to="/login" style={{ color: 'white' }}>
             <PersonCircle size={30} />
           </Link>
         </>

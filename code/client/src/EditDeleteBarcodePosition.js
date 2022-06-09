@@ -59,8 +59,8 @@ function EditDeleteBarcodePosition (props){
                       </option>
                       {props.positions.length > 0 ? (
                         props.positions.map((p) => (
-                          <option value={p.barcode}>
-                            {p.barcode}
+                          <option value={p.positionID}>
+                            {p.positionID}
                           </option>
                         ))
                       ) : (

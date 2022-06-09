@@ -105,6 +105,7 @@ function NewReturnOrder(props) {
                         if(product.SKUId*1 === item.SKUId*1){
                             const returnItem ={
                                 SKUId:item.SKUId,
+                                itemId:product.itemId,
                                 description:product.description,
                                 price:product.price,
                                 RFID:item.rfid
@@ -177,6 +178,7 @@ function NewReturnOrder(props) {
                                                     if(product.SKUId*1 === el.SKUId*1){
                                                         const returnItem ={
                                                             SKUId:el.SKUId,
+                                                            itemId: product.itemId,
                                                             description:product.description,
                                                             price:product.price,
                                                             RFID:el.rfid
