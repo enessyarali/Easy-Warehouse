@@ -67,7 +67,7 @@ class RestockOrderDBU {
     async selectReturnItems(id) {
         // return an array
         return new Promise((resolve, reject) => {
-            const sql = 'SELECT S.SKUid AS skuId, S.RFID AS rfid FROM "sku-items-rko" R JOIN "sku-items" S ON S.id = R.skuItemId \
+            const sql = 'SELECT S.SKUid AS skuId, S.RFID AS rfid, R.itemId as itemId FROM "sku-items-rko" R JOIN "sku-items" S ON S.id = R.skuItemId \
                 WHERE R.orderId=? AND NOT EXISTS ( \
                     SELECT TR.id \
                     FROM "test-results" TR \
@@ -79,7 +79,7 @@ class RestockOrderDBU {
                     return;
                 }
                 const skuItemArray = rows.map((si) => {
-                    const sia = { SKUId: si.skuId, rfid: si.rfid };
+                    const sia = { SKUId: si.skuId, rfid: si.rfid, itemId: si.itemId };
                     return sia;
                 });
                 Promise.all(skuItemArray).then((skuItemArray) => resolve(skuItemArray));
@@ -97,8 +97,8 @@ class RestockOrderDBU {
         const prod = [].concat(products); //to make sure it is an array
         const orderId = await this.#insertOrder(issueDate, supplierId);
         const promises = prod.map((p) => new Promise(async (resolve, reject) => {
-            const insert = 'INSERT INTO "products-rko" (orderId, skuId, description, price, quantity) VALUES (?,?,?,?,?)';
-            this.db.run(insert, [orderId, p.SKUId, p.description, p.price, p.qty], function (err) {
+            const insert = 'INSERT INTO "products-rko" (orderId, skuId, description, price, quantity, itemId) VALUES (?,?,?,?,?,?)';
+            this.db.run(insert, [orderId, p.SKUId, p.description, p.price, p.qty, p.itemId], function (err) {
                 if (err) {
                     reject(err);
                     return;
@@ -137,11 +137,11 @@ class RestockOrderDBU {
                 throw (new Error("SKUitem does not exist. Operation aborted.", 9));
             // save SkuItemId and SKUid
             else
-                ids.push({ siId: isSKUitem, skId: ski.SKUId });
+                ids.push({ siId: isSKUitem, skId: ski.SKUId, itemId: ski.itemId});
         }
         const promises = ids.map((i) => new Promise(async (resolve, reject) => {
-            const addItem = 'INSERT INTO "sku-items-rko" (orderId, skuItemId, skuId) VALUES (?,?,?)';
-            this.db.run(addItem, [orderId, i.siId, i.skId], function (err) {
+            const addItem = 'INSERT INTO "sku-items-rko" (orderId, skuItemId, skuId, itemId) VALUES (?,?,?,?)';
+            this.db.run(addItem, [orderId, i.siId, i.skId, i.itemId], function (err) {
                 if (err) {
                     reject(err);
                     return;
@@ -226,13 +226,13 @@ class RestockOrderDBU {
     // private method to get products for a given orderId 
     #getProducts(orderId) {
         return new Promise((resolve, reject) => {
-            const sqlProd = 'SELECT skuId, description, price, quantity FROM "products-rko" S WHERE S.orderId=?';
+            const sqlProd = 'SELECT skuId, description, price, quantity, itemId FROM "products-rko" S WHERE S.orderId=?';
             this.db.all(sqlProd, [orderId], (err, rows) => {
                 if (err) {
                     reject(err);
                     return;
                 }
-                const products = rows.map((p) => new ProductRKO(p.skuId, p.description, p.price, p.quantity));
+                const products = rows.map((p) => new ProductRKO(p.skuId, p.description, p.price, p.quantity, p.itemId));
                 resolve(products);
             });
         });
@@ -241,7 +241,7 @@ class RestockOrderDBU {
     // private method to get skuItems for a given orderId 
     #getSkuItems(orderId) {
         return new Promise((resolve, reject) => {
-            const sqlSKUi = 'SELECT S.SKUId as SKUId, S.RFID as rfid FROM "SKU-ITEMS" S JOIN "sku-items-rko" R ON R.SKUitemId=S.id WHERE R.orderId = ?';
+            const sqlSKUi = 'SELECT S.SKUId as SKUId, S.RFID as rfid, R.itemId as itemId FROM "SKU-ITEMS" S JOIN "sku-items-rko" R ON R.SKUitemId=S.id WHERE R.orderId = ?';
             this.db.all(sqlSKUi, [orderId], (err, rows) => {
                 if (err) {
                     reject(err);

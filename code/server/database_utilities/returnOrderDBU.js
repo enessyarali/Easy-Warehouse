@@ -68,8 +68,8 @@ class ReturnOrderDBU {
         const orderId = await this.#insertOrder(returnDate, restockOrderId);
         const promises = prod.map((p) => new Promise(async (resolve, reject) => {
             const skuItemId = await this.#checkSKUitem(p.RFID, p.SKUId);
-            const insert = 'INSERT INTO "products-rto" (orderId, skuId, description, price, skuItemId) VALUES (?,?,?,?,?)';
-            this.db.run(insert, [orderId, p.SKUId, p.description, p.price, skuItemId], function (err) {
+            const insert = 'INSERT INTO "products-rto" (orderId, skuId, description, price, skuItemId, itemId) VALUES (?,?,?,?,?,?)';
+            this.db.run(insert, [orderId, p.SKUId, p.description, p.price, skuItemId, p.itemId], function (err) {
                 if (err) {
                     reject(err);
                     return;
@@ -108,7 +108,7 @@ class ReturnOrderDBU {
     // private method to get products for a given orderId 
     #getProducts(id) {
         return new Promise((resolve, reject) => {
-            const sqlProd = 'SELECT skuId, description, price, skuItemId FROM "products-rto" WHERE orderId=?';
+            const sqlProd = 'SELECT skuId, description, price, skuItemId, itemId FROM "products-rto" WHERE orderId=?';
             this.db.all(sqlProd, [id], (err, rows) => {
                 if (err) {
                     reject(err);
@@ -116,7 +116,7 @@ class ReturnOrderDBU {
                 }
                 const products = rows.map(async (p) => {
                     const rfId = await this.#retrieveRFID(p.skuItemId);
-                    return new ProductRTO(p.skuId, p.description, p.price, rfId);});
+                    return new ProductRTO(p.skuId, p.description, p.price, rfId, p.itemId);});
                 Promise.all(products).then((p) => resolve(p));
             });
         });
