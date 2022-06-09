@@ -7,8 +7,8 @@ import { toast } from "react-toastify";
 
 function NewPosition(props) {
     const [validated, setValidated] = useState(false);
-    const [barcode, setBarcode] = useState(props.positions && props.edit && props.positions.length>0 ? (props.positions[0].barcode):(""));
-    const [aisleID, setAisleID] = useState("");
+    const [barcode, setBarcode] = useState(props.positions && props.edit && props.positions.length>0 ? (props.positions[0].positionID):(""));
+    const [aisleID, setAisleID] = useState(0);
     const [row, setRow] = useState(0);
     const [col, setCol] = useState(0);
     const [maxVolume, setMaxVolume] = useState(0);
@@ -25,7 +25,7 @@ function NewPosition(props) {
         let usedBarcode = -1;
         if(!props.edit){
             for(let pos of props.positions){
-                if(pos.barcode === barcode)
+                if(pos.positionID === barcode)
                     usedBarcode = 1;
             }
         }
@@ -38,7 +38,7 @@ function NewPosition(props) {
         } else {
             if(props.edit){
                 const newPosition = {
-                    barcode:barcode,
+                    positionID:barcode,
                     newAisleID:aisleID,
                     newRow: row,
                     newCol: col,
@@ -52,7 +52,7 @@ function NewPosition(props) {
             }
             else{
             const newPosition = {
-                barcode:barcode,
+                positionID:barcode,
                 aisleID:aisleID,
                 row: row,
                 col: col,
@@ -63,8 +63,8 @@ function NewPosition(props) {
             props.addPosition(newPosition);
             setBarcode(""); 
             setAisleID(""); 
-            setRow(0); 
-            setCol(0); 
+            setRow(""); 
+            setCol(""); 
             setMaxVolume(0); 
             setMaxWeight(0);  
             setOccupiedVolume(0); 
@@ -98,7 +98,7 @@ function NewPosition(props) {
                       onChange={(e) => {setBarcode(e.target.value)
                                         const barc= e.target.value;
                                         for (let pos of props.positions){
-                                            if(pos.barcode === barc){
+                                            if(pos.positionID === barc){
                                                 setAisleID(pos.aisleID); 
                                                 setRow(pos.row); 
                                                 setCol(pos.col); 
@@ -115,8 +115,8 @@ function NewPosition(props) {
                       </option>  
                       {props.positions.length > 0 ? (
                         props.positions.map((p) => (
-                          <option value={p.barcode}>
-                            {p.barcode}
+                          <option value={p.positionID}>
+                            {p.positionID}
                           </option>
                         ))
                       ) : (
@@ -133,7 +133,7 @@ function NewPosition(props) {
               </Link>
               <Button variant="warning" id="submitButton" disabled={props.positions && (props.positions.length <= 0)} onClick={() => { 
                   for (let pos of props.positions){
-                    if(pos.barcode === barcode){
+                    if(pos.positionID === barcode){
                         setAisleID(pos.aisleID); 
                         setRow(pos.row); 
                         setCol(pos.col); 
@@ -157,7 +157,7 @@ function NewPosition(props) {
                     <Col xs={2} />
                     <Col xs={8}>
                         <Form.Group  >
-                            <Form.Label>Barcode:</Form.Label>
+                            <Form.Label>Position ID:</Form.Label>
                             <Form.Control
                                 autoFocus
                                 type='text'
@@ -167,7 +167,7 @@ function NewPosition(props) {
                                 required
                                 onChange={ev => setBarcode(ev.target.value)} />
                             <Form.Control.Feedback type="invalid">
-                                Please insert a valid barcode.
+                                Please insert a valid position ID.
                             </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
@@ -178,7 +178,7 @@ function NewPosition(props) {
                     <Col xs={2} />
                     <Col xs={8}>
                         <Form.Group  >
-                            <Form.Label>Aisle ID (3 characters):</Form.Label>
+                            <Form.Label>Aisle ID (4 digits):</Form.Label>
                             <Form.Control
                                 type='text'
                                 id="aisleIDField"
@@ -197,12 +197,11 @@ function NewPosition(props) {
                     <Col xs={2} />
                     <Col xs={8}>
                         <Form.Group controlId='number'>
-                            <Form.Label>Row:</Form.Label>
+                            <Form.Label>Row (4 digits):</Form.Label>
                             <Form.Control
-                                type='number'
+                                type='text'
                                 id="rowField"
                                 value={row}
-                                min={0}
                                 required
                                 onChange={ev => setRow(ev.target.value)} />
                             <Form.Control.Feedback type="invalid">
@@ -217,12 +216,11 @@ function NewPosition(props) {
                     <Col xs={2} />
                     <Col xs={8}>
                         <Form.Group controlId='number'>
-                            <Form.Label>Col:</Form.Label>
+                            <Form.Label>Col(4 digits):</Form.Label>
                             <Form.Control
-                                type='number'
+                                type='text'
                                 id="colField"
                                 value={col}
-                                min={0}
                                 required
                                 onChange={ev => setCol(ev.target.value)} />
                             <Form.Control.Feedback type="invalid">
@@ -319,7 +317,7 @@ function NewPosition(props) {
                 <Row>
                     <Col md={6} xs={6}/>
                     {!props.edit && <Col md={2} xs={1}>
-                        <Button id="clearButton" onClick={() => { setBarcode(""); setAisleID(""); setRow(0); setCol(0); setMaxVolume(0); setMaxWeight(0); setOccupiedVolume(0); setOccupiedWeight(0);  setValidated(false); }} type="button" variant="secondary" className="float-right">Clear</Button>
+                        <Button id="clearButton" onClick={() => { setBarcode(""); setAisleID(""); setRow(""); setCol(""); setMaxVolume(0); setMaxWeight(0); setOccupiedVolume(0); setOccupiedWeight(0);  setValidated(false); }} type="button" variant="secondary" className="float-right">Clear</Button>
                     </Col>}
                     <Col md={1} xs={3} className="pl-5">
                         <Button variant="warning" color="black" id="submitButton" type="submit" className="float-right ">{props.edit ?("Edit"):("Create")} Position</Button>

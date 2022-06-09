@@ -15,9 +15,10 @@ function NewRestockOrder(props) {
     const [issueDate, setIssueDate] = useState (date.toLocaleString('ja-JP',options).replace(',',''));
 
     //Fields of every product
-    const [id, setId] = useState (props.skus && props.skus.length > 0 ? (props.skus[0].id):(0));
+    const [id, setId] = useState (0);
     const [description, setDescription] = useState("");
     const [quantity,setQuantity] = useState(1);
+    const [itemId,setItemId] = useState(0);
     const [price,setPrice] = useState (0.01);
 
     const [show,setShow] = useState (false);
@@ -105,7 +106,7 @@ function NewRestockOrder(props) {
               <Col>
                 <Form>
                   <Form.Group>
-                    <Form.Label>Select SKU</Form.Label>
+                    <Form.Label>Select SKU (according to products sold by supplier)</Form.Label>
                     <Form.Select
                       id="selectSKU"
                       onChange={(e) => {setId(e.target.value)
@@ -114,6 +115,11 @@ function NewRestockOrder(props) {
                                             if(sku.id*1 === id*1){
                                                 setDescription(sku.description);
                                             }
+                                        }
+                                        for(let item of props.items){
+                                          if (id*1 === item.SKUId*1 && supplierId*1 === item.supplierId*1){
+                                            setItemId(item.id)
+                                          }
                                         }
                     }}
                       
@@ -128,6 +134,14 @@ function NewRestockOrder(props) {
                                     {return false;}
                             }
                             return true;
+                        })
+                        //Filter according to current supplierId
+                        .filter((s)=>{
+                            for(let item of props.items){
+                              if (s.id*1 === item.SKUId*1 && supplierId*1 === item.supplierId*1)
+                                  {return true;}
+                            }
+                        return false;
                         })
                         .map((p) => (
                           <option value={p.id}>
@@ -168,7 +182,8 @@ function NewRestockOrder(props) {
             </Modal.Body>
             <Modal.Footer>
             <Button variant="secondary" onClick={()=>{
-                        setId(props.skus && props.skus.length > 0 ? (props.skus[0].id):(0));
+                        setId(0);
+                        setItemId(0);
                         setDescription("");
                         setQuantity(1);
                         setPrice(0.01);
@@ -180,8 +195,14 @@ function NewRestockOrder(props) {
                         setDescription(sku.description);  
                     }
                 }
+                for(let item of props.items){
+                  if (id*1 === item.SKUId*1 && supplierId*1 === item.supplierId*1){
+                    setItemId(item.id)
+                  }
+                }
                   const newProduct = {
                     SKUId: id,
+                    itemId: itemId,
                     description: description,
                     price: price,
                     qty: quantity
@@ -189,7 +210,8 @@ function NewRestockOrder(props) {
 
                   setProducts(oldList => {return [...oldList, newProduct];})
 
-                  setId(props.skus && props.skus.length > 0 ? (props.skus[0].id):(0));
+                  setId(0);
+                  setItemId(0);
                   setDescription("");
                   setQuantity(1);
                   setPrice(0.01);
@@ -265,7 +287,7 @@ function NewRestockOrder(props) {
                 <Row>
                     <Col xs={2} />
                     <Col xs={8}>
-                    <Button variant="warning" onClick={()=>{setShow(true)}}>Add SKU</Button> 
+                    <Button variant="warning" disabled={supplierId*1===0} onClick={()=>{setShow(true)}}>Add SKU</Button> 
                     </Col>
                     <Col xs={2} />
                 </Row>

@@ -136,12 +136,12 @@ async function logIn(credentials, type) {
   function editPositionBarcode(oldCode,newCode) {
     // call: PUT /api/position
     return new Promise((resolve, reject) => {
-      fetch("/api/position/"+oldCode+"/changeCode", {
+      fetch("/api/position/"+oldCode+"/changeID", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({newBarcode:newCode}),
+        body: JSON.stringify({newPositionID:newCode}),
       })
         .then((response) => {
           if (response.ok) {
@@ -170,7 +170,7 @@ async function logIn(credentials, type) {
   function editPosition(newPosition) {
     // call: PUT /api/position
     return new Promise((resolve, reject) => {
-      fetch("/api/position/"+newPosition.barcode, {
+      fetch("/api/position/"+newPosition.positionID, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

@@ -46,7 +46,7 @@ function Login(props) {
         <Form.Group size="lg">
           <Form.Label>Type of user</Form.Label>
           <Form.Select defaultValue="C" id="userType" onChange={e => setType(e.target.value)}>
-            <option value="C">Customer</option>
+            <option value="C">Internal Customer</option>
             <option value="M">Manager</option>
             <option value="S">Supplier</option>
             <option value="K">Clerk</option>
@@ -61,13 +61,15 @@ function Login(props) {
         </Button>
         </Form.Group>
         <br />
+        {/* 
         <Form.Group size="lg">
         <Link to="/register" style={{ color: 'white', textDecoration:'none'}}> 
           <Button variant="warning" block size="lg">
             Create a new account
           </Button>
         </Link>
-        </Form.Group>
+        </Form.Group>*/}
+        
         
       </Form>
     </div>

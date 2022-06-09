@@ -14,7 +14,7 @@ function EditPositionDeleteSKU (props){
         let found = 0;
         //Filter free positions
         for (let sku of props.skus){
-          if (sku.position === p.barcode){
+          if (sku.position === p.positionID){
             found = 1;
             break;
           }
@@ -40,7 +40,7 @@ function EditPositionDeleteSKU (props){
       })
       
       .map((pos) => (
-        pos.barcode
+        pos.positionID
       ))
     ) : (
       []
@@ -197,7 +197,7 @@ function EditPositionDeleteSKU (props){
                                             let found = 0;
                                             //Filter free positions
                                             for (let sku of props.skus){
-                                              if (sku.position === p.barcode){
+                                              if (sku.position === p.positionID){
                                                 found = 1;
                                                 break;
                                               }
@@ -223,8 +223,8 @@ function EditPositionDeleteSKU (props){
                                           })
                                           
                                           .map((pos) => (
-                                            <option value={pos.barcode}>
-                                              {pos.barcode}
+                                            <option value={pos.positionID}>
+                                              {pos.positionID}
                                             </option>
                                           ))
                                         ) : (
@@ -232,7 +232,7 @@ function EditPositionDeleteSKU (props){
                                         )} 
                       </Form.Select>
                             <Form.Control.Feedback type="invalid">
-                                Please insert a valid barcode.
+                                Please insert a valid positionID.
                             </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
