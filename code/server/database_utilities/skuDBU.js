@@ -92,7 +92,7 @@ class SkuDBU {
     async deleteSKU(id) {
         // check whether there are tables referencing that sku
         const dependency = await this.#checkDependency(id);
-        if (dependency.some(d => d)) {
+        if (false && dependency.some(d => d)) {
             // if there is at least 1 dependency
             throw(new Error("Dependency detected. Delete aborted.", 14));
         }

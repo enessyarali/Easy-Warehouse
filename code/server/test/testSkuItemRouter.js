@@ -50,7 +50,7 @@ describe('test sku item apis', () => {
 
     // populate the DB
     beforeEach(async () => {
-        await dbSet.resetAutoInc();
+        await dbSet.resetTable();
         await agent.post('/api/sku').send(sku1);
         await agent.post('/api/sku').send(sku2);
         await agent.post('/api/skuitem').send(si1);

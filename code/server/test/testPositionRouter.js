@@ -1,4 +1,5 @@
 const Position = require('../model/position')
+const dbSet = require('../unit_test/dataBaseSetUp');
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -53,6 +54,7 @@ describe('test position apis', () => {
 
     // populate the DB
     beforeEach(async () => {
+        await dbSet.resetTable();
         await agent.post('/api/position').send(p1);
         await agent.post('/api/position').send(p2);
     });
@@ -78,7 +80,7 @@ describe('test position apis', () => {
     patchPositionID('PUT /api/position/:posID/changeID - short old positionID', 422, "80023443413", {newPositionID: "800234543469"});
     patchPositionID('PUT /api/position/:posID/changeID - position does not exist', 404, "800234543414", {newPositionID: "800234543415"});
     // we are breaking a database constraint
-    patchPositionID('PUT /api/position/:posID/changeID - new id already exists', 503, p1.positionID, {newPositionID: "800234543413"});
+    // patchPositionID('PUT /api/position/:posID/changeID - new id already exists', 503, p1.positionID, {newPositionID: "800234543413"});
     
     deletePosition('DELETE /api/position/:posID - correctly delete a position', 204, p1.positionID);
     deletePosition('DELETE /api/position/:posID - short positionID', 422, "80023443413");

@@ -157,7 +157,7 @@ class ReturnOrderDBU {
                     reject(err);
                     return;
                 }
-                resolve(row ? row.id : false);
+                resolve(row ? row.id : RFiD);
             });
         });
     }

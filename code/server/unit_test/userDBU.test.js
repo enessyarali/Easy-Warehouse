@@ -15,7 +15,7 @@ describe('Load Users' , () =>{
      beforeAll(async () => {
         //clear DB
         await dbSet.resetTable();
-
+        await dbSet.setupHardCodedUsers();
     });
     //at the end of all tests in this file
      afterAll(async () => {
@@ -75,6 +75,7 @@ describe('Add new Users' , () =>{
     beforeAll(async () => {
        //clear DB
        await dbSet.resetTable();
+       await dbSet.setupHardCodedUsers();
 
    });
    //at the end of all tests in this file
@@ -189,7 +190,7 @@ describe('Check Password' , () =>{
     beforeAll(async () => {
        //clear DB
        await dbSet.resetTable();
-
+       await dbSet.setupHardCodedUsers();
    });
    //at the end of all tests in this file
     afterAll(async () => {

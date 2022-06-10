@@ -207,7 +207,7 @@ class InternalOrderDBU {
                 reject(err);
                 return;
             }
-            resolve(row? row.id : false);;
+            resolve(row? row.id : rfid);
             });
         });
    }

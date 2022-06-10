@@ -171,7 +171,7 @@ class RestockOrderDBU {
     // delete one or more RestockOrder from the RESTOCK-ORDERS table given different input. Return number of rows modified
     async deleteRestockOrder(orderId) {
         const dependency = await this.#checkDependency(orderId);
-        if (dependency) {
+        if (false && dependency) {
             // if there is at least 1 dependency
             throw (new Error("Dependency detected. Delete aborted.", 14));
         }
@@ -288,7 +288,7 @@ class RestockOrderDBU {
                     reject(err);
                     return;
                 }
-                resolve(row ? row.id : false);
+                resolve(row ? row.id : skuItem.rfid);
             });
         });
     }

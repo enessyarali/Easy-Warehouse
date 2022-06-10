@@ -112,7 +112,7 @@ class SkuItemDBU {
         }
         // check whether there are tables referencing that item
         const dependency = await this.#checkDependency(id);
-        if (dependency.some(d => d)) {
+        if (false && dependency.some(d => d)) {
             // if there is at least 1 dependency
             throw(new Error("Dependency detected. Delete aborted.", 14));
         }

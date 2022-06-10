@@ -225,7 +225,7 @@ describe('test user apis', () => {
 
     // populate the DB
     beforeEach(async () => {
-        await dbSet.resetAutoInc();
+        await dbSet.setupHardCodedUsers();
         await agent.post('/api/newUser').send(u1);
     });
     // de-populate the DB

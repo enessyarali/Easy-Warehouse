@@ -36,6 +36,18 @@ exports.resetAutoInc = async () => {
     await resetPosition();
 }
 
+exports.setupHardCodedUsers = async () => {
+    await cleanUser();
+    await resetUser();
+    /* HARD CODED USERS */
+    await insertUser("John","Travolta","user1@ezwh.com","customer", "4Ehqbsh2XjnZg3pkKiYqjOM6Nam2OFfmb1C/IhPmalJ2q6IcoREbXIOdJhuI9f+RDa7ssd0B7hy652uE4/6LHA==","f1d75ca8a25b907e3970f32441d955cd5dce951ad45da6ae20");
+    await insertUser("Paul","Messy","qualityEmployee1@ezwh.com","qualityEmployee","4Ehqbsh2XjnZg3pkKiYqjOM6Nam2OFfmb1C/IhPmalJ2q6IcoREbXIOdJhuI9f+RDa7ssd0B7hy652uE4/6LHA==","f1d75ca8a25b907e3970f32441d955cd5dce951ad45da6ae20");
+    await insertUser("Hugo","Reyes","clerk1@ezwh.com","clerk","GXLk4tKsDYs+3S64luKAXk/IVjek15f8LwL3pa695+8xMCSQ4xsfRNjY0z2WemkvRY1aujFDeq2RnWI7VufwpQ==","f969075f1939118f3121dac611c3d3ea2dcee600bff747688d");
+    await insertUser("Sayid","Jarrah","deliveryEmployee1@ezwh.com","deliveryEmployee","tZvIde5C0zHfNozUTgOLL3HG3/w2fdI9kLw8GQ/mTc68biCgiLjsx6tdzCH07QUxztTVa/viTqau13Z0AJz6Mg==","b89ceaf137eeb67699852a1cd92802292a0639b9770e0ca9d8");
+    await insertUser("Ben","Linus","supplier1@ezwh.com","supplier","SEL5Qj2mK6MfoNfaSjNWON7Vgd4FxYVPhmPDmmt/CUz/+zIDxK6/ZxLggWyM1r7xX0jF2YyY++gPEXza+UYaDg==","f1878c01fe90cb45aa54b7d26e10a7a4cadcd6a92b8d3b4170");
+    await insertUser("Andy","Cheaper","manager1@ezwh.com","manager","oduc+F0kCin6RqAvc34itVMdRFvy3GlnEMZ2CtD2kIiZbR8DLdE4cZX1OxORTuTzidVfwWDm0A7PtJQ++PFKwg==","dfdc8ea7e2d41c58dfc23505be7697511cd4a4d560fe6262ad");
+}
+
 exports.voidRestockOrder = async () => {
     await cleanRestockOrder();
     await cleanProductRko();
@@ -180,12 +192,14 @@ async function fillTable() {
     await insertItem(2,'dI2',1,2,5);
     //await insertItem(3,'dI3',1,2,5);      the insertion of this item causes problems
 
+    /* HARD CODED USERS */
+    await insertUser("John","Travolta","user1@ezwh.com","customer", "4Ehqbsh2XjnZg3pkKiYqjOM6Nam2OFfmb1C/IhPmalJ2q6IcoREbXIOdJhuI9f+RDa7ssd0B7hy652uE4/6LHA==","f1d75ca8a25b907e3970f32441d955cd5dce951ad45da6ae20");
+    await insertUser("Paul","Messy","qualityEmployee1@ezwh.com","qualityEmployee","4Ehqbsh2XjnZg3pkKiYqjOM6Nam2OFfmb1C/IhPmalJ2q6IcoREbXIOdJhuI9f+RDa7ssd0B7hy652uE4/6LHA==","f1d75ca8a25b907e3970f32441d955cd5dce951ad45da6ae20");
+    await insertUser("Hugo","Reyes","clerk1@ezwh.com","clerk","GXLk4tKsDYs+3S64luKAXk/IVjek15f8LwL3pa695+8xMCSQ4xsfRNjY0z2WemkvRY1aujFDeq2RnWI7VufwpQ==","f969075f1939118f3121dac611c3d3ea2dcee600bff747688d");
+    await insertUser("Sayid","Jarrah","deliveryEmployee1@ezwh.com","deliveryEmployee","tZvIde5C0zHfNozUTgOLL3HG3/w2fdI9kLw8GQ/mTc68biCgiLjsx6tdzCH07QUxztTVa/viTqau13Z0AJz6Mg==","b89ceaf137eeb67699852a1cd92802292a0639b9770e0ca9d8");
+    await insertUser("Ben","Linus","supplier1@ezwh.com","supplier","SEL5Qj2mK6MfoNfaSjNWON7Vgd4FxYVPhmPDmmt/CUz/+zIDxK6/ZxLggWyM1r7xX0jF2YyY++gPEXza+UYaDg==","f1878c01fe90cb45aa54b7d26e10a7a4cadcd6a92b8d3b4170");
+    await insertUser("Andy","Cheaper","manager1@ezwh.com","manager","oduc+F0kCin6RqAvc34itVMdRFvy3GlnEMZ2CtD2kIiZbR8DLdE4cZX1OxORTuTzidVfwWDm0A7PtJQ++PFKwg==","dfdc8ea7e2d41c58dfc23505be7697511cd4a4d560fe6262ad");
     await insertUser('testName','surname1','mail1','customer','psw1','salt1');
-    /*await insertUser('testName','surname2','mail2','qualityemployee','psw2','salt2');
-    await insertUser('testName','surname3','mail3','clerk','psw3','salt3');
-    await insertUser('testName','surname4','mail4','deliveryEmployee','psw4','salt4');
-    await insertUser('testName','surname5','mail5','supplier','psw5','salt5');
-    await insertUser('testName','surname6','mail6','manager','psw6','salt6');*/
 
     await insertPosition('111','1','1','1',500,500,100,100);
     await insertPosition('222','2','1','1',50,50,0,0);
@@ -552,7 +566,7 @@ function cleanItem(){
 
 function cleanUser(){
     return new Promise((resolve, reject) => {
-        const sqlDelete = 'DELETE FROM USERS WHERE name="testName"';
+        const sqlDelete = 'DELETE FROM USERS';
         db.run(sqlDelete, [], function (err) {
             if (err) {
                 reject(err);

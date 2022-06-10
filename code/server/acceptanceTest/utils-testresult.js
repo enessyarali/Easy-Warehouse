@@ -177,7 +177,7 @@ function testDeleteTestResultByRFIDandID(agent, expCode, rfid){
     });
 }
 
-function testDeleteAllTestResultByRFID(agent, expCode, rfid){
+/*function testDeleteAllTestResultByRFID(agent, expCode, rfid){
     describe(' get /api/skuitems/:rfid/testResults', function(){
         it('Delete all test results associated to a certain rfid', function(done){
             agent.get('/api/skuitems/'+rfid+'/testResults')
@@ -195,7 +195,23 @@ function testDeleteAllTestResultByRFID(agent, expCode, rfid){
             }).catch(err=>done(err));
         });
     });
+}*/
+function testDeleteAllTestResultByRFID(agent, expCode, rfid){
+    describe(' get /api/skuitems/:rfid/testResults', function(){
+        it('Delete all test results associated to a certain rfid', async function(){
+            const res = await agent.get('/api/skuitems/'+rfid+'/testResults');
+            res.should.have.status(expCode);
+            res.body.should.be.a('array');
+            //console.log("delete all", res.body);
+            let res2;
+            for(let i=0; i<res.body.length; i++){
+                res2 = await agent.delete('/api/skuitems/'+rfid+'/testResult/'+res.body[i].id)
+                res2.should.have.status(204);
+            }    
+        });
+    });
 }
+
 
 exports.newTestResult = newTestResult
 exports.testPostNewTestResult = testPostNewTestResult

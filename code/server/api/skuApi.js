@@ -40,9 +40,9 @@ router.get('/api/skus/:id', async (req,res) => {
 // POST /api/sku
 // add a new sku to the database
 router.post('/api/sku', async (req,res) => {
-  if (req.body === undefined || req.body.description === undefined || req.body.weight === undefined || req.body.weight <= 0 || 
+  if (req.body === undefined || !req.body.description || req.body.weight === undefined || req.body.weight <= 0 || 
       req.body.volume === undefined || req.body.volume <= 0 || req.body.price === undefined || req.body.price <= 0 ||
-      req.body.notes === undefined || req.body.availableQuantity === undefined || req.body.availableQuantity < 0 ||
+      !req.body.notes || req.body.availableQuantity === undefined || req.body.availableQuantity < 0 ||
       typeof req.body.weight !== 'number' || typeof req.body.volume !== 'number' || typeof req.body.price !== 'number' ||
       typeof req.body.availableQuantity !== 'number' || !Number.isInteger(req.body.weight) || !Number.isInteger(req.body.volume) ||
       !Number.isInteger(req.body.availableQuantity)) {
@@ -128,7 +128,7 @@ router.put('/api/sku/:id/position', async (req,res) => {
 // remove a sku from the database
 router.delete('/api/skus/:id', async (req,res) => {
   const id = parseInt(req.params.id);
-  if (!Number.isInteger(id) || id < 1) {
+  if (!Number.isInteger(id) || id < 0) {
     return res.status(422).json({error: `Validation of id failed`});
   }
   try{
