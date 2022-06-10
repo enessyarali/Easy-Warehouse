@@ -86,7 +86,7 @@ function testGetItemnotfound(agent, id, expCode){
 }
 
 
-/*function deleteAllItems(agent){
+function deleteAllItems(agent){
     describe('Removing all Items', function(){
         it('Getting Items', function(done){
             agent.get('/api/items')
@@ -102,21 +102,6 @@ function testGetItemnotfound(agent, id, expCode){
                 }
                 done();
             }).catch(err => done(err));
-        });
-    });
-}*/
-function deleteAllItems(agent){
-    describe('Removing all Items', function(){
-        it('Getting Items', async function(){
-            const res = await agent.get('/api/items');
-            res.should.have.status(200);
-            if(res.body.length !==0) {
-                let res2;
-                for (let i = 0; i< res.body.length; i++){
-                    res2 = agent.delete('/api/items/'+res.body[i].id);
-                    res2.should.have.status(204);
-                    }
-                }
         });
     });
 }

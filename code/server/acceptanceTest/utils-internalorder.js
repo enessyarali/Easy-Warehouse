@@ -69,7 +69,7 @@ function testPostWrongNewInternalOrders(agent, intord, expCode){
     });
 }
 
-/*function deleteAllInternalOrders(agent){
+function deleteAllInternalOrders(agent){
     describe('Removing all Internal Orders', function(){
         it('Getting Interna Orders', function(done){
             agent.get('/api/internalOrders')
@@ -87,24 +87,7 @@ function testPostWrongNewInternalOrders(agent, intord, expCode){
             }).catch(err => done(err));
         });
     });
-}*/
-function deleteAllInternalOrders(agent){
-    describe('Removing all Internal Orders', function(){
-        it('Getting Interna Orders', async function(){
-            const res = await agent.get('/api/internalOrders');
-            res.should.have.status(200);
-            if(res.body.length !==0) {
-                let res2;
-                for (let i = 0; i< res.body.length; i++){
-                    res2 = await agent.delete('/api/internalOrders/'+res.body[i].id);
-                    res2.should.have.status(204);
-                }
-            }
-        });
-    });
 }
-
-
 
 function testGetAllInternalOrders(agent, size, expCode){
     describe(' get /api/internalOrders', function(){
