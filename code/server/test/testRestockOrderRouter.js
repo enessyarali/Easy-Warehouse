@@ -32,7 +32,7 @@ const agent = chai.request.agent(app);
  *      FR5.11 Delete a restock order
  */
 
-describe('test restock order apis', () => {
+describe.only('test restock order apis', () => {
 
     let sku1 = new SKU(undefined, "Eurovision 2022 CD", 1, 1, "Fragile!", null, 8.99, 30);
     let sku2 = new SKU(undefined, "Chiara Ferragni's brand water", 1, 1, "$$$", null, 800.99, 1);
@@ -251,7 +251,7 @@ describe('test restock order apis', () => {
 
     deleteRestockOrder('DELETE /api/restockOrder/:id - correctly delete an order', 204, null, ro1);
     deleteRestockOrder('DELETE /api/restockOrder/:id - passing a negative id', 422, -2);
-    deleteRestockOrder('DELETE /api/restockOrder/:id - order does not exist', 404, 100000000);
+    deleteRestockOrder('DELETE /api/restockOrder/:id - order does not exist', 204, 100000000);
 });
 
 // FR5.0.1 List all restock orders
