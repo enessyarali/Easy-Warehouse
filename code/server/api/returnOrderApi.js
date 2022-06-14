@@ -43,7 +43,8 @@ router.post('/api/returnOrder', async (req,res) => {
     || req.body.products === undefined || !Array.isArray(req.body.products)
     || req.body.restockOrderId === undefined 
     || req.body.products.some(p => (p.SKUId === undefined || typeof p.SKUId !== 'number' ||
-    p.SKUId <= 0 || p.description === undefined || p.price === undefined ||
+    !Number.isInteger(p.SKUId) || p.SKUId <= 0 || p.itemId === undefined || typeof p.itemId !== 'number' ||
+    !Number.isInteger(p.itemId) || p.itemId <= 0 || p.description === undefined || p.price === undefined ||
     typeof p.price !== 'number' || p.price <= 0 || p.RFID === undefined ||
     !validators.rfidIsValid(p.RFID)))
     || !Number.isInteger(parseInt(req.body.restockOrderId)) || parseInt(req.body.restockOrderId) <= 0) {
