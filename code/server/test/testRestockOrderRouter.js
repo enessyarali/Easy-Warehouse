@@ -32,7 +32,7 @@ const agent = chai.request.agent(app);
  *      FR5.11 Delete a restock order
  */
 
-describe.only('test restock order apis', () => {
+describe('test restock order apis', () => {
 
     let sku1 = new SKU(undefined, "Eurovision 2022 CD", 1, 1, "Fragile!", null, 8.99, 30);
     let sku2 = new SKU(undefined, "Chiara Ferragni's brand water", 1, 1, "$$$", null, 800.99, 1);

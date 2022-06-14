@@ -6,6 +6,7 @@ Date: 04 May 2022
 
 | Change | Description |
 |---|------|
+| <b>Fix issue</b> | NEW API: ITEM<br>GET<br>/api/items/:id/:supplierId (NEW API, instead of /api/items/:id)<br>PUT<br>/api/item/:id/:supplierId (NEW API, instead of /api/item/:id)<br>DELETE<br> /api/items/:id/:supplierId  (NEW API, instead of /api/items/:id) |
 |<b>Change1</b>| <b>Api that changes</b> <br> <b>RESTOCK ORDER</b> <br> GET <br> /api/restockOrders <br>  /api/restockOrdersIssued <br> /api/restockOrders/:id <br> /api/restockOrders/:id/returnItems <br> POST <br> /api/restockOrder <br> PUT <br> /api/restockOrder/:id/skuItems <br> <b>RETURN ORDER</b> <br> GET <br> /api/returnOrders <br> /api/returnOrders/:id <br> POST <br> /api/returnOrder <br>  |
 | issue 2 | fixed comment, 'delete a position receiving its positionId |
 | issue 11 | fixed POST /api/item,  now receives both SKU.id and Item.id |
@@ -1316,10 +1317,10 @@ Returns an array of all restock orders in state = ISSUED. Example:
 - **Permissions allowed**:  Manager, Supplier
 - **Error responses**:  `401 Unauthorized` (not logged in or wrong permissions), `500 Internal Server Error` (generic error).
 
-#### **/api/items/:id**
+#### **/api/items/:id/:supplierId**
 
-- **Return an item, given its id**.
-- **Request header** : req.params.id to retrieve id
+- **Return an item, given its id and supplierId**.
+- **Request header** : req.params.id to retrieve id, req.params.supplierId to retrieve supplierId
 - **Request body**: none
 - **Response**: `200 OK` (success); body: An object describing the Item
 
@@ -1363,10 +1364,10 @@ Returns an array of all restock orders in state = ISSUED. Example:
 
 ### PUT
 
-#### **/api/item/:id**
+#### **/api/item/:id/:supplierId**
 
 - **Modify an existing item.**
-- **Request header** has a line: `Content-Type: application/json` and req.params.id to retrieve id.
+- **Request header** has a line: `Content-Type: application/json`, req.params.id to retrieve id and req.params.supplierId to retrieve supplierId.
 - **Request body**: a JSON object containing id and new description and new Price.
 If some fields doesn't change, send the old value.
 
@@ -1384,10 +1385,10 @@ Example of Request body
 
 ### DELETE
 
-#### **/api/items/:id**
+#### **/api/items/:id/:supplierId**
 
-- **Delete an item receiving its id.**
-- **Request header** : req.params.id to retrieve id
+- **Delete an item receiving its id and supplierId.**
+- **Request header** : req.params.id to retrieve id and req.params.supplierId to retrieve supplierId
 - **Request body**: none
 - **Response header**:  `204 No Content` (success).
 - **Response body**: none.
