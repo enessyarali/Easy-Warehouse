@@ -24,11 +24,11 @@ class ItemDBU {
     }
 
 // get item(s) from the ITEM table and return it/them as an Item object
-    loadItem(id = undefined) {
+    loadItem(id = undefined, supplierId = undefined) {
         return new Promise((resolve, reject) => {
             const sqlNull = 'SELECT * FROM ITEMS';
-            const sqlWithId = 'SELECT * FROM ITEMS WHERE id=?';
-            this.db.all(id ? sqlWithId : sqlNull, id ? [id] : [], (err, rows) => { 
+            const sqlWithId = 'SELECT * FROM ITEMS WHERE id=? AND supplierId=?';
+            this.db.all(id ? sqlWithId : sqlNull, id ? [id, supplierId] : [], (err, rows) => { 
                 if (err) {
                     reject(err);
                     return;
@@ -69,10 +69,10 @@ class ItemDBU {
     }
 
 // update a selected Item in the ITEM table. Return number of rows modified
-    updateItem(id, newDescription, newPrice) {
+    updateItem(id, newDescription, newPrice, supplierId) {
         return new Promise((resolve, reject) => {
-            const sqlUpdate = 'UPDATE ITEMS SET description = ?, price = ? WHERE id = ?;'
-            this.db.run(sqlUpdate, [newDescription, newPrice, id], function (err) {
+            const sqlUpdate = 'UPDATE ITEMS SET description = ?, price = ? WHERE id = ? AND supplierId = ?;'
+            this.db.run(sqlUpdate, [newDescription, newPrice, id, supplierId], function (err) {
                 if(err) {
                     reject(err);
                     return;
@@ -88,10 +88,10 @@ class ItemDBU {
     deleteItem(itemId=undefined,supplierId=undefined,skuId=undefined) {        
         let sqlInfo = {sql: undefined, values: undefined};
 
-        if(itemId || itemId === 0) {
-            const sqlDeleteFromItem = 'DELETE FROM ITEMS WHERE id = ?';
+        if((itemId && supplierId) || itemId === 0) {
+            const sqlDeleteFromItem = 'DELETE FROM ITEMS WHERE id = ? AND supplierId = ?';
             sqlInfo.sql = sqlDeleteFromItem;
-            sqlInfo.values = [itemId];
+            sqlInfo.values = [itemId, supplierId];
         }
         else if(supplierId) {
             const sqlDeleteFromSupplier = 'DELETE FROM ITEMS WHERE supplierId = ?';
