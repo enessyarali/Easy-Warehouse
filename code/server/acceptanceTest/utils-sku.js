@@ -53,7 +53,7 @@ function testPostNewSku(agent, thesku, expCode) {
     });
 }
 
-/*function deleteAllSkus(agent) {
+function deleteAllSkus(agent) {
     describe('removing all skus', function() {
         it('Getting SKUs', function (done) {
             agent.get('/api/skus')
@@ -71,27 +71,7 @@ function testPostNewSku(agent, thesku, expCode) {
             }).catch(err => done(err));
         });
     });
-}*/
-
-// working version of deleteAllSkus (otherwise it is not possible to test CRUD-SKUItems locally)
-function deleteAllSkus(agent) {
-    describe('removing all skus', function() {
-        it('Getting SKUs', async function () {
-            const res = await agent.get('/api/skus');
-            res.should.have.status(200);
-            if (res.body.length !==0) {
-                let res2;
-                for (let i = 0; i < res.body.length; i++) {
-                    res2 = await agent.delete('/api/skus/'+res.body[i].id)
-                    console.log(res2.body);
-                    console.log(res.body[i].id);
-                    res2.should.have.status(204);
-                }
-            } 
-        });
-    });
 }
-
 function testGetAllSkus(agent, sku, size, expCode) {
     
     describe('get /api/skus', function() {

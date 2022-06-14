@@ -80,7 +80,7 @@ function testPostNewWrongRestockOrder(agent, myrestock, expCode){
     });
 }
 
-/*function deleteAllRestockOrders(agent){
+function deleteAllRestockOrders(agent){
     describe('Removing all Restock orders', function(){
         it('Getting and removing', function(done){
             agent.get('/api/restockOrders')
@@ -98,24 +98,7 @@ function testPostNewWrongRestockOrder(agent, myrestock, expCode){
             }).catch(err => done(err));
         });
     });
-}*/
-function deleteAllRestockOrders(agent){
-    describe('Removing all Restock orders', function(){
-        it('Getting and removing', async function(){
-            const res = await agent.get('/api/restockOrders');
-            //console.log(res.body);
-            res.should.have.status(200);
-            if(res.body.length !==0){
-                let res2;
-                for( let i=0; i< res.body.length; i++){
-                    res2 = await agent.delete('/api/restockOrder/'+res.body[i].id)
-                    res2.should.have.status(204);
-                }
-            }
-        });
-    });
 }
-
 
 function testGetAllRestockOrders(agent, myrestocks, expCode){
     describe(' get /api/restockOrders', function(){
