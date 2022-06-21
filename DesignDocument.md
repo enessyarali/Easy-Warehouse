@@ -264,16 +264,16 @@ Delete from the database the internal order with matching id by calling db.delet
 `.get('/api/items')`
 Retrieve all items in the database by calling db.loadItem().
 
-`.get('/api/items/:id')`
+`.get('/api/items/:id/:supplierId')`
 Retrieve the item with matching id from the database by calling db.loadItem(id).
 
 `.post('/api/item')`
 Add a new item with data from request body in the database by calling db.insertItem(id, description, price, SKUId, supplierId).
 
-`.put('/api/item/:id')`
+`.put('/api/item/:id/:supplierId')`
 Update an existing item (with matching id) with a new description and a new price by calling db.updateItem(id, newDescription, newPrice) with data of request headers and body.
 
-`.delete('/api/item/:id')`
+`.delete('/api/items/:id/:supplierId')`
 Delete the item with matching id from the database by calling db.deleteItem(itemId).
 
 ## Database utilities
@@ -424,13 +424,13 @@ Update information of an existing InternalOrder in the database.
 Delete from the database the InternalOrder with matching orderId.
 
 **itemDBU**
-`  Array<Item> loadItem (itemId :Itenger=null)`  
+`  Array<Item> loadItem (itemId :Itenger=null, supplierId :Integer=null)`  
 Select all Item with the given itemId. If no itemId is provided, it returns all Items in the database.
 
 `  void insertItem (item :Item)`  
 Insert a new Item in the database.
 
-`  void updateItem (item :Item)`  
+`  void updateItem (itemId :Itenger, descriptor :String, price : Float, supplierId :Integer)`  
 Update information of an existing Item in the database.
 
 `  void deleteItem (itemId :Integer=null, supplierId :Integer=null, skuId :Integer=null)`  
