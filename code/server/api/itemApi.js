@@ -16,16 +16,17 @@ router.get('/api/items', async (req,res) => {
   }
 });
 
-router.get('/api/items/:id', async (req,res) => {
+router.get('/api/items/:id/:supplierId', async (req,res) => {
   // create connection with the db  
   try {
     const id = parseInt(req.params.id);
-    if(!Number.isInteger(id) || id < 0)
-      return res.status(422).json({error: `Invalid Item id.`});
+    const suppId = parseInt(req.params.supplierId);
+    if(!Number.isInteger(id) || id <= 0 || !Number.isInteger(suppId) || suppId <= 0)
+      return res.status(422).json({error: `Invalid item or supplier id.`});
     const db = new ItemDBU('ezwh.db');
-    const itemList = await db.loadItem(id);
+    const itemList = await db.loadItem(id, suppId);
     if(itemList.length === 0)
-      return res.status(404).json({error: `No Item with matching id.`});
+      return res.status(404).json({error: `No Item with matching id or supplier id.`});
     return res.status(200).json(itemList.pop());
   } catch (err) {
       return res.status(500).json({error: `Something went wrong...`, message: err.message});
@@ -61,20 +62,22 @@ router.post('/api/item', async (req,res) => {
 });
 
 
-// PUT /api/item/:id
+// PUT /api/item/:id/:supplierId
 // modify an item in the database
-router.put('/api/item/:id', async (req,res) => {
+router.put('/api/item/:id/:supplierId', async (req,res) => {
   const id = parseInt(req.params.id);
+  const suppId = parseInt(req.params.supplierId);
   if (req.body === undefined || req.body.newDescription === undefined || 
-    req.body.newPrice == undefined || req.body.newPrice < 0 || typeof req.body.newPrice !== 'number') {
+    req.body.newPrice == undefined || req.body.newPrice < 0 || typeof req.body.newPrice !== 'number' ||
+    !Number.isInteger(id) || id <= 0 || !Number.isInteger(suppId) || suppId <= 0) {
     return res.status(422).json({error: `Invalid item data.`});
   }
   try{
       const db = new ItemDBU('ezwh.db');
       // get the item to be modified
-      const updated = await db.updateItem(id, req.body.newDescription, req.body.newPrice);
+      const updated = await db.updateItem(id, req.body.newDescription, req.body.newPrice, suppId);
       if(!updated)
-        return res.status(404).json({error: `No item with matching id.`});
+        return res.status(404).json({error: `No item with matching id and supplier id.`});
       return res.status(200).end();
   }
   catch(err){
@@ -85,18 +88,19 @@ router.put('/api/item/:id', async (req,res) => {
 });
 
 
-// DELETE /api/item/:id
+// DELETE /api/item/:id/:supplierId
 // remove a item from the database
-router.delete('/api/items/:id', async (req,res) => {
+router.delete('/api/items/:id/:supplierId', async (req,res) => {
   const id = parseInt(req.params.id);
-  if (!Number.isInteger(id) || id < 0) {
-    return res.status(422).json({error: `Validation of id failed`});
+  const suppId = parseInt(req.params.supplierId);
+  if (!Number.isInteger(id) || id < 0 || !Number.isInteger(suppId) || suppId <= 0) {
+    return res.status(422).json({error: `Validation of id or supplier id failed.`});
   }
   try{
       const db = new ItemDBU('ezwh.db');
-      const deleted = await db.deleteItem(id);
+      const deleted = await db.deleteItem(id, suppId);
       if (!deleted)
-        return res.status(404).json({error: `No Item with matching id.`});
+        return res.status(404).json({error: `No Item with matching id and supplier id.`});
       return res.status(204).end();
   }
   catch(err){

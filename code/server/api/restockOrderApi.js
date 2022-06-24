@@ -100,10 +100,11 @@ router.get('/api/restockOrders/:id/returnItems', async (req,res) => {
 // POST /api/restockOrder
 // add a new restockOrder to the database
 router.post('/api/restockOrder', async (req,res) => {
-  if (req.body === undefined || req.body.issueDate == undefined || !validators.dateIsValid(req.body.issueDate) || 
+  if (req.body === undefined || req.body.issueDate === undefined || !validators.dateIsValid(req.body.issueDate) || 
       req.body.products === undefined || !Array.isArray(req.body.products) ||
       req.body.products.some(p => (p.SKUId === undefined || typeof p.SKUId !== 'number' ||
-      p.SKUId <= 0 || p.description === undefined || p.price === undefined ||
+      !Number.isInteger(p.SKUId) || p.SKUId <= 0 || p.itemId === undefined || typeof p.itemId !== 'number' ||
+      !Number.isInteger(p.itemId) || p.itemId <= 0 || p.description === undefined || p.price === undefined ||
       typeof p.price !== 'number' || p.price <= 0 || p.qty === undefined || typeof p.qty !== 'number' ||
       !Number.isInteger(p.qty) || p.qty < 0)) ||
       req.body.supplierId === undefined || typeof req.body.supplierId !== 'number' 
@@ -152,7 +153,8 @@ router.put('/api/restockOrder/:id/skuItems', async (req,res) => {
     return res.status(422).json({error: `Invalid restockOrder id.`});
   if (req.body === undefined || req.body.skuItems === undefined || !Array.isArray(req.body.skuItems) ||
     req.body.skuItems.some((i) => (i.SKUId===undefined || typeof i.SKUId !== 'number' ||
-    i.SKUId <= 0 || i.rfid===undefined || !validators.rfidIsValid(i.rfid)))) {
+    !Number.isInteger(i.SKUId) || i.SKUId <= 0 || i.itemId===undefined || typeof i.itemId !== 'number' ||
+    !Number.isInteger(i.itemId) || i.itemId <=0 || i.rfid===undefined || !validators.rfidIsValid(i.rfid)))) {
     return res.status(422).json({error: `Invalid restockOrder data.`});
   }
   try{
@@ -222,9 +224,7 @@ router.delete('/api/restockOrder/:id', async (req,res) => {
   try{
       const db = new RestockOrderDBU('ezwh.db');
       // delete the restockOrder
-      const deleted = await db.deleteRestockOrder(id);
-      if (deleted.every(d => !d))
-        return res.status(404).json({error: `No restockOrder with matching id.`});
+      await db.deleteRestockOrder(id);
       return res.status(204).end();
   }
   catch(err){

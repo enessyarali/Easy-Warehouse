@@ -56,47 +56,47 @@ describe('test restock order apis', () => {
     tr3.rfid = "12345678901234567890123456789017";
 
     const ro1 = new RestockOrder(undefined, "2022/05/19 08:53", "ISSUED", 5, undefined);
-    ro1.setProducts([{"SKUId":undefined,"description":"Eurovision 2022 CD","price":10.99,"qty":2},
-                    {"SKUId":undefined,"description":"Watermelon","price":7.99,"qty":1}]);
+    ro1.setProducts([{"SKUId":undefined, "description":"Eurovision 2022 CD","price":10.99,"qty":2, "itemId": 1},
+                    {"SKUId":undefined,"description":"Watermelon","price":7.99,"qty":1, "itemId": 2}]);
 
     const ro2 = new RestockOrder(undefined, "2022/05/20 08:53", "DELIVERY", 5, '{"deliveryDate":"2022/05/29"}');
-    ro2.setProducts([{"SKUId":undefined,"description":"Chiara Ferragni's brand water","price":1000.99,"qty":1},
-                    {"SKUId":undefined,"description":"Banana","price":0.99,"qty":1}]);
+    ro2.setProducts([{"SKUId":undefined,"description":"Chiara Ferragni's brand water","price":1000.99,"qty":1, "itemId": 3},
+                    {"SKUId":undefined,"description":"Banana","price":0.99,"qty":1, "itemId": 4}]);
 
     const ro3 = new RestockOrder(undefined, "2022/05/21 08:53", "ISSUED", 5, undefined);
-    ro3.setProducts([{"SKUId":undefined,"description":"Eurovision 2022 CD","price":10.99,"qty":2},
-                    {"SKUId":undefined,"description":"Watermelon","price":7.99,"qty":1}]);
+    ro3.setProducts([{"SKUId":undefined,"description":"Eurovision 2022 CD","price":10.99,"qty":2, "itemId": 1},
+                    {"SKUId":undefined,"description":"Watermelon","price":7.99,"qty":1, "itemId": 2}]);
 
     const ro4 = new RestockOrder(undefined, "2022/05/18 08:53", "COMPLETEDRETURN", 5, undefined);
-    ro4.setProducts([{"SKUId":undefined,"description":"Chiara Ferragni's brand water","price":1000.99,"qty":1},
-                    {"SKUId":undefined,"description":"Banana","price":0.99,"qty":1}]);
-    ro4.setSkuItems([{"SKUId": undefined, "rfid": "12345678901234567890123456789016"}, 
-                            {"SKUId": undefined, "rfid": "12345678901234567890123456789017"}]);
+    ro4.setProducts([{"SKUId":undefined,"description":"Chiara Ferragni's brand water","price":1000.99,"qty":1, "itemId": 3},
+                    {"SKUId":undefined,"description":"Banana","price":0.99,"qty":1, "itemId": 4}]);
+    ro4.setSkuItems([{"SKUId": undefined, "rfid": "12345678901234567890123456789016", "itemId": 3}, 
+                            {"SKUId": undefined, "rfid": "12345678901234567890123456789017", "itemId": 4}]);
 
     const ro5 = new RestockOrder(undefined, "2022/05/17 08:53", "DELIVERED", 5, undefined);
-    ro5.setProducts([{"SKUId":undefined,"description":"Chiara Ferragni's brand water","price":1000.99,"qty":1},
-                            {"SKUId":undefined,"description":"Banana","price":0.99,"qty":1}]);
+    ro5.setProducts([{"SKUId":undefined,"description":"Chiara Ferragni's brand water","price":1000.99,"qty":1, "itemId": 3},
+                            {"SKUId":undefined,"description":"Banana","price":0.99,"qty":1, "itemId": 4}]);
 
     // date has a wrong format
     const ro1_invalid = new RestockOrder(undefined, "2022-05-19", "ISSUED", 5, undefined);
-    ro1_invalid.setProducts([{"SKUId":undefined,"description":"Eurovision 2022 CD","price":10.99,"qty":2},
-                    {"SKUId":undefined,"description":"Watermelon","price":7.99,"qty":1}]);
+    ro1_invalid.setProducts([{"SKUId":undefined,"description":"Eurovision 2022 CD","price":10.99,"qty":2, "itemId": 1},
+                    {"SKUId":undefined,"description":"Watermelon","price":7.99,"qty":1, "itemId": 2}]);
     // date is in the future
     const ro2_invalid = new RestockOrder(undefined, "2122/05/19", "ISSUED", 5, undefined);
-    ro2_invalid.setProducts([{"SKUId":undefined,"description":"Eurovision 2022 CD","price":10.99,"qty":2},
-                    {"SKUId":undefined,"description":"Watermelon","price":7.99,"qty":1}]);
+    ro2_invalid.setProducts([{"SKUId":undefined,"description":"Eurovision 2022 CD","price":10.99,"qty":2, "itemId": 1},
+                    {"SKUId":undefined,"description":"Watermelon","price":7.99,"qty":1, "itemId": 2}]);
     // product has missing SKUId field
     const ro3_invalid = new RestockOrder(undefined, "2022/05/19 08:53", "ISSUED", 5, undefined);
-    ro3_invalid.setProducts([{"SKUId":undefined,"description":"Eurovision 2022 CD","price":10.99,"qty":2},
-                    {"SKUId":undefined,"description":"Watermelon","price":7.99,"qty":1}]);
+    ro3_invalid.setProducts([{"SKUId":undefined,"description":"Eurovision 2022 CD","price":10.99,"qty":2, "itemId": 1},
+                    {"SKUId":undefined,"description":"Watermelon","price":7.99,"qty":1, "itemId": 2}]);
     // supplier does not exist
     const ro4_invalid = new RestockOrder(undefined, "2022/05/19 08:53", "ISSUED", 1, undefined);
-    ro4_invalid.setProducts([{"SKUId":undefined,"description":"Eurovision 2022 CD","price":10.99,"qty":2},
-                    {"SKUId":undefined,"description":"Watermelon","price":7.99,"qty":1}]);
+    ro4_invalid.setProducts([{"SKUId":undefined,"description":"Eurovision 2022 CD","price":10.99,"qty":2, "itemId": 1},
+                    {"SKUId":undefined,"description":"Watermelon","price":7.99,"qty":1, "itemId": 2}]);
     // product has negative quantity
     const ro5_invalid = new RestockOrder(undefined, "2022/05/19 08:53", "ISSUED", 5, undefined);
-    ro5_invalid.setProducts([{"SKUId":undefined,"description":"Eurovision 2022 CD","price":10.99,"qty":2},
-                    {"SKUId":undefined,"description":"Watermelon","price":7.99,"qty":-1}]);
+    ro5_invalid.setProducts([{"SKUId":undefined,"description":"Eurovision 2022 CD","price":10.99,"qty":2, "itemId": 1},
+                    {"SKUId":undefined,"description":"Watermelon","price":7.99,"qty":-1, "itemId": 2}]);
 
     // populate the DB
     beforeEach(async () => {
@@ -190,8 +190,8 @@ describe('test restock order apis', () => {
         await agent.put(`/api/restockOrder/${ro2.id}/transportNote`).send({"transportNote":{"deliveryDate":"2022/05/29"}});
         await agent.put(`/api/restockOrder/${ro4.id}`).send({"newState":"DELIVERED"});
         await agent.put(`/api/restockOrder/${ro5.id}`).send({"newState":"DELIVERED"});
-        await agent.put(`/api/restockOrder/${ro4.id}/skuItems`).send({"skuItems":[{"SKUId": si2.SKUId, "rfid": "12345678901234567890123456789016"},
-                                                        {"SKUId": si4.SKUId, "rfid": "12345678901234567890123456789017"}]});
+        await agent.put(`/api/restockOrder/${ro4.id}/skuItems`).send({"skuItems":[{"SKUId": si2.SKUId, "rfid": "12345678901234567890123456789016", "itemId": 3},
+                                                        {"SKUId": si4.SKUId, "rfid": "12345678901234567890123456789017", "itemId": 4}]});
         await agent.put(`/api/restockOrder/${ro4.id}`).send({"newState":"COMPLETEDRETURN"});
     });
     // de-populate the DB
@@ -222,7 +222,7 @@ describe('test restock order apis', () => {
     getRestockOrder('GET /api/restockOrders/:id - passing a negative id', 422, -2);
     getRestockOrder('GET /api/restockOrders/:id - order does not exist', 404, 100000000);
 
-    getReturnItems('GET /api/restockOrders/:id/returnItems - correctly get the return items', 200, null, ro4, [{"SKUId": si4, "rfid": "12345678901234567890123456789017"}],);
+    getReturnItems('GET /api/restockOrders/:id/returnItems - correctly get the return items', 200, null, ro4, [{"SKUId": si4, "rfid": "12345678901234567890123456789017", "itemId": 4}],);
     getReturnItems('GET /api/restockOrders/:id/returnItems - order state is not COMPLETEDRETURN', 422, null, ro1);
     getReturnItems('GET /api/restockOrders/:id/returnItems - order does not exist', 404, 100000000);
 
@@ -242,16 +242,16 @@ describe('test restock order apis', () => {
     patchTransportNote('PUT /api/restockOrder/:id/transportNote - delivery date is before issue date', 422, {"transportNote":{"deliveryDate":"2021/12/29"}}, null, ro2);
     patchTransportNote('PUT /api/restockOrder/:id/transportNote - order does not exist', 404, {"transportNote":{"deliveryDate":"2022/12/29"}}, 100000000);
 
-    patchSkuItems('PUT /api/restockOrder/:id/skuItems - correctly add a list of sku items to an order', 200, {"skuItems":[{"SKUId": si4, "rfid": "12345678901234567890123456789017"}]}, null, ro5);
-    patchSkuItems('PUT /api/restockOrder/:id/skuItems - item is not inside an array', 422, {"skuItems": {"SKUId": si4, "rfid": "12345678901234567890123456789017"}}, null, ro5);
-    patchSkuItems('PUT /api/restockOrder/:id/skuItems - order state is not DELIVERED', 422, {"skuItems":[{"SKUId": si4, "rfid": "12345678901234567890123456789017"}]}, null, ro1);
-    patchSkuItems('PUT /api/restockOrder/:id/skuItems - order id is 0', 422, {"skuItems":[{"SKUId": si4, "rfid": "12345678901234567890123456789017"}]}, 0);
-    patchSkuItems('PUT /api/restockOrder/:id/skuItems - typo in a sku item field', 422, {"skuItems":[{"SKUid": 4, "rfid": "12345678901234567890123456789017"}]}, null, ro5);
-    patchSkuItems('PUT /api/restockOrder/:id/skuItems - order does not exist', 404, {"skuItems":[{"SKUId": si4, "rfid": "12345678901234567890123456789017"}]}, 100000000);
+    patchSkuItems('PUT /api/restockOrder/:id/skuItems - correctly add a list of sku items to an order', 200, {"skuItems":[{"SKUId": si4, "rfid": "12345678901234567890123456789017", "itemId": 4}]}, null, ro5);
+    patchSkuItems('PUT /api/restockOrder/:id/skuItems - item is not inside an array', 422, {"skuItems": {"SKUId": si4, "rfid": "12345678901234567890123456789017", "itemId": 4}}, null, ro5);
+    patchSkuItems('PUT /api/restockOrder/:id/skuItems - order state is not DELIVERED', 422, {"skuItems":[{"SKUId": si4, "rfid": "12345678901234567890123456789017", "itemId": 4}]}, null, ro1);
+    patchSkuItems('PUT /api/restockOrder/:id/skuItems - order id is 0', 422, {"skuItems":[{"SKUId": si4, "rfid": "12345678901234567890123456789017", "itemId": 4}]}, 0);
+    patchSkuItems('PUT /api/restockOrder/:id/skuItems - typo in a sku item field', 422, {"skuItems":[{"SKUid": 4, "rfid": "12345678901234567890123456789017", "itemId": 4}]}, null, ro5);
+    patchSkuItems('PUT /api/restockOrder/:id/skuItems - order does not exist', 404, {"skuItems":[{"SKUId": si4, "rfid": "12345678901234567890123456789017", "itemId": 4}]}, 100000000);
 
     deleteRestockOrder('DELETE /api/restockOrder/:id - correctly delete an order', 204, null, ro1);
     deleteRestockOrder('DELETE /api/restockOrder/:id - passing a negative id', 422, -2);
-    deleteRestockOrder('DELETE /api/restockOrder/:id - order does not exist', 404, 100000000);
+    deleteRestockOrder('DELETE /api/restockOrder/:id - order does not exist', 204, 100000000);
 });
 
 // FR5.0.1 List all restock orders
@@ -347,6 +347,7 @@ function checkProducts(dbRO, expectedRO) {
         p.description.should.equal(expectedRO.products[i].description);
         p.price.should.equal(expectedRO.products[i].price);
         p.qty.should.equal(expectedRO.products[i].qty);
+        p.itemId.should.equal(expectedRO.products[i].itemId);
         i++;
     }
 }
@@ -358,6 +359,7 @@ function checkSkuItems(siDB, expSkuItems) {
         for (let s of siDB) {
             s.SKUId.should.equal(expSkuItems[i].SKUId);
             s.rfid.should.equal(expSkuItems[i].rfid);
+            s.itemId.should.equal(expSkuItems[i].itemId);
             i++;
         }
     }

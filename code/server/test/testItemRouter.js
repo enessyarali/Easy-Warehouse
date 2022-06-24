@@ -84,8 +84,8 @@ describe('test item apis', () => {
     });
     // de-populate the DB
     afterEach( async () => {
-        await agent.delete('/api/items/1');
-        await agent.delete('/api/items/2');
+        await agent.delete('/api/items/1/5');
+        await agent.delete('/api/items/2/5');
         await agent.delete(`/api/skus/${sku1.id}`);
         await agent.delete(`/api/skus/${sku2.id}`);
         await agent.delete(`/api/skus/${sku3.id}`);
@@ -93,9 +93,9 @@ describe('test item apis', () => {
     });
 
     getAllItems('GET /api/items - retrieve all items in the system', 200, [i1, i2]);
-    getItem('GET /api/items/:id - correctly get an item', 200, i1.id, i1);
-    getItem('GET /api/items/:id - passing a negative id', 422, -2);
-    getItem('GET /api/items/:id - item does not exist', 404, 6);
+    getItem('GET /api/items/:id/:supplierId - correctly get an item', 200, i1.id, i1);
+    getItem('GET /api/items/:id/:supplierId - passing a negative id', 422, -2);
+    getItem('GET /api/items/:id/:supplierId - item does not exist', 404, 6);
 
     addItem('POST /api/item - correctly adding an item', 201, i3);
     addItem('POST /api/item - SKUId does not match any SKU', 404, i1_invalid);
@@ -103,13 +103,13 @@ describe('test item apis', () => {
     addItem('POST /api/item - supplier already sells SKU', 422, i3_invalid);
     addItem('POST /api/item - supplier already sells item', 422, i4_invalid);
 
-    modifyItem('PUT /api/item/:id - correctly modify an item', 200, i1.id, newI1);
-    modifyItem('PUT /api/item/:id - item does not exist', 404, 300, newI1);
-    modifyItem('PUT /api/item/:id - price is negative', 422, i1.id, newI1_invalid);
+    modifyItem('PUT /api/item/:id/:supplierId - correctly modify an item', 200, i1.id, newI1);
+    modifyItem('PUT /api/item/:id/:supplierId - item does not exist', 404, 300, newI1);
+    modifyItem('PUT /api/item/:id/:supplierId - price is negative', 422, i1.id, newI1_invalid);
 
-    deleteItem('DELETE /api/items/:id - correctly delete an item', 204, i1.id);
-    deleteItem('DELETE /api/items/:id - passing a negative id', 422, -2);
-    deleteItem('DELETE /api/items/:id - item does not exist', 404, 300);
+    deleteItem('DELETE /api/items/:id/:supplierId - correctly delete an item', 204, i1.id);
+    deleteItem('DELETE /api/items/:id/:supplierId - passing a negative id', 422, -2);
+    deleteItem('DELETE /api/items/:id/:supplierId - item does not exist', 404, 300);
 });
 
 
@@ -142,7 +142,7 @@ function getItem(description, expectedHTTPStatus, id, item=undefined) {
     it(description, async function () {
         try {
             let startTime = performance.now();
-            const r = await agent.get(`/api/items/${id}`);
+            const r = await agent.get(`/api/items/${id}/5`);
             r.should.have.status(expectedHTTPStatus);
             if(r.status == 200) {
                 r.body.id.should.equal(item.id);
@@ -171,7 +171,7 @@ function addItem(description, expectedHTTPStatus, i) {
             if (rInsert.status==201) {
                 // if the insertion was successful, try the deletions
                 startTime = performance.now();
-                const rDelete = await agent.delete(`/api/items/${i.id}`);
+                const rDelete = await agent.delete(`/api/items/${i.id}/5`);
                 rDelete.should.have.status(204);
                 endTime = performance.now();
                 (endTime-startTime).should.lessThanOrEqual(500);
@@ -185,7 +185,7 @@ function modifyItem(description, expectedHTTPStatus, id, newI) {
     it(description, async function () {
         try {
             let startTime = performance.now();
-            const rUpdate = await agent.put(`/api/item/${id}`).send(newI);
+            const rUpdate = await agent.put(`/api/item/${id}/5`).send(newI);
             rUpdate.should.have.status(expectedHTTPStatus);
             let endTime = performance.now();
             (endTime-startTime).should.lessThanOrEqual(500);
@@ -198,7 +198,7 @@ function deleteItem(description, expectedHTTPStatus, id) {
     it(description, async function () {
         try {
             let startTime = performance.now();
-            const r = await agent.delete(`/api/items/${id}`);
+            const r = await agent.delete(`/api/items/${id}/5`);
             r.should.have.status(expectedHTTPStatus);
             let endTime = performance.now();
             (endTime-startTime).should.lessThanOrEqual(500);

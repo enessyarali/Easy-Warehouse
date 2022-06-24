@@ -38,26 +38,26 @@ describe('test return order apis', () => {
     tr3.rfid = "12345678901234567890123456789017";
 
     const ro4 = new RestockOrder(undefined, "2022/05/18 08:53", "COMPLETEDRETURN", 5, undefined);
-    ro4.setProducts([{"SKUId":undefined,"description":"Chiara Ferragni's brand water","price":1000.99,"qty":1},
-                    {"SKUId":undefined,"description":"Banana","price":0.99,"qty":1}]);
-    ro4.setSkuItems([{"SKUId": undefined, "rfid": "12345678901234567890123456789016"}, 
-                            {"SKUId": undefined, "rfid": "12345678901234567890123456789017"}]);
+    ro4.setProducts([{"SKUId":undefined,"description":"Chiara Ferragni's brand water","price":1000.99,"qty":1, "itemId": 3},
+                    {"SKUId":undefined,"description":"Banana","price":0.99,"qty":1, "itemId": 4}]);
+    ro4.setSkuItems([{"SKUId": undefined, "rfid": "12345678901234567890123456789016", "itemId": 3}, 
+                            {"SKUId": undefined, "rfid": "12345678901234567890123456789017", "itemId": 4}]);
 
     const rt = new ReturnOrder(undefined, "2022/05/21", undefined);
-    rt.setProducts([{"SKUId":undefined,"description":"Banana","price":0.99, "RFID": "12345678901234567890123456789017"}]);
+    rt.setProducts([{"SKUId":undefined,"description":"Banana","price":0.99, "RFID": "12345678901234567890123456789017", "itemId": 4}]);
 
     // wrong date format
     const rt1_invalid = new ReturnOrder(undefined, "2022/05/21 8.09", undefined);
-    rt1_invalid.setProducts([{"SKUId":undefined,"description":"Banana","price":0.99, "RFID": "12345678901234567890123456789017"}]);
+    rt1_invalid.setProducts([{"SKUId":undefined,"description":"Banana","price":0.99, "RFID": "12345678901234567890123456789017", "itemId": 4}]);
     // restock order does not exist
     const rt2_invalid = new ReturnOrder(undefined, "2022/05/21", 1000000000);
-    rt2_invalid.setProducts([{"SKUId":undefined,"description":"Banana","price":0.99, "RFID": "12345678901234567890123456789017"}]);
+    rt2_invalid.setProducts([{"SKUId":undefined,"description":"Banana","price":0.99, "RFID": "12345678901234567890123456789017", "itemId": 4}]);
     // restock order id is equal to 0
     const rt3_invalid = new ReturnOrder(undefined, "2022/05/21", 0);
-    rt3_invalid.setProducts([{"SKUId":undefined,"description":"Banana","price":0.99, "RFID": "12345678901234567890123456789017"}]);
+    rt3_invalid.setProducts([{"SKUId":undefined,"description":"Banana","price":0.99, "RFID": "12345678901234567890123456789017", "itemId": 4}]);
     // product has negative price
     const rt4_invalid = new ReturnOrder(undefined, "2022/05/21", undefined);
-    rt4_invalid.setProducts([{"SKUId":undefined,"description":"Banana","price":-0.99, "RFID": "12345678901234567890123456789017"}]);
+    rt4_invalid.setProducts([{"SKUId":undefined,"description":"Banana","price":-0.99, "RFID": "12345678901234567890123456789017", "itemId": 4}]);
 
     // populate the DB
     beforeEach(async () => {
@@ -119,8 +119,8 @@ describe('test return order apis', () => {
         rt1_invalid.restockOrderId = ro4.id;
         rt4_invalid.restockOrderId = ro4.id;
         await agent.put(`/api/restockOrder/${ro4.id}`).send({"newState":"DELIVERED"});
-        await agent.put(`/api/restockOrder/${ro4.id}/skuItems`).send({"skuItems":[{"SKUId": si2.SKUId, "rfid": "12345678901234567890123456789016"},
-                                                        {"SKUId": si4.SKUId, "rfid": "12345678901234567890123456789017"}]});
+        await agent.put(`/api/restockOrder/${ro4.id}/skuItems`).send({"skuItems":[{"SKUId": si2.SKUId, "rfid": "12345678901234567890123456789016", "itemId": 3},
+                                                        {"SKUId": si4.SKUId, "rfid": "12345678901234567890123456789017", "itemId": 4}]});
         await agent.put(`/api/restockOrder/${ro4.id}`).send({"newState":"COMPLETEDRETURN"});
         await agent.post('/api/returnOrder').send(rt);
         const ret = await agent.get('/api/returnOrders');
@@ -207,6 +207,7 @@ function checkProducts(dbRT, expectedRT) {
         p.description.should.equal(expectedRT.products[i].description);
         p.price.should.equal(expectedRT.products[i].price);
         p.RFID.should.equal(expectedRT.products[i].RFID);
+        p.itemId.should.equal(expectedRT.products[i].itemId);
         i++;
     }
 }

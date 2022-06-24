@@ -20,11 +20,12 @@ class ReturnOrder {
 
 class ProductRTO{
     
-    constructor(SKUId, description, price, rfid) {
+    constructor(SKUId, description, price, rfid, itemId) {
         this.SKUId = SKUId;
         this.description = description;
         this.price = price;
         this.RFID = rfid;
+        this.itemId = itemId;
     }
 }
     module.exports ={ReturnOrder : ReturnOrder , ProductRTO : ProductRTO}

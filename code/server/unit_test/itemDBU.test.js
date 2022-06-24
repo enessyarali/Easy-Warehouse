@@ -30,14 +30,20 @@ function testGetItem(db) {
         expect(res.length).to.equal(2); //should return 2 Items
     });
 
-    test('retrieve an Item by Id', async () => {
-        var res = await db.loadItem(1);
+    test('retrieve an Item by Id and supplierId', async () => {
+        var res = await db.loadItem(1, 5);
 
         expect(res[0].id).to.equal(1);
         expect(res[0].description).to.equal('dI1');
         expect(res[0].price).to.equal(1);
         expect(res[0].SKUId).to.equal(1);
         expect(res[0].supplierId).to.equal(5);
+    });
+
+    test('retrieve an Item by Id and supplierId - item not found', async () => {
+        var res = await db.loadItem(1, 1);
+
+        expect(res.length).to.equal(0);
     });
 }
 
@@ -66,7 +72,7 @@ describe('Insert and modify Item', () => {
 function testInsertItem(db) {
     test('Insert a new Item', async () => {
         await db.insertItem(1, 'dI1', 1, 1, 5);
-        var res = await db.loadItem(1);
+        var res = await db.loadItem(1, 5);
 
         //check if the insertion succeded correctly
         expect(res[0].id).to.equal(1);
@@ -80,8 +86,8 @@ function testInsertItem(db) {
 function testUpdateItem(db) {
     test('Update an existing Item', async () => {
         await db.insertItem(2, 'dI2', 1, 2, 5);
-        await db.updateItem(2, 'testItem', 2);
-        var res = await db.loadItem(2);
+        await db.updateItem(2, 'testItem', 2, 5);
+        var res = await db.loadItem(2, 5);
 
         expect(res[0].id).to.equal(2);
         expect(res[0].description).to.equal('testItem');
@@ -112,9 +118,9 @@ describe('Delete Item', () => {
 
 function testDeleteItemById(db) {
     test('Delete an existing Item given its Id', async () => {
-        await db.deleteItem(1);
+        await db.deleteItem(1, 5);
         //try to retrive the just deleted Item
-        var res = await db.loadItem(1);
+        var res = await db.loadItem(1, 5);
         expect(res.length).to.equal(0); //should return nothing
     });
 }
